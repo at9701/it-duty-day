@@ -179,7 +179,7 @@ canvas{box-shadow:0 0 0 1px var(--line),0 4px 0 0 #0a0d12,0 0 40px rgba(95,211,1
     <div class="seg" id="shiftSeg" style="margin-top:6px">
       <button class="on" data-k="day">白班 07–15</button><button data-k="eve">小夜 15–23</button><button data-k="night">大夜 23–07</button><button data-k="hol">假日白班 07–15</button>
     </div>
-    <p class="hint" id="shiftDesc" style="margin-top:4px">電話最多、單位最多、主任在位子上。中餐自己想辦法。</p>
+    <p class="hint" id="shiftDesc" style="margin-top:4px">早上七點到下午三點。門診全開、行政都在、主任坐在隔壁，電話最多的一班。</p>
     <div class="row"><button class="primary" id="next1">下一步 →</button><button id="mapBtn2">先看院區導覽</button></div>
     </div>
     <div id="page2" hidden>
@@ -264,7 +264,7 @@ const BLUEPRINT={
   D1:['er:急診二區'],D2:['er:外傷中心'],D3:['icu'],D4:['icu:內科加護'],D5:['or:開刀房二區'],D6:['ward:產房'],D7:['ward:嬰兒室'],D8:['icu:新生兒加護'],D9:['ward:燒燙傷中心'],D10:['icu:心臟加護'],D11:['lobby:轉送中心'],
   E1:['lobby:教學大樓大廳'],E2:['edu:教室'],E3:['edu:模擬中心'],E4:['research:實驗室'],E5:['research:實驗室二'],E6:['research:動物中心'],E7:['research:生物資料庫'],E8:['research:臨床試驗中心'],E9:['meet:值班宿舍'],E10:['meet:國際會議廳'],E11:['acct:研發處']}},
 };
-const DIFF={easy:{name:'簡單',desc:'一棟樓 12 層、20 幾個單位。第一次玩選這個。',team:[1,2],extra:0},normal:{name:'普通',desc:'兩棟樓、30 幾個單位，病房跟門診分開。',team:[1,3],extra:1},hard:{name:'困難',desc:'三棟樓、40 幾個單位，病房一整棟九層。',team:[1,4],extra:1.5},extreme:{name:'極難',desc:'五棟樓、60 幾個單位，急重症自己一棟。誰來都一樣。',team:[2,6],extra:2}};
+const DIFF={easy:{name:'簡單',desc:'一棟 12 層樓的醫院，20 幾個單位。跑現場不用過棟，第一次玩先選這個。',team:[1,2],extra:0},normal:{name:'普通',desc:'兩棟樓、30 幾個單位。門診檢查在 A 棟，病房急診在 B 棟，要走空橋。',team:[1,3],extra:1},hard:{name:'困難',desc:'三棟樓、40 幾個單位。行政、門診檢查、病房各一棟，病房有九層護理站。',team:[1,4],extra:1.5},extreme:{name:'極難',desc:'五棟樓、60 幾個單位。多了急重症大樓和研究教學大樓，從資訊部走到最遠那間要一個多小時。',team:[2,6],extra:2}};
 const FIXED_IDS=new Set(['office','server','meet','lobby','reg','cashier','cafe','seven','buffet','bento','noodle','tea','hr','acct','ga','pr','edu','exec','vp','er','opd','xray','report','mri','ct','cath','or','ward2','ward3','ward4','ward5','icu','lab','pharmacy','dialysis']);
 function buildWorld(diffKey){const bp=BLUEPRINT[diffKey];FLOORS={};ROOMS={};BLD=bp.bld;BORD=Object.keys(bp.bld).join('');let auto=0;
  for(const key in bp.floors){const b=key[0],f=+key.slice(1);const grid=[];for(let y=0;y<H;y++){grid[y]=[];for(let x=0;x<W;x++)grid[y][x]=(x==0||y==0||x==W-1||y==H-1||y==5)?1:0;}
@@ -1043,15 +1043,15 @@ const RANDOM=[
 function addTask(tt,roomId,title,dur,pat,kind,src,remote){const room=roomById(roomId);const t={id:S.tasks.length,t:tt,room,title,dur,pat,kind,tri:null,remote:!!remote,src,sx:room.x+1+Math.floor(rnd()*(room.w-2)),sy:room.y+1+Math.floor(rnd()*(room.h-2)),state:src==='call'?'ringing':'pending',visitor:src==='visit',ringAt:tt,tries:0,esc:false,assignee:null,prog:0,done:null,late:false,asked:0,mis:0,answeredAt:src==='call'?null:tt,random:true};S.tasks.push(t);return t;}
 const SHIFTS={
  day:{name:'白班',start:7*60,len:480,ev:EV,meal:{label:'午餐',from:270,deadline:420,effFrom:390},pulls:[[150,0,60,'被主任叫去開會'],[360,1,90,'被派去支援其他院區']],open:(id,t)=>id==='seven'||id==='office'||id==='cafe'||t>=270,sleepy:false,
-  desc:'電話最多、單位最多、主任在位子上。中餐自己想辦法。'},
+  desc:'早上七點到下午三點。門診全開、行政都在、主任坐在隔壁，電話最多的一班。'},
  eve:{name:'小夜班',start:15*60,len:480,ev:EV_EVE,meal:{label:'晚餐',from:90,deadline:300,effFrom:270},pulls:[],open:(id,t)=>id==='seven'||id==='office'||(id==='cafe'&&t<180)||(t<360),sleepy:false,
-  desc:'晚診看到九點、急診最忙、行政都下班了。B1 九點關，之後只剩小七。九點的日結批次要盯。'},
+  desc:'下午三點到晚上十一點。晚診看到九點，急診最忙，行政都下班了。B1 店家九點關門，之後只剩小七。晚上九點的日結批次要盯著。'},
  night:{name:'大夜班',start:23*60,len:480,ev:EV_NIGHT,meal:null,pulls:[],open:(id,t)=>id==='seven'||id==='office',sleepy:true,
-  desc:'電話少，排程多：備份、版更、重開、批次監看，大半時間窩在機房。會越來越睏，咖啡有用，代價你知道。只剩小七開著。'},
- office:{name:'上班日',start:8*60+30,len:540,ev:EV,meal:{label:'午餐',from:210,deadline:330,effFrom:300},pulls:[[150,0,60,'被主任叫去開會'],[360,1,90,'被派去支援其他院區']],open:(id,t)=>id==='seven'||id==='office'||id==='cafe'||t>=210,sleepy:false,desc:'08:30 到 17:30。電話最多、單位最多。'},
- officeHol:{name:'假日上班',start:8*60+30,len:540,ev:EV_HOL,meal:{label:'午餐',from:210,deadline:330,effFrom:300},pulls:[],open:(id,t)=>id==='seven'||id==='office'||id==='bento'&&t>=210,sleepy:false,desc:'08:30 到 17:30。只有早診，行政都放假。'},
+  desc:'晚上十一點到早上七點。電話很少，但備份、版更、重開、批次都排在這一班，大半時間窩在機房。會越來越睏，咖啡有用，代價你知道。只剩小七開著。'},
+ office:{name:'上班日',start:8*60+30,len:540,ev:EV,meal:{label:'午餐',from:210,deadline:330,effFrom:300},pulls:[[150,0,60,'被主任叫去開會'],[360,1,90,'被派去支援其他院區']],open:(id,t)=>id==='seven'||id==='office'||id==='cafe'||t>=210,sleepy:false,desc:'早上八點半到下午五點半。門診全開、行政都在，電話最多的一天。'},
+ officeHol:{name:'假日上班',start:8*60+30,len:540,ev:EV_HOL,meal:{label:'午餐',from:210,deadline:330,effFrom:300},pulls:[],open:(id,t)=>id==='seven'||id==='office'||id==='bento'&&t>=210,sleepy:false,desc:'早上八點半到下午五點半。只有早診，行政單位放假，急診照常。'},
  hol:{name:'假日白班',start:7*60,len:480,ev:EV_HOL,meal:{label:'午餐',from:270,deadline:420,effFrom:390},pulls:[],open:(id,t)=>id==='seven'||id==='office'||id==='bento'&&t>=270,sleepy:false,
-  desc:'只有上午診，行政沒人，急診照樣忙。主任在家，但會打電話來。B1 只開小七和便當店。'},
+  desc:'早上七點到下午三點。只有早診，行政單位放假，急診照常忙。主任在家，但會打電話來。B1 只有小七跟便當店有開。'},
 };
 let shiftKey='day';
 const SH=()=>S.shift;
