@@ -183,24 +183,33 @@ canvas{box-shadow:0 0 0 1px var(--line),0 4px 0 0 #0a0d12,0 0 40px rgba(95,211,1
     <div class="row"><button class="primary" id="next1">下一步 →</button><button id="mapBtn2">先看院區導覽</button></div>
     </div>
     <div id="page2" hidden>
-    <div id="secEnv"><div style="margin-top:12px"><b>這間醫院能用的手段</b>（跑現場一定可以）</div>
+    <div id="secEnv"><div style="margin-top:12px"><b>這間醫院有哪些工具可以用？</b></div>
     <div class="seg" id="envSeg" style="margin-top:6px">
       <button class="on" data-e="remote">有遠端工具</button><button class="on" data-e="guide">可以電話教對方弄</button><button class="on" data-e="fwd">分機轉手機</button><button data-e="ticket">有工單系統</button><button class="on" data-e="spare">有備機庫存</button><button class="on" data-e="vendor">廠商維護合約</button><button data-e="nac">全院 802.1X 強制</button>
     </div>
-    <p class="hint" style="margin-top:4px">分機轉手機：關掉的話人不在資訊部就接不到。工單系統：三成的人會自己上系統填單，不會漏接。備機庫存：沒有的話「先換備機」要多跑倉庫 20 分鐘。廠商合約：沒簽的話「叫廠商」要多等半小時。802.1X：有人亂接設備會直接被擋，不會整層斷線，但廠商跟訪客會更常來盧你。遠端：有標「可遠端」的，坐在位子上就能弄。電話教：在哪都能打，講電話的時候別的電話進不來；要講什麼你自己選（一定有「你先重開機看看」），教不教得會看是什麼問題、對方是誰——行政好教，急診跟院長室難教。教不會還是要跑一趟。檢查室跟機房的事電話教不來。</p></div>
+    <div class="hint" style="margin-top:6px;display:grid;grid-template-columns:auto 1fr;gap:3px 10px">
+      <b>遠端工具</b><span>有標「可遠端」的事，坐在位子上就能處理。</span>
+      <b>電話教</b><span>打電話教對方自己弄。要講什麼你選（一定會有「你先重開機看看」），教不教得會要看是什麼問題、對方是誰。教不會還是得跑一趟。檢查室跟機房的事教不來。</span>
+      <b>分機轉手機</b><span>關掉的話，人不在資訊部就接不到電話。</span>
+      <b>工單系統</b><span>大約三成的人會自己上系統填單，不會漏接。</span>
+      <b>備機庫存</b><span>沒有備機的話，「先換備機」要多跑倉庫 20 分鐘。</span>
+      <b>廠商合約</b><span>沒簽約的話，「叫廠商」要多等半小時。</span>
+      <b>802.1X</b><span>有人亂接設備會直接被擋，不會整層斷線，但廠商跟訪客會更常來盧你。</span>
+    </div>
+    <p class="hint" style="margin-top:4px">跑現場不管有沒有勾都可以。</p></div>
     <div style="margin-top:12px"><b>你是</b></div>
     <div class="seg" id="genderSeg" style="margin-top:6px;align-items:center"><button class="on" data-g="m">男生</button><button data-g="f">女生</button><canvas id="pv" width="48" height="48" style="width:72px;height:72px;image-rendering:pixelated;background:#0b0e14;border:1px solid var(--line);border-radius:4px"></canvas><button id="reroll">換個造型</button></div>
-    <div id="secSkills"><div style="margin-top:12px"><b>你會什麼？</b>（最多選 2 個，都不選就是什麼都普通）</div>
+    <div id="secSkills"><div style="margin-top:12px"><b>你比較熟哪一塊？</b>（最多選兩個，不選就是每樣都普通）</div>
     <div class="seg" id="skillSeg" style="margin-top:6px"></div>
-    <p class="hint" id="skillHint" style="margin-top:4px">自己那塊的事做起來快三成，選做法的時候對的那個會標 ★，電話教人也比較教得會。同事會什麼是隨機的。</p></div>
-    <div style="margin-top:12px"><b>你是哪種人？</b>（選 1 個）</div>
+    <p class="hint" id="skillHint" style="margin-top:4px">熟的那塊做起來快三成，選做法的時候對的那個會標 ★，電話教人也比較教得會。同事熟什麼是隨機的。</p></div>
+    <div style="margin-top:12px"><b>你是哪一種人？</b>（選一個）</div>
     <div class="seg" id="traitSeg" style="margin-top:6px"></div>
     <p class="hint" id="traitHint" style="margin-top:4px"></p>
     <div style="margin-top:12px"><b id="teamLabel">今天幾個人上班？</b></div>
     <div class="seg" id="teamSeg" style="margin-top:6px">
       <button class="on" data-n="1">1 人</button><button data-n="2">2 人</button><button data-n="3">3 人</button><button data-n="4">4 人</button>
     </div>
-    <div style="margin-top:12px"><b>上班路上先去小七（錢包 $<span id="budget">300</span>）</b></div>
+    <div style="margin-top:12px"><b>上班路上要不要先去小七？</b><span class="hint">　身上有 $<span id="budget">300</span></span></div>
     <div class="seg" id="preShop" style="margin-top:6px"></div>
     <div class="hint" style="margin-top:6px;display:grid;grid-template-columns:auto 1fr;gap:2px 10px">
       <b>咖啡</b><span>帶著走想喝就喝：90 分鐘內手快 15%，但也比較快想尿尿（1.6 倍）</span>
@@ -210,12 +219,12 @@ canvas{box-shadow:0 0 0 1px var(--line),0 4px 0 0 #0a0d12,0 0 40px rgba(95,211,1
       <b>黃色乖乖</b><span>……顏色買錯會多跳一張「機房不明告警」，除非旁邊有綠色的鎮著</span>
       <b>靠得住</b><span>放機櫃上：你選「先這樣，之後可能再壞」的做法，一半不會再壞</span>
     </div>
-    <p class="hint" style="margin-top:6px">今天身上就 300 塊，中午吃飯、喝提神的都從這裡扣。上班後地圖下面那排會有「喝咖啡」「放乖乖」，乖乖要人在機房才放得了。</p>
-    <div id="lunchOpt"><div style="margin-top:12px"><b>午餐怎麼解決？</b></div>
+    <p class="hint" style="margin-top:6px">今天就這 300 塊，中午吃飯、買提神的都從這裡扣。買了的東西上班後會在地圖下面那排出現「喝咖啡」「放乖乖」的按鈕，乖乖要走到機房才放得了。</p>
+    <div id="lunchOpt"><div style="margin-top:12px"><b>中午打算怎麼吃？</b></div>
     <div class="seg" id="lunchSeg" style="margin-top:6px">
-      <button class="on" data-l="0">中午再下去 B1 買</button><button data-l="1">上班路上先買便當放著</button>
+      <button class="on" data-l="0">中午再下去 B1 買</button><button data-l="1">路上先買個便當放辦公室</button>
     </div>
-    <p class="hint" style="margin-top:4px">小七也賣綠色乖乖和靠得住，買了拿去機房放，告警會少一半、修過的東西比較不會再壞。買錯顏色後果自負。B1 有小七、便當店、自助餐、麵店、手搖飲；C棟大廳有咖啡店；辦公室茶水間有免錢的三合一。提神的喝了手比較快，但也比較會想尿尿，退掉還會累。早上買的便當中午冷掉了，吃 15 分，下午 -5%。</p></div>
+    <p class="hint" style="margin-top:4px">B1 有小七、便當店、自助餐、麵店、手搖飲，C 棟大廳有咖啡店，辦公室茶水間有免錢的三合一。早上買的便當到中午會冷掉，吃 15 分鐘，下午會稍微沒力一點；中午下去買比較熱，但要看那時候有沒有空。</p></div>
     <p class="hint" style="margin-top:8px">同事會自己去接離他最近的，你也可以直接叫他去。不過同事會被叫去開會、被借去別的院區，別太指望。</p>
     <div class="row"><button id="back1">← 上一步</button><button class="primary" id="go">打卡上班</button></div>
     </div>
@@ -768,7 +777,7 @@ const PROC_KEY=[['官網','web'],['機房巡檢','patrol'],['巡檢（排程）'
 function procOf(t){if(t.procKey&&PROC[t.procKey])return PROC[t.procKey];if(t.tri)return null;if(t.kind==='backup')return PROC.backup;for(const [k,v] of PROC_KEY)if(t.title.includes(k))return PROC[v];if(t.src==='sched')return PROC.check;return null;}
 function domOf(t){const p=procOf(t);return p?p.dom:(t.tri?'med':'sys');}
 const SKILLS={sys:{name:'系統／AD',desc:'Windows、AD、帳號權限、伺服器'},net:{name:'網路',desc:'交換器、WiFi、VLAN、PACS 走的路'},sec:{name:'資安',desc:'MDE、SOC 告警、中毒處理、軟體審核'},db:{name:'資料庫',desc:'HIS DB、備份、鎖定與長查詢'},hw:{name:'硬體維修',desc:'開不了機、螢幕、讀卡機、印表機、掃描槍'},app:{name:'應用系統',desc:'HIS 功能、信箱、檔案還原、官網'},med:{name:'醫療設備',desc:'X光／MRI／心導管工作站，分得出電腦還是儀器'}};
-const TRAITS={none:{name:'普通',desc:'做了幾年，不快不慢，沒有學長可以問（自己就是學長）'},talk:{name:'嘴甜',desc:'電話教成功率 ×1.2，民眾來電會提示怎麼回'},fit:{name:'體力好',desc:'走路快 25%，膀胱慢 20%'},vet:{name:'老鳥',desc:'認識總務、儀器組、廠商：選錯的時間代價打七折，出事的後果晚 50% 才來'},caffeine:{name:'咖啡成癮',desc:'提神效果 ×1.5，但膀胱 ×1.3，沒喝的時候 -5%'},rookie:{name:'剛報到',desc:'什麼都慢兩成，但可以打給學長問（+5 分）'}};
+const TRAITS={none:{name:'普通',desc:'做了幾年，不快不慢。沒有學長可以問，因為你就是學長。'},talk:{name:'嘴甜',desc:'很會講。電話教人成功率高兩成，民眾打來問官網的時候會提示你怎麼回。'},fit:{name:'體力好',desc:'走路快四分之一，比較不會想上廁所。'},vet:{name:'老鳥',desc:'總務、儀器組、廠商都認識。選錯做法多花的時間打七折，出事的後果也會晚一點才到。'},caffeine:{name:'咖啡成癮',desc:'咖啡對你特別有用（效果 1.5 倍），但更容易想上廁所，沒喝的時候還會慢一點。'},rookie:{name:'剛報到',desc:'什麼都慢兩成，但選做法的時候可以打給學長問，問一次 5 分鐘。'}};
 function hasSkill(a,d){return a.skills&&a.skills.has(d);}
 function skillMult(a,t){let m=1;if(hasSkill(a,domOf(t)))m*=1.3;if(a.trait==='rookie')m*=0.8;if(a.trait==='caffeine'&&a===S.player&&buffMult()<=1)m*=0.95;return m;}
 const SKILL={};
@@ -1552,7 +1561,7 @@ function drawPreview(){const pc=document.getElementById('pv'),c2=pc.getContext('
 document.getElementById('reroll').onclick=()=>{seed=Date.now()&0x7fffffff;const o={};randomLook(o);playerLook=o.look;drawPreview();};document.querySelectorAll('#genderSeg button[data-g]').forEach(b=>b.onclick=()=>{genderKey=b.dataset.g;document.querySelectorAll('#genderSeg button[data-g]').forEach(x=>x.classList.toggle('on',x===b));drawPreview();});
 document.getElementById('reroll').onclick=()=>{seed=Date.now()&0x7fffffff;const o={};randomLook(o);playerLook=o.look;drawPreview();};
 const pickedSkills=new Set();let traitKey='none';
-(function(){const sg=document.getElementById('skillSeg');for(const k in SKILLS){const b=document.createElement('button');b.textContent=SKILLS[k].name;b.title=SKILLS[k].desc;b.onclick=()=>{if(pickedSkills.has(k))pickedSkills.delete(k);else if(pickedSkills.size<2)pickedSkills.add(k);else return;b.classList.toggle('on',pickedSkills.has(k));document.getElementById('skillHint').textContent=pickedSkills.size?[...pickedSkills].map(x=>SKILLS[x].name+'：'+SKILLS[x].desc).join('　'):'自己領域的單快三成，選做法時正解會標 ★，電話教人也比較準。同事的專長隨機。';};sg.appendChild(b);}
+(function(){const sg=document.getElementById('skillSeg');for(const k in SKILLS){const b=document.createElement('button');b.textContent=SKILLS[k].name;b.title=SKILLS[k].desc;b.onclick=()=>{if(pickedSkills.has(k))pickedSkills.delete(k);else if(pickedSkills.size<2)pickedSkills.add(k);else return;b.classList.toggle('on',pickedSkills.has(k));document.getElementById('skillHint').textContent=pickedSkills.size?[...pickedSkills].map(x=>SKILLS[x].name+'：'+SKILLS[x].desc).join('　'):'熟的那塊做起來快三成，選做法的時候對的那個會標 ★，電話教人也比較教得會。同事熟什麼是隨機的。';};sg.appendChild(b);}
  const tg=document.getElementById('traitSeg');for(const k in TRAITS){const b=document.createElement('button');b.textContent=TRAITS[k].name;b.classList.toggle('on',k==='none');b.onclick=()=>{traitKey=k;[...tg.children].forEach(x=>x.classList.toggle('on',x===b));document.getElementById('traitHint').textContent=TRAITS[k].desc;};tg.appendChild(b);}})();
 let roleKey='duty',specKey='net';
 const nickOf=()=>{const v=(document.getElementById('nick').value||'').trim();return v||'你';};
