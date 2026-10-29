@@ -163,7 +163,12 @@ canvas{box-shadow:0 0 0 1px var(--line),0 4px 0 0 #0a0d12,0 0 40px rgba(95,211,1
     <div class="row" style="margin-top:6px"><input id="nick" type="text" maxlength="8" placeholder="暱稱或姓名（最多 8 字）" style="font-family:var(--sans);font-size:14px;padding:8px 10px;border:1px solid var(--line);border-radius:4px;background:var(--panel2);color:var(--fg);width:220px"></div>
     <div style="margin-top:12px"><b>你是誰？</b></div>
     <div class="seg" id="roleSeg" style="margin-top:6px"><button data-r="newbie">剛到醫院的新人</button><button class="on" data-r="duty">值班人員</button><button data-r="spec">專責工程師</button><button data-r="mgr">主任（主管）</button></div>
-    <p class="hint" id="roleHint" style="margin-top:4px">新人：第一天報到，手腳慢兩成，不會可以打給學長，各單位對你會客氣一點。預設簡單、白班、兩個人。值班的：接電話、跑現場、修東西。專責的：值班搞不定你那塊的會丟上來，加上你自己手上的事。主任：派人、簽字、接投訴、擋院長，底下的人有體力和心情，操過頭會請假。</p>
+    <div class="hint" id="roleHint" style="margin-top:6px;display:grid;grid-template-columns:auto 1fr;gap:3px 10px">
+      <b>新人</b><span>第一天報到。動作比較慢，不會的可以打給學長，各單位也會對你客氣一點。</span>
+      <b>值班人員</b><span>電話進來你接，哪裡壞了你去，什麼都要會一點。</span>
+      <b>專責工程師</b><span>你負責一個領域（網路、資安、資料庫、系統、程式或 PACS）。值班同事遇到你領域的問題會轉給你，你自己也有該做的事。</span>
+      <b>主任</b><span>不太需要自己修，但要派人、簽核、接投訴，還要幫底下的人擋院長。同事會累、會不爽，操過頭會請假。</span>
+    </div>
     <div id="secSpec" hidden><div style="margin-top:12px"><b>哪一種工程師？</b></div>
     <div class="seg" id="specSeg" style="margin-top:6px"></div>
     <p class="hint" id="specHint" style="margin-top:4px"></p></div>
@@ -830,12 +835,12 @@ function tickGuide(dtMin){const P=S.player,g=P.guide;g.remain-=dtMin;S.phoneMin+
 function beginWork(t){const a=S.player;if(a.busy&&a.busy.task!==t)cancelBusy(a);S.tasks.forEach(x=>{if(x!==t&&x.assignee===a&&x.state==='pending'&&!(a.guide&&a.guide.task===x))x.assignee=null;});t.assignee=a;a.busy={task:t};a.path=[];a.steps=[];}
 // ---- 專責工程師：各領域的單與決策樹 ----
 const SPEC={
- dev:{name:'程式開發',dom:'app',desc:'HIS 功能、使用者需求、上版、官網。值班的人碰到「系統問題」會丟給你。'},
- net:{name:'網路',dom:'net',desc:'交換器、WiFi、VLAN、防火牆規則、廠商接網路。整層慢、PACS 斷都找你。'},
- sec:{name:'資安',dom:'sec',desc:'SOC 告警、中毒、弱掃、釣魚信、稽核。簽錯一個，今天提早結束。'},
- db:{name:'資料庫',dom:'db',desc:'備份、DB 慢、資料修正單、報表、空間。一張修正單改錯就是病歷。'},
- sys:{name:'系統負責人',dom:'sys',desc:'AD、伺服器、憑證、更新排程、新機上線。帳號權限的事都是你的。'},
- pacs:{name:'PACS 系統',dom:'med',desc:'影像傳輸、工作站、DICOM、儲存。你管的是電腦和線，儀器本身是儀器組的，但每一通電話都要你先分清楚。'},
+ dev:{name:'程式開發',dom:'app',desc:'HIS 功能、使用者需求、上版、官網。值班遇到系統畫面的問題會找你。'},
+ net:{name:'網路',dom:'net',desc:'交換器、WiFi、VLAN、防火牆、廠商要接網路。整層變慢、PACS 斷線都會找你。'},
+ sec:{name:'資安',dom:'sec',desc:'SOC 告警、中毒、弱掃、釣魚信、稽核。簽錯一張，今天可能提早結束。'},
+ db:{name:'資料庫',dom:'db',desc:'備份、資料庫變慢、資料修正單、報表、空間不夠。修正單改錯，動到的是病歷。'},
+ sys:{name:'系統負責人',dom:'sys',desc:'AD、伺服器、憑證、更新排程、新機上線。帳號跟權限的事都歸你。'},
+ pacs:{name:'PACS 系統',dom:'med',desc:'影像傳輸、工作站、DICOM、儲存。電腦跟線是你的，儀器本身是儀器組的，但每通電話都要你先分出是哪一邊。'},
 };
 Object.assign(PROC,{
  patrol:{dom:'sys',start:'a',a:{q:'機房巡檢。拿著表進去，先看什麼？',opts:[['溫濕度、UPS 負載與電池狀態、每個機櫃的告警燈、昨晚備份結果、門禁紀錄，逐項簽',1,0,'','巡檢表每一欄都有理由，缺一欄就是一個沒人看到的告警。','b'],['看溫度正常就簽名',0,0,'rep','UPS 電池告警燈亮了三天沒人看。',null],['拍一張照片回辦公室慢慢看',2,5,'','照片看不到告警燈閃。',null]]},b:{q:'第三排有一台伺服器前面板橘燈亮。',opts:[['查是哪台、看管理介面的硬體告警（硬碟／電源／風扇），開單通知負責人',1,0,'','橘燈是硬體有東西壞了還在撐，今天不處理，下週可能就直接倒。',null],['記在表上就好',0,0,'rep','沒人會看那張表。',null]]}},
