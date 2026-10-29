@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="像素風模擬：醫院資訊部值班的一天。值班人員／專責工程師／主任三種角色，1–5 棟樓，接電話、跑現場、做決定、看後果。">
+<meta name="description" content="像素風模擬：醫院資訊單位人員的一天。值班人員／專責工程師／主任三種角色，1–5 棟樓，接電話、跑現場、做決定、看後果。給新人練判斷，給主管看人力。">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}img{max-width:100%}</style>
 </head>
 <body>
-<title>資訊部值班的一天</title>
+<title>醫院資訊單位人員的一天</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
 <style>
@@ -155,8 +155,10 @@ canvas{box-shadow:0 0 0 1px var(--line),0 4px 0 0 #0a0d12,0 0 40px rgba(95,211,1
 
 <div class="overlay" id="start">
   <div class="box">
-    <h2>資訊部值班的一天</h2>
-    <p>三個來源：電話（接了才知道）、主任交辦、沒人接被轉上去的。走現場、修東西、吃飯、上廁所、接投訴。下班看評語和分數。</p>
+    <h2>醫院資訊單位人員的一天</h2>
+    <p>一間醫院，幾棟樓、幾十個單位、上千台電腦，今天由你顧。護理站給藥車斷線、院長投影機接不上、急診檢傷台當機、廠商帶筆電要接網路、民眾打來問官網為什麼掛了——這些事不會排隊，會同時來。</p>
+    <p>你可以當值班人員（接電話、跑現場、修東西）、專責工程師（網路、資安、資料庫、系統、程式、PACS，接值班升級上來的事）或主任（派人、簽核、接投訴、扛院長）。每一通電話你要選怎麼回、每一件事你要選怎麼做，選錯了後果一兩個小時後會回來找你。</p>
+    <p class="hint">給新人：這是一天的縮影，練的是判斷和底線，不是手。給主管：換人數、換難度各跑一次，分數和投訴自己會說話。一班約 15–30 分鐘。</p>
     <div id="page1">
     <div style="margin-top:12px"><b>你叫什麼？</b></div>
     <div class="row" style="margin-top:6px"><input id="nick" type="text" maxlength="8" placeholder="暱稱或姓名（最多 8 字）" style="font-family:var(--sans);font-size:14px;padding:8px 10px;border:1px solid var(--line);border-radius:4px;background:var(--panel2);color:var(--fg);width:220px"></div>
