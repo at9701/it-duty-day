@@ -134,21 +134,21 @@ canvas{box-shadow:0 0 0 1px var(--line),0 4px 0 0 #0a0d12,0 0 40px rgba(95,211,1
     <canvas id="c" width="768" height="352"></canvas>
     <div class="transit" id="transit" hidden></div>
     <div class="toast" id="toast"></div>
-    <div class="actbar" id="actbar" style="margin-top:8px"><span class="lab">現在可以</span><span class="bodyBtns" id="bodyBtns"></span><span class="hint" id="actHint">走到小七、機房、廁所，或帶著東西，這裡會出現能做的事</span></div>
+    <div class="actbar" id="actbar" style="margin-top:8px"><span class="lab">現在可以</span><span class="bodyBtns" id="bodyBtns"></span><span class="hint" id="actHint">走到小七、機房、廁所，或身上有帶東西，這裡才會有東西可以按</span></div>
   </div>
 </div>
 
 <div class="panel" id="teamPanel" hidden>
-  <h3>人力板 <span class="hint">血條掉到 0 會請假回家；心情太差會不接單。</span><span class="spacer"></span><button id="autoBtn">自動派單：關</button></h3>
+  <h3>人力板 <span class="hint">體力歸零會請假回家；心情太差會跟你說他在忙。</span><span class="spacer"></span><button id="autoBtn">自動派單：關</button></h3>
   <div class="list" id="team"></div>
 </div>
 <div class="bottom">
   <div class="panel" id="callPanel" hidden>
-    <h3>來電 <span class="hint">人在資訊部就會接；在外面用手機接要停 2 分鐘。響 10 分鐘沒接算漏接，對方會再打一次，再沒接就直接找主任了。</span></h3>
+    <h3>來電 <span class="hint">人在資訊部分機就接了；在外面用手機接要停 2 分鐘。響 10 分鐘沒人接算漏接，對方會再打一次，再沒接他就直接找主任了。</span></h3>
     <div class="list" id="calls"></div>
   </div>
   <div class="panel">
-    <h3>工單 <span class="hint" id="where">點工單會自己走過去（含電梯／樓梯／空橋）；點地圖走路；到了按「處理」</span></h3>
+    <h3>工單 <span class="hint" id="where">點工單人會自己走過去（會搭電梯、走樓梯、過空橋）；點地圖也能走；到了按「處理」或空白鍵</span></h3>
     <div class="list" id="list"></div>
   </div>
 </div>
@@ -156,15 +156,15 @@ canvas{box-shadow:0 0 0 1px var(--line),0 4px 0 0 #0a0d12,0 0 40px rgba(95,211,1
 <div class="overlay" id="start">
   <div class="box">
     <h2>醫院資訊單位人員的一天</h2>
-    <p>一間醫院，幾棟樓、幾十個單位、上千台電腦，今天由你顧。護理站給藥車斷線、院長投影機接不上、急診檢傷台當機、廠商帶筆電要接網路、民眾打來問官網為什麼掛了——這些事不會排隊，會同時來。</p>
-    <p>你可以當值班人員（接電話、跑現場、修東西）、專責工程師（網路、資安、資料庫、系統、程式、PACS，接值班升級上來的事）或主任（派人、簽核、接投訴、扛院長）。每一通電話你要選怎麼回、每一件事你要選怎麼做，選錯了後果一兩個小時後會回來找你。</p>
-    <p class="hint">給新人：這是一天的縮影，練的是判斷和底線，不是手。給主管：換人數、換難度各跑一次，分數和投訴自己會說話。一班約 15–30 分鐘。</p>
+    <p>整間醫院的電腦今天都歸你管。護理站說給藥車又斷線、院長室投影機接不上、急診檢傷台當掉、廠商拎著筆電說要接一下網路、民眾打來罵官網進不去……這些不會一件一件來，是一起來。</p>
+    <p>你可以選當值班的（電話一直響、到處跑、什麼都要會一點）、專責的（網路、資安、DB、系統、程式、PACS，值班搞不定的會丟給你）、或是主任（派人、簽字、被投訴、幫底下的人擋院長）。電話怎麼回、事情怎麼處理都是你決定，選錯了，過一兩個小時它會回來找你。</p>
+    <p class="hint">新人玩：練的是遇到事情先想什麼、什麼不能做，不是練手。主管玩：1 個人跑一次、3 個人跑一次，分數跟投訴數自己看。一班大概 15 到 30 分鐘。</p>
     <div id="page1">
     <div style="margin-top:12px"><b>你叫什麼？</b></div>
     <div class="row" style="margin-top:6px"><input id="nick" type="text" maxlength="8" placeholder="暱稱或姓名（最多 8 字）" style="font-family:var(--sans);font-size:14px;padding:8px 10px;border:1px solid var(--line);border-radius:4px;background:var(--panel2);color:var(--fg);width:220px"></div>
     <div style="margin-top:12px"><b>你是誰？</b></div>
     <div class="seg" id="roleSeg" style="margin-top:6px"><button data-r="newbie">剛到醫院的新人</button><button class="on" data-r="duty">值班人員</button><button data-r="spec">專責工程師</button><button data-r="mgr">主任（主管）</button></div>
-    <p class="hint" id="roleHint" style="margin-top:4px">新人：第一天上班，什麼都慢兩成，但可以打給學長問、單位對你比較客氣，預設簡單難度、白班、2 個人。值班人員：接電話、跑現場、修東西。專責工程師：值班的人處理不了你那個領域的事會升級給你，加上你自己的單。主任：派單、簽核、接投訴、扛院長，同事有血條和心情。</p>
+    <p class="hint" id="roleHint" style="margin-top:4px">新人：第一天報到，手腳慢兩成，不會可以打給學長，各單位對你會客氣一點。預設簡單、白班、兩個人。值班的：接電話、跑現場、修東西。專責的：值班搞不定你那塊的會丟上來，加上你自己手上的事。主任：派人、簽字、接投訴、擋院長，底下的人有體力和心情，操過頭會請假。</p>
     <div id="secSpec" hidden><div style="margin-top:12px"><b>哪一種工程師？</b></div>
     <div class="seg" id="specSeg" style="margin-top:6px"></div>
     <p class="hint" id="specHint" style="margin-top:4px"></p></div>
@@ -175,7 +175,7 @@ canvas{box-shadow:0 0 0 1px var(--line),0 4px 0 0 #0a0d12,0 0 40px rgba(95,211,1
     <div class="seg" id="shiftSeg" style="margin-top:6px">
       <button class="on" data-k="day">白班 07–15</button><button data-k="eve">小夜 15–23</button><button data-k="night">大夜 23–07</button><button data-k="hol">假日白班 07–15</button>
     </div>
-    <p class="hint" id="shiftDesc" style="margin-top:4px">電話最多、單位最多、主任在位子上。午餐自己想辦法。</p>
+    <p class="hint" id="shiftDesc" style="margin-top:4px">電話最多、單位最多、主任在位子上。中餐自己想辦法。</p>
     <div class="row"><button class="primary" id="next1">下一步 →</button><button id="mapBtn2">先看院區導覽</button></div>
     </div>
     <div id="page2" hidden>
@@ -183,12 +183,12 @@ canvas{box-shadow:0 0 0 1px var(--line),0 4px 0 0 #0a0d12,0 0 40px rgba(95,211,1
     <div class="seg" id="envSeg" style="margin-top:6px">
       <button class="on" data-e="remote">有遠端工具</button><button class="on" data-e="guide">可以電話教對方弄</button><button class="on" data-e="fwd">分機轉手機</button><button data-e="ticket">有工單系統</button><button class="on" data-e="spare">有備機庫存</button><button class="on" data-e="vendor">廠商維護合約</button><button data-e="nac">全院 802.1X 強制</button>
     </div>
-    <p class="hint" style="margin-top:4px">分機轉手機：關了就只有人在資訊部才接得到。工單系統：三成的電話會改成自己填單，不會漏接。備機庫存：沒有的話「先換備機」要多等 20 分。廠商合約：沒有的話「叫廠商」要多等 30 分。802.1X：私接設備會被擋掉不會斷整層，但廠商和訪客會更常來煩你。遠端：標「可遠端」的單，坐在資訊部就能解。電話教：在哪都能打，講的時候別的電話接不到；你要選講什麼（永遠有「你先重開機看看」），成不成看問題種類和對方——行政好教、急診和院長室難教。教不會還是要跑。檢查室和機房的事不能用電話教。</p></div>
+    <p class="hint" style="margin-top:4px">分機轉手機：關掉的話人不在資訊部就接不到。工單系統：三成的人會自己上系統填單，不會漏接。備機庫存：沒有的話「先換備機」要多跑倉庫 20 分鐘。廠商合約：沒簽的話「叫廠商」要多等半小時。802.1X：有人亂接設備會直接被擋，不會整層斷線，但廠商跟訪客會更常來盧你。遠端：有標「可遠端」的，坐在位子上就能弄。電話教：在哪都能打，講電話的時候別的電話進不來；要講什麼你自己選（一定有「你先重開機看看」），教不教得會看是什麼問題、對方是誰——行政好教，急診跟院長室難教。教不會還是要跑一趟。檢查室跟機房的事電話教不來。</p></div>
     <div style="margin-top:12px"><b>你是</b></div>
     <div class="seg" id="genderSeg" style="margin-top:6px;align-items:center"><button class="on" data-g="m">男生</button><button data-g="f">女生</button><canvas id="pv" width="48" height="48" style="width:72px;height:72px;image-rendering:pixelated;background:#0b0e14;border:1px solid var(--line);border-radius:4px"></canvas><button id="reroll">換個造型</button></div>
     <div id="secSkills"><div style="margin-top:12px"><b>你會什麼？</b>（最多選 2 個，都不選就是什麼都普通）</div>
     <div class="seg" id="skillSeg" style="margin-top:6px"></div>
-    <p class="hint" id="skillHint" style="margin-top:4px">自己領域的單快三成，選做法時正解會標 ★，電話教人也比較準。同事的專長隨機。</p></div>
+    <p class="hint" id="skillHint" style="margin-top:4px">自己那塊的事做起來快三成，選做法的時候對的那個會標 ★，電話教人也比較教得會。同事會什麼是隨機的。</p></div>
     <div style="margin-top:12px"><b>你是哪種人？</b>（選 1 個）</div>
     <div class="seg" id="traitSeg" style="margin-top:6px"></div>
     <p class="hint" id="traitHint" style="margin-top:4px"></p>
@@ -199,20 +199,20 @@ canvas{box-shadow:0 0 0 1px var(--line),0 4px 0 0 #0a0d12,0 0 40px rgba(95,211,1
     <div style="margin-top:12px"><b>上班路上先去小七（錢包 $<span id="budget">300</span>）</b></div>
     <div class="seg" id="preShop" style="margin-top:6px"></div>
     <div class="hint" style="margin-top:6px;display:grid;grid-template-columns:auto 1fr;gap:2px 10px">
-      <b>咖啡</b><span>帶著走，隨時喝：90 分鐘內手快 15%，但膀胱也快 1.6 倍</span>
-      <b>蠻牛</b><span>60 分鐘手快 30%，膀胱 2 倍，退掉後累 40 分鐘（-15%）</span>
-      <b>無糖綠茶</b><span>溫和：+5% 60 分鐘，膀胱 1.3 倍</span>
-      <b>綠色乖乖</b><span>拿到機房放在機櫃上：機房告警（UPS、溫度、DB 慢、批次異常）有一半會「自己好了」</span>
-      <b>黃色乖乖</b><span>……買錯顏色會多一張「機房不明告警」，除非旁邊有綠色的壓著</span>
-      <b>靠得住</b><span>放機櫃上：你選「可以但之後會再壞」的做法，有一半不會再壞</span>
+      <b>咖啡</b><span>帶著走想喝就喝：90 分鐘內手快 15%，但也比較快想尿尿（1.6 倍）</span>
+      <b>蠻牛</b><span>60 分鐘手快 30%，尿意 2 倍，退了之後會累 40 分鐘（-15%）</span>
+      <b>無糖綠茶</b><span>溫和一點：+5% 撐 60 分鐘，尿意 1.3 倍</span>
+      <b>綠色乖乖</b><span>拿去機房放機櫃上：機房的告警（UPS、溫度、DB 變慢、批次跳錯）一半會自己好</span>
+      <b>黃色乖乖</b><span>……顏色買錯會多跳一張「機房不明告警」，除非旁邊有綠色的鎮著</span>
+      <b>靠得住</b><span>放機櫃上：你選「先這樣，之後可能再壞」的做法，一半不會再壞</span>
     </div>
-    <p class="hint" style="margin-top:6px">今天的錢就這些（$300），中午和提神的也從這裡出。上班後 HUD 右上會有「喝咖啡」「放乖乖」的按鈕，乖乖要人在機房才能放。</p>
+    <p class="hint" style="margin-top:6px">今天身上就 300 塊，中午吃飯、喝提神的都從這裡扣。上班後地圖下面那排會有「喝咖啡」「放乖乖」，乖乖要人在機房才放得了。</p>
     <div id="lunchOpt"><div style="margin-top:12px"><b>午餐怎麼解決？</b></div>
     <div class="seg" id="lunchSeg" style="margin-top:6px">
       <button class="on" data-l="0">中午再下去 B1 買</button><button data-l="1">上班路上先買便當放著</button>
     </div>
     <p class="hint" style="margin-top:4px">小七也賣綠色乖乖和靠得住，買了拿去機房放，告警會少一半、修過的東西比較不會再壞。買錯顏色後果自負。B1 有小七、便當店、自助餐、麵店、手搖飲；C棟大廳有咖啡店；辦公室茶水間有免錢的三合一。提神的喝了手比較快，但也比較會想尿尿，退掉還會累。早上買的便當中午冷掉了，吃 15 分，下午 -5%。</p></div>
-    <p class="hint" style="margin-top:8px">同事會自己去接最近的單，你也可以直接指派。不過同事會被叫去開會、被借去別院區，別太指望。</p>
+    <p class="hint" style="margin-top:8px">同事會自己去接離他最近的，你也可以直接叫他去。不過同事會被叫去開會、被借去別的院區，別太指望。</p>
     <div class="row"><button id="back1">← 上一步</button><button class="primary" id="go">打卡上班</button></div>
     </div>
   </div>
@@ -260,7 +260,7 @@ const BLUEPRINT={
   D1:['er:急診二區'],D2:['er:外傷中心'],D3:['icu'],D4:['icu:內科加護'],D5:['or:開刀房二區'],D6:['ward:產房'],D7:['ward:嬰兒室'],D8:['icu:新生兒加護'],D9:['ward:燒燙傷中心'],D10:['icu:心臟加護'],D11:['lobby:轉送中心'],
   E1:['lobby:教學大樓大廳'],E2:['edu:教室'],E3:['edu:模擬中心'],E4:['research:實驗室'],E5:['research:實驗室二'],E6:['research:動物中心'],E7:['research:生物資料庫'],E8:['research:臨床試驗中心'],E9:['meet:值班宿舍'],E10:['meet:國際會議廳'],E11:['acct:研發處']}},
 };
-const DIFF={easy:{name:'簡單',desc:'一棟樓 12 層，20 個單位。適合新人第一次。',team:[1,2],extra:0},normal:{name:'普通',desc:'兩棟樓，30 個單位。',team:[1,3],extra:1},hard:{name:'困難',desc:'三棟樓，40 個單位，病房九層。',team:[1,4],extra:1.5},extreme:{name:'極難',desc:'五棟樓，60 個單位，急重症一整棟。換誰來都一樣。',team:[2,6],extra:2}};
+const DIFF={easy:{name:'簡單',desc:'一棟樓 12 層、20 幾個單位。第一次玩選這個。',team:[1,2],extra:0},normal:{name:'普通',desc:'兩棟樓、30 幾個單位，病房跟門診分開。',team:[1,3],extra:1},hard:{name:'困難',desc:'三棟樓、40 幾個單位，病房一整棟九層。',team:[1,4],extra:1.5},extreme:{name:'極難',desc:'五棟樓、60 幾個單位，急重症自己一棟。誰來都一樣。',team:[2,6],extra:2}};
 const FIXED_IDS=new Set(['office','server','meet','lobby','reg','cashier','cafe','seven','buffet','bento','noodle','tea','hr','acct','ga','pr','edu','exec','vp','er','opd','xray','report','mri','ct','cath','or','ward2','ward3','ward4','ward5','icu','lab','pharmacy','dialysis']);
 function buildWorld(diffKey){const bp=BLUEPRINT[diffKey];FLOORS={};ROOMS={};BLD=bp.bld;BORD=Object.keys(bp.bld).join('');let auto=0;
  for(const key in bp.floors){const b=key[0],f=+key.slice(1);const grid=[];for(let y=0;y<H;y++){grid[y]=[];for(let x=0;x<W;x++)grid[y][x]=(x==0||y==0||x==W-1||y==H-1||y==5)?1:0;}
@@ -1039,13 +1039,13 @@ const RANDOM=[
 function addTask(tt,roomId,title,dur,pat,kind,src,remote){const room=roomById(roomId);const t={id:S.tasks.length,t:tt,room,title,dur,pat,kind,tri:null,remote:!!remote,src,sx:room.x+1+Math.floor(rnd()*(room.w-2)),sy:room.y+1+Math.floor(rnd()*(room.h-2)),state:src==='call'?'ringing':'pending',visitor:src==='visit',ringAt:tt,tries:0,esc:false,assignee:null,prog:0,done:null,late:false,asked:0,mis:0,answeredAt:src==='call'?null:tt,random:true};S.tasks.push(t);return t;}
 const SHIFTS={
  day:{name:'白班',start:7*60,len:480,ev:EV,meal:{label:'午餐',from:270,deadline:420,effFrom:390},pulls:[[150,0,60,'被主任叫去開會'],[360,1,90,'被派去支援其他院區']],open:(id,t)=>id==='seven'||id==='office'||id==='cafe'||t>=270,sleepy:false,
-  desc:'電話最多、單位最多、主任在位子上。午餐自己想辦法。'},
+  desc:'電話最多、單位最多、主任在位子上。中餐自己想辦法。'},
  eve:{name:'小夜班',start:15*60,len:480,ev:EV_EVE,meal:{label:'晚餐',from:90,deadline:300,effFrom:270},pulls:[],open:(id,t)=>id==='seven'||id==='office'||(id==='cafe'&&t<180)||(t<360),sleepy:false,
   desc:'晚診看到九點、急診最忙、行政都下班了。B1 九點關，之後只剩小七。九點的日結批次要盯。'},
  night:{name:'大夜班',start:23*60,len:480,ev:EV_NIGHT,meal:null,pulls:[],open:(id,t)=>id==='seven'||id==='office',sleepy:true,
   desc:'電話少，排程多：備份、版更、重開、批次監看，大半時間窩在機房。會越來越睏，咖啡有用，代價你知道。只剩小七開著。'},
- office:{name:'上班日',start:8*60+30,len:540,ev:EV,meal:{label:'午餐',from:210,deadline:330,effFrom:300},pulls:[[150,0,60,'被主任叫去開會'],[360,1,90,'被派去支援其他院區']],open:(id,t)=>id==='seven'||id==='office'||id==='cafe'||t>=210,sleepy:false,desc:'08:30–17:30。電話最多、單位最多。'},
- officeHol:{name:'假日上班',start:8*60+30,len:540,ev:EV_HOL,meal:{label:'午餐',from:210,deadline:330,effFrom:300},pulls:[],open:(id,t)=>id==='seven'||id==='office'||id==='bento'&&t>=210,sleepy:false,desc:'08:30–17:30。只有上午診，行政沒人。'},
+ office:{name:'上班日',start:8*60+30,len:540,ev:EV,meal:{label:'午餐',from:210,deadline:330,effFrom:300},pulls:[[150,0,60,'被主任叫去開會'],[360,1,90,'被派去支援其他院區']],open:(id,t)=>id==='seven'||id==='office'||id==='cafe'||t>=210,sleepy:false,desc:'08:30 到 17:30。電話最多、單位最多。'},
+ officeHol:{name:'假日上班',start:8*60+30,len:540,ev:EV_HOL,meal:{label:'午餐',from:210,deadline:330,effFrom:300},pulls:[],open:(id,t)=>id==='seven'||id==='office'||id==='bento'&&t>=210,sleepy:false,desc:'08:30 到 17:30。只有早診，行政都放假。'},
  hol:{name:'假日白班',start:7*60,len:480,ev:EV_HOL,meal:{label:'午餐',from:270,deadline:420,effFrom:390},pulls:[],open:(id,t)=>id==='seven'||id==='office'||id==='bento'&&t>=270,sleepy:false,
   desc:'只有上午診，行政沒人，急診照樣忙。主任在家，但會打電話來。B1 只開小七和便當店。'},
 };
