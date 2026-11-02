@@ -1,17 +1,28 @@
 # 請來體驗看看——當醫院資訊人員的一天
 
-像素風模擬遊戲：醫院資訊單位人員的一天——值班人員、專責工程師（網路／資安／資料庫／系統／程式／PACS）、主任三種角色。給新人練判斷與底線，給主管看人力配置的差異。單一 HTML，無後端。
+模擬遊戲：醫院資訊單位人員的一天。角色有剛到醫院的新人、值班人員、專責工程師（網路／資安／資料庫／系統／程式／PACS）、主任。給新人練判斷與底線，給主管看人力配置的差異。單一 HTML，無後端。
+
+- **3D 版（首頁）**：`index.html`。Three.js 與字型已內嵌，院內電腦不用連外網也能玩。
+- **2D 像素版**：`2d/index.html`。電腦比較舊、3D 跑不動時用這個。
+
+兩個版本用同一套事件、做法選單、因果與評分；3D 版的地圖較大，走路速度已校準成跟 2D 花一樣的遊戲時間。
 
 ## 部署到 GitHub Pages
-1. 建一個 repo（例如 `it-duty-day`），把 `index.html` 放在根目錄
-2. Settings → Pages → Source 選 `Deploy from a branch`，Branch 選 `main` / `(root)`
-3. 幾分鐘後網址是 `https://<你的帳號>.github.io/it-duty-day/`
+1. Settings → Pages → Source 選 `Deploy from a branch`，Branch 選 `main` / `(root)`
+2. 3D：`https://<帳號>.github.io/it-duty-day/`；2D：`https://<帳號>.github.io/it-duty-day/2d/`
 
-## 改內容
+## 3D 版功能
+- 開場是院區外觀，選醫院大小後大樓數會跟著變（1／2／3／5 棟）
+- 各單位照實際格局：門診診間、開放式病房與護理站、加護病房雙層門、開刀房更衣區、急診分區、影像鉛牆機房、核醫、內視鏡、心導管等
+- 工單會標在實際設備上（讀卡機、印表機、AP、電腦推車、工作站…）
+- 結算可以列印檢討單、下載檢討單（網頁檔）、下載 CSV，給帶新人的學長對照討論
+
+## 改內容（兩版共用的資料）
 - 事件腳本：`EV`（白班）、`EV_EVE`、`EV_NIGHT`、`EV_HOL`、`SPEC_EV`（各專責）
 - 做法選單：`PROC`（每類問題的決策樹）、`DEEPEN` / `DEEPEN2`（補充選項）
 - 電話教：`GUIDE`；釐清題：`TRIAGE`；後果：`CONSEQ`；壞結局：`ENDINGS`
 - 樓層與單位：`BLUEPRINT`（四個難度）、`UNIT`、`TPL`（額外單位的工單模板）
 - 小七／美食街菜單：`MENU`；專長與特質：`SKILLS`、`TRAITS`
+- 3D 版另外有：工單對應設備的規則 `DEVRULES`
 
-字型來自 Google Fonts（Press Start 2P），離線時會退回系統等寬字。
+做法選單的答案是遊戲預設，請以院內 SOP 為準。
