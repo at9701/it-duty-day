@@ -302,9 +302,9 @@ function tickNPCs(dt){const F=FLOORS[viewKey()];if(!F||!F.npcs)return;const now=
  const r=a.room;const tx=r.x+1+Math.floor(rnd()*(r.w-2)),ty=r.y+1+Math.floor(rnd()*(r.h-2));const p=bfs(a.key,a.x,a.y,tx,ty);if(p&&p.length<8){a.path=p;a.steps=[{type:'walk',x:tx,y:ty}];}});}
 // 額外單位的任務模板（固定 id 以外的單位，依 base 抽）
 const TPL={
- ward:[['給藥車平板連不到 WiFi',15,45],['護理師帳號被鎖',5,30,'normal',1],['整站印表機不印',15,50],['護理站電腦當機',15,45],['給藥車電腦斷線',15,45]],
- icu:[['中央監視站電腦當機',15,20,'prio'],['護理師帳號被鎖',5,30,'normal',1],['印表機不印',10,40]],
- opd:[['診間電腦開不了機',15,40],['讀卡機讀不到健保卡',10,40],['診間螢幕閃爍',10,60],['整層 HIS 開藥很慢',20,40],['處方列印不出',10,30,'prio']],
+ ward:[['給藥車平板連不到 WiFi',15,45],['整層網路時好時壞',25,25,'prio'],['護理師帳號被鎖',5,30,'normal',1],['整站印表機不印',15,50],['護理站電腦當機',15,45],['給藥車電腦斷線',15,45]],
+ icu:[['中央監視站電腦當機',15,20,'prio'],['中央監視站收不到幾床床邊機的資料',20,20,'prio'],['護理師帳號被鎖',5,30,'normal',1],['印表機不印',10,40]],
+ opd:[['診間電腦開不了機',15,40],['診間電腦網路不通',15,40],['讀卡機讀不到健保卡',10,40],['診間螢幕閃爍',10,60],['整層 HIS 開藥很慢',20,40],['處方列印不出',10,30,'prio']],
  er:[['檢傷台電腦當機',15,30,'prio'],['無線掃描槍連不上',10,35],['急診護理站印表機不印',10,40]],
  lab:[['檢驗儀器報告傳不到 LIS',15,40,'normal',0,'lab'],['條碼印表機不印',10,40],['檢驗科電腦當機',15,45]],
  pharmacy:[['自動包藥機的電腦當機',15,25,'prio'],['藥袋印表機不印',10,30],['藥局 HIS 很慢',20,40]],
@@ -469,7 +469,7 @@ const PROC={
    ['等它自己好',0,0,'rep+poweroff','停電就知道了。',null]]}},
  virus:{dom:'sec',start:'a',
   a:{q:'急診護理站電腦跳中毒警示。',opts:[
-   ['拔網路線、不要關機、拍下畫面',1,0,'','拔網路線是怕擴散，不關機是要留現場。','b'],
+   ['從 MDE 下隔離（或直接拔網路線），不要關機、拍下畫面',1,0,'','隔離是怕擴散，不關機是要留現場。','b'],
    ['跑一次掃毒繼續用',0,0,'sec+spread','跳警示代表可能已經執行了。',null],
    ['直接重灌',0,45,'data','重灌下去，要查的東西全沒了。',null]]},
   b:{q:'斷網了。護理師問「我還能用嗎？」',opts:[
@@ -494,11 +494,11 @@ const PROC={
    ['請主管補簽 VPN 申請，先開有簽的',1,0,'','口頭講的之後對不起帳，要有簽核。',null],
    ['先開，之後補單',0,0,'sec','「之後補」通常就沒有之後了。',null]]}},
  update:{dom:'med',start:'a',
-  a:{q:'心導管室工作站要更新驅動／韌體。',opts:[
-   ['向廠商確認相容版本、先備份設定',1,0,'','醫材的工作站不能自己亂升級。','b'],
-   ['上官網抓最新版',0,30,'rep+cathdown','醫材軟體最新版常不相容。',null]]},
-  b:{q:'備份完成，廠商給了指定版本。',opts:[
-   ['在非手術時段更新、更新後跑一次功能驗證',1,0,'','更新完要驗證過才算完成。',null],
+  a:{q:'心導管室說廠商要更新工作站的驅動，問你要不要先弄。',opts:[
+   ['先確認這台是不是醫材附屬電腦：是的話由廠商照原廠版本更新，你負責排時段、備份、網路與防毒例外',1,0,'','醫材附屬電腦自己升級，出事保固和醫材登記都會有問題。','b'],
+   ['上官網抓最新版自己裝',0,30,'rep+cathdown','醫材軟體最新版常不相容。',null]]},
+  b:{q:'廠商給了指定版本，想排在明天第一台手術前更新。',opts:[
+   ['改排在沒有手術的時段，更新後請廠商和技師一起測，你確認影像傳得到 PACS',1,0,'','更新完要驗證過才算完成，手術前沒有時間出錯。',null],
    ['更新完就走',2,0,'rep','明天手術發現不能用。',null]]}},
  mail:{dom:'app',start:'a',
   a:{q:'{room}說手機收不到信、信箱同步不了。',opts:[
@@ -544,7 +544,7 @@ const PROC={
    ['確認空調狀態、開備援機、開門通風',1,0,'','先把溫度壓下來，原因等一下再找。','b'],
    ['先關幾台不重要的伺服器',0,20,'data+hisdown','你怎麼知道哪台不重要？',null]]},
   b:{q:'備援空調有開，溫度還在升。',opts:[
-   ['通知總務叫空調廠商、持續監看、準備關非核心測試機',1,0,'','真的要關也要先關不重要的測試機，不是全部一起關。',null],
+   ['通知工務叫空調廠商、持續監看、準備關非核心測試機',1,0,'','真的要關也要先關不重要的測試機，不是全部一起關。',null],
    ['全部關掉',0,30,'data+hisdown','全院 HIS 中斷。',null]]}},
  check:{dom:'sys',start:'a',
   a:{q:'照排程做。',opts:[
@@ -610,8 +610,8 @@ PROC.byod_vendor={dom:'net',start:'a',
    ['查儀器所在 VLAN，開一條限時、限目的的防火牆規則，做完關掉',1,0,'','只開他需要的，而且要設到期時間。',null],
    ['那就先接內網，做完再說',0,0,'sec+rogue','「做完再說」通常沒有再說。',null]]}};
 PROC.byod_router={dom:'net',start:'a',
-  a:{q:'診間桌下多了一台小米路由器，WAN 孔插在醫院網路孔上。醫師說 WiFi 太爛。',opts:[
-   ['先確認它有沒有開 DHCP，立刻拔掉，跟醫師說明並回報 WiFi 覆蓋問題',1,0,'','私接路由器會發 DHCP，整層診間可能拿到錯的 IP。','b'],
+  a:{q:'診間桌下多了一台小米路由器，醫院的網路線插在它的 LAN 孔上。醫師說 WiFi 太爛。',opts:[
+   ['先確認它有沒有開 DHCP，立刻拔掉，跟醫師說明並回報 WiFi 覆蓋問題',1,0,'','插在 LAN 孔，它的 DHCP 會直接發給整層，診間會拿到錯的 IP。','b'],
    ['醫師說要用，就讓他用',0,0,'sec+rogue','你會在十分鐘後接到整層斷線的電話。',null],
    ['幫他設成 AP 模式、關 DHCP，讓他繼續用',2,10,'sec','斷線問題解了，但那還是一台沒人管的設備。',null]]},
   b:{q:'醫師：「那我 WiFi 怎麼辦？」',opts:[
@@ -690,7 +690,7 @@ const DEEPEN={
  virus:{b:[['叫她換一台電腦繼續',0,0,'sec+spread','原機還在網路上。',null]],c:[['叫她以後用雲端',2,0,'','你說不要插，他還是會插。',null]]},
  restore:{a:[['先問他有沒有自己存別的地方',2,2,'','他說沒有，通常真的沒有。','b']],b:[['用資料救援軟體掃',2,20,'','共享有版本不用掃。',null]]},
  onboard:{a:[['先讓他用同事電腦看文件',2,0,'','今天還是要開。','b']],b:[['打給主任問',2,10,'','主任會說照規定。',null]]},
- update:{a:[['請儀器組處理',0,10,'','工作站是電腦，是你的。','b']],b:[['下班前更新',0,0,'rep','明早第一台手術就要用。',null]]},
+ update:{a:[['丟給儀器組，說不關資訊的事',2,0,'','醫材是他們的，但網路、帳號、防毒例外還是你的，要一起排。','b']],b:[['下班前更新',0,0,'rep','明早第一台手術就要用。',null]]},
  mail:{a:[['叫他重開手機',2,3,'','有時有用，但原因是密碼。','b']],b:[['幫他關掉兩步驗證',0,0,'sec','副院長的信箱沒二階段。',null]]},
  pdf:{a:[['先問：是哪個系統匯出的？有沒有別人也打不開？',2,2,'','問題定位，但院長在等。','b']],b:{q:'是會計傳來的，副檔名是 .pdf 但其實是 .xlsx 改名的。',opts:[['改回副檔名開給他看，跟會計說一下',1,0,'','檔案是假 PDF，改名就好。',null],['叫會計重傳',2,5,'','可以，但院長等。',null],['裝另一套 PDF 軟體',0,15,'','不是軟體問題。',null]]}},
  av:{a:[['叫主任用手機開會',0,0,'','主任會記得這件事。','b']],b:[['重裝會議軟體',0,15,'','被擋的不是軟體。',null]]},
@@ -741,7 +741,7 @@ const DEEPEN={
  soc:{a:[['先隔離再查',2,5,'','也不算錯，但隔離之前先確認那台不是 DC 或重要伺服器。','b']]},
  wifi:{c:[['重啟 ISE',0,30,'rep','全院的網路驗證會跟著停。',null]]},
  slow:{c:[['換上行交換器',0,40,'','做過頭了。',null]]},
- card:{a:[['請掛號改手輸',2,0,'','手輸會被健保署退件。','b']]},
+ card:{a:[['請櫃台先走異常就醫流程，之後補登',2,0,'','病人可以先看，但補登會累積一大堆，還是要儘快修好。','b']]},
  boot:{b:[['直接送修',2,20,'','線沒接好也拿去送修，廠商會笑。',null]]},
  web:{a:[['請廠商看',2,20,'','廠商要等，先自己分。','b']],b:[['關掉 WAF',0,0,'sec','WAF 一關官網就沒防護了。',null]]},
  byod_vendor:{b:[['給他你的帳號登 VPN',0,0,'sec','你的帳號在廠商電腦上。',null]]},
@@ -772,8 +772,8 @@ function applyDeepen(){for(const k in DEEPEN){const pr=PROC[k];if(!pr)continue;f
  // 一步樹的第一步若只有 null 下一步，接到新加的 b
  for(const k in DEEPEN){const pr=PROC[k];if(!pr)continue;if(pr.b&&pr.a){pr.a.opts.forEach(o=>{if(o[1]===1&&o[5]==null)o[5]='b';});}}}
 
-const PROC_KEY=[['交接：','takeover'],['值班日誌','handover'],['叫號','signage'],['RAID','pacs_dr'],['燒光碟','pacs_cd'],['燒錄','pacs_cd'],['要接 PACS','pacs_new'],['沒傳到 PACS','pacs_send'],['開影像很慢','pacs_ws'],['影像很慢','pacs_ws'],['X 光拍完','pacs_er'],['傳影像失敗','pacs_er'],['加密共享','soc'],['C2','soc'],['DHCP','floornet'],['整層斷線','floornet'],['資安署','vulnintel'],['DB 唯讀','dbgrant'],['更新後開不了','boot'],['訪客網路','wifi'],['官網','web'],['機房巡檢','patrol'],['巡檢（排程）','patrol'],['批次','batch'],['媒體更換','tape'],['韌體更新','firmware'],['版更','patch'],['服務檢查','svccheck'],['開診前','clinicprep'],['日誌','handover'],['交接','handover'],['稽核缺失','auditreply'],['月報','monthly'],['來函','govletter'],['委員會：','committee'],['事件統計','committee'],['情資','vulnscan'],['廠商工程師','byod_vendor'],['小米路由器','byod_router'],['Raspberry','byod_pi'],['iPad','byod_ipad'],['Switch','byod_switch'],['監視器主機','byod_iot'],['家屬要 WiFi','byod_guest'],['施工的廠商','byod_contractor'],['轉檔工具','install2'],['開不了機','boot'],['WiFi','wifi'],['讀卡機','card'],['螢幕','display'],['投影','display'],['共享資料夾','share'],['當機','crash'],['SOC','soc'],['帳號被鎖','lock'],['很慢','slow'],['報稅軟體','install'],['掃描槍','scanner'],['印表機','printer'],['印不出','printer'],['UPS','ups'],['中毒','virus'],['損毀','restore'],['到職','onboard'],['驅動','update'],['韌體','update'],['版更','update'],['信箱','mail'],['PDF','pdf'],['簡報檔','pdf'],['視訊','av'],['叫號','signage'],['PACS','pacs'],['資料庫回應','dbslow'],['溫度','temp'],['斷線','wifi']];
-function procOf(t){if(t.procKey&&PROC[t.procKey])return PROC[t.procKey];if(t.tri)return null;if(t.kind==='backup')return PROC.backup;for(const [k,v] of PROC_KEY)if(t.title.includes(k))return PROC[v];if(t.src==='sched')return PROC.check;return null;}
+const PROC_KEY=[['交接：','takeover'],['卡紙','printjam'],['匯出 Excel','xlsexport'],['網路不通','portdown'],['時好時壞','loop'],['健保雲端','nhivpn'],['上網正常','dns'],['網路電話','poe'],['監視站收不到','monitornet'],['值班日誌','handover'],['叫號','signage'],['RAID','pacs_dr'],['燒光碟','pacs_cd'],['燒錄','pacs_cd'],['要接 PACS','pacs_new'],['沒傳到 PACS','pacs_send'],['開影像很慢','pacs_ws'],['影像很慢','pacs_ws'],['X 光拍完','pacs_er'],['傳影像失敗','pacs_er'],['加密共享','soc'],['C2','soc'],['DHCP','floornet'],['整層斷線','floornet'],['資安署','vulnintel'],['DB 唯讀','dbgrant'],['更新後開不了','boot'],['訪客網路','wifi'],['官網','web'],['機房巡檢','patrol'],['巡檢（排程）','patrol'],['批次','batch'],['媒體更換','tape'],['韌體更新','firmware'],['版更','patch'],['服務檢查','svccheck'],['開診前','clinicprep'],['日誌','handover'],['交接','handover'],['稽核缺失','auditreply'],['月報','monthly'],['來函','govletter'],['委員會：','committee'],['事件統計','committee'],['情資','vulnscan'],['廠商工程師','byod_vendor'],['小米路由器','byod_router'],['Raspberry','byod_pi'],['iPad','byod_ipad'],['Switch','byod_switch'],['監視器主機','byod_iot'],['家屬要 WiFi','byod_guest'],['施工的廠商','byod_contractor'],['轉檔工具','install2'],['開不了機','boot'],['WiFi','wifi'],['讀卡機','card'],['螢幕','display'],['投影','display'],['共享資料夾','share'],['當機','crash'],['SOC','soc'],['帳號被鎖','lock'],['很慢','slow'],['報稅軟體','install'],['掃描槍','scanner'],['印表機','printer'],['印不出','printer'],['UPS','ups'],['中毒','virus'],['損毀','restore'],['到職','onboard'],['驅動','update'],['韌體','update'],['版更','update'],['信箱','mail'],['PDF','pdf'],['簡報檔','pdf'],['視訊','av'],['叫號','signage'],['PACS','pacs'],['資料庫回應','dbslow'],['溫度','temp'],['斷線','wifi']];
+function procOf(t){if(t.procKey&&PROC[t.procKey])return PROC[t.procKey];if(t.id!=null&&!t.procKey&&/很慢/.test(t.title)&&!/影像|資料庫/.test(t.title)){t.procKey=rnd()<0.5?'slowapp':'slow';return PROC[t.procKey];}if(t.tri)return null;if(t.kind==='backup')return PROC.backup;for(const [k,v] of PROC_KEY)if(t.title.includes(k))return PROC[v];if(t.src==='sched')return PROC.check;return null;}
 function domOf(t){const p=procOf(t);return p?p.dom:(t.tri?'med':'sys');}
 const SKILLS={sys:{name:'系統／AD',desc:'Windows、AD、帳號權限、伺服器'},net:{name:'網路',desc:'交換器、WiFi、VLAN、PACS 走的路'},sec:{name:'資安',desc:'MDE、SOC 告警、中毒處理、軟體審核'},db:{name:'資料庫',desc:'HIS DB、備份、鎖定與長查詢'},hw:{name:'硬體維修',desc:'開不了機、螢幕、讀卡機、印表機、掃描槍'},app:{name:'應用系統',desc:'HIS 功能、信箱、檔案還原、官網'},med:{name:'醫療設備',desc:'X光／MRI／心導管工作站，分得出電腦還是儀器'}};
 const TRAITS={none:{name:'普通',desc:'做了幾年，不快不慢。沒有學長可以問，因為你就是學長。'},talk:{name:'嘴甜',desc:'很會講。電話教人成功率高兩成，民眾打來問官網的時候會提示你怎麼回。'},fit:{name:'體力好',desc:'走路快四分之一，比較不會想上廁所。'},vet:{name:'老鳥',desc:'總務、儀器組、廠商都認識。選錯做法多花的時間打七折，出事的後果也會晚一點才到。'},caffeine:{name:'咖啡成癮',desc:'咖啡對你特別有用（效果 1.5 倍），但更容易想上廁所，沒喝的時候還會慢一點。'},rookie:{name:'剛報到',desc:'什麼都慢兩成，但選做法的時候可以打給學長問，問一次 5 分鐘。'}};
@@ -894,6 +894,37 @@ Object.assign(PROC,{
  cert:{dom:'sys',start:'a',a:{q:'HIS 網站憑證三天後到期。',opts:[['今天換，先在測試站驗證鏈完整，再排時間換正式',1,0,'','到期那天全院跳警告。',null],['到期前一天再換',0,0,'rep','到期前一天你在忙別的。',null]]}},
  newsrv:{dom:'sys',start:'a',a:{q:'新伺服器要上線，廠商已經裝好。',opts:[['依基準：加網域、更新、防毒、MDE、備份、監控、改預設密碼',1,0,'','上線清單一項都不能跳過。',null],['廠商說裝好了就好',0,0,'sec+shadow','一台還是預設密碼的伺服器放在內網。',null]]}},
 });
+Object.assign(PROC,{
+ printjam:{dom:'hw',start:'a',a:{q:'{room}的印表機卡紙，後面排了十幾個病人。',opts:[['照面板指示打開蓋板，順著出紙方向把紙抽出來，看裡面有沒有碎紙',1,0,'','順著方向抽，紙才不會斷在裡面。','b'],['抓住紙用力往外扯',0,5,'rep','紙斷一半卡在滾輪裡，更難拿。','b'],['叫櫃台先印到隔壁那台',2,0,'','收據印到隔壁，病人容易拿錯。','b']]},
+  b:{q:'紙拿出來了，印兩張又卡。',opts:[['看紙匣：紙有沒有受潮、放太滿、導板有沒有靠緊，換一包新紙；還是一直卡就是滾輪磨損，報修',1,0,'','一直卡多半是紙或滾輪，不是機器壞了。',null],['再抽出來就好',2,0,'rep','等一下又卡。',null],['換一台新的印表機',0,15,'','換個滾輪就好，不用整台換。',null]]}},
+ xlsexport:{dom:'app',start:'a',a:{q:'使用者說 HIS 匯出的報表 Excel 打不開，跳「檔案格式與副檔名不符」。',opts:[['問是哪一支報表、什麼時候開始的，遠端看一下那個檔案',1,0,'','先看檔案本身，不要先動 Office。','b'],['叫他重灌 Office',0,30,'','Office 沒壞。','b'],['叫他上傳到 Google 試算表開',0,0,'sec','病人資料傳到外部雲端。',null]]},
+  b:{q:'是上週改版後，報表改成輸出 CSV，副檔名卻還是 .xls。',opts:[['先教他按「是」開啟或改副檔名，回報程式組修正輸出格式',1,0,'','先讓他能用，再讓程式組修。',null],['跟他說就這樣用',2,0,'rep','每個人都會打來問一次。',null],['自己去改程式',0,0,'rep','沒走上版流程直接改正式機。',null]]}},
+ slowapp:{dom:'net',start:'a',a:{q:'{room}說 HIS 很慢，「是不是網路又怎麼了」。',opts:[['問範圍：一台、一層、還是全院？是全部都慢，還是只有某個畫面慢？',1,0,'','範圍跟「哪個畫面」問出來，方向就出來了。','b'],['重開那層交換器',0,25,'rep+floordown','整層斷線，而且還不一定是網路。','b'],['跟他說是網路在慢，等一下就好',0,0,'rep','還沒查就先認了，後面查出不是網路也講不清楚。','b']]},
+  b:{q:'整層都慢，但只有 HIS 某幾個功能慢（開藥、列印），查檢驗報告、開網頁都很快。',opts:[['先做網路檢測：從那層 ping HIS 主機看延遲和掉封包、看上行流量，數據留下來',1,0,'','先證明網路沒問題，才轉得出去。','c'],['直接換上行光纖',0,30,'','網路沒問題，白換。','c'],['直接轉給程式組',2,0,'','方向可能對，但沒數據，他們會說「是網路吧」又丟回來。','c']]},
+  c:{q:'網路正常：延遲 1ms、沒有掉封包、上行流量很低。',opts:[['把檢測結果和「只有某幾個功能慢」一起轉給程式組和 DBA，回覆單位處理進度和暫時辦法',1,0,'','網路正常不是結案，是把單轉給對的人，而且附上證據。','d'],['跟單位說「網路沒問題」就結案',0,0,'rep','單位還是很慢，他們會覺得資訊室在推。',null],['再換一台交換器試試看',0,30,'','數據都正常了還在換硬體，時間都耗在這裡。',null]]},
+  d:{q:'DBA 回覆：昨天上版的新功能，查詢沒用到索引，資料一多就慢。',opts:[['請程式組和 DBA 排修正，回覆單位預計時間，結案時把原因寫進工單',1,0,'','原因寫進工單，下次有人說「HIS 很慢」，大家知道先查哪裡。',null],['跟單位說「不是我們網路的事」',0,0,'','對單位來說都是資訊室，進度還是要有人回。',null],['自己去資料庫加索引',0,10,'rep','不是你的系統，沒走變更直接動正式 DB。',null]]}},
+ portdown:{dom:'net',start:'a',a:{q:'{room}一台電腦網路不通，隔壁都正常。',opts:[['問：右下角網路圖示是不是紅叉？牆上網路孔旁邊的燈有沒有亮？',1,0,'','一台不通，先分是線、網路孔，還是電腦。','b'],['叫他重開電腦',2,5,'','有時候會好，但線或 port 的問題重開沒用。','b'],['重開那層交換器',0,20,'rep+floordown','一台不通去重開整層，其他人一起斷。',null]]},
+  b:{q:'到現場：線有插，電腦的網路燈不亮。',opts:[['先換一條確定是好的線；還是不亮，就查交換器上那個 port：有沒有被關、err-disabled、VLAN 對不對',1,0,'','線跟 port 先排除，再懷疑電腦。','c'],['直接換網路卡',0,20,'','線跟 port 都還沒查。',null],['叫他改用 WiFi',2,0,'','診間桌機多半沒有無線網卡，而且原因沒找。',null]]},
+  c:{q:'交換器上那個 port 是 err-disabled，log 寫 BPDU guard。',opts:[['去看那個孔後面接了什麼：多半是有人接了小交換器或接成迴圈，拆掉再把 port 打開',1,0,'','port 被關是保護機制在動，先找出原因再打開。',null],['直接 shut／no shut 打開',2,0,'rep','後面那台東西還在，等一下又被關。',null],['把那個 port 的 BPDU guard 拿掉',0,0,'sec+rogue','保護拿掉，下次接成迴圈就整層一起倒。',null]]}},
+ loop:{dom:'net',start:'a',a:{q:'{room}整層網路時好時壞，交換器的燈全部在狂閃。',opts:[['看那層交換器：CPU、廣播封包量、哪個 port 流量暴增、STP 拓撲是不是一直在變',1,0,'','燈全部狂閃、時好時壞，很像廣播風暴。','b'],['重開那層交換器',2,10,'rep','好一下，迴圈還在，幾分鐘後又來。','b'],['打給 HIS 廠商說系統一直斷',0,15,'','是網路在倒，不是 HIS。',null]]},
+  b:{q:'查到兩個 port 互相接在一起：有人把一條網路線兩頭都插在護理站牆上的孔。',opts:[['拔掉那條線，那兩個 port 開 BPDU guard 和 storm control，記錄並跟單位說明',1,0,'','拔掉止血，再把保護補上，下次就只會關掉一個 port。',null],['拔掉就好',2,0,'rep','下次有人再插一次，整層又倒。',null],['把那層的 STP 關掉，免得一直收斂',0,0,'rep+floordown','STP 關掉，迴圈就變成整層直接倒。',null]]}},
+ nhivpn:{dom:'net',start:'a',a:{q:'{room}說健保雲端藥歷查不到，讀卡上傳也失敗。',opts:[['問範圍：只有這台、這一區，還是全院都查不到？',1,0,'','一台是電腦，全院是線路。','b'],['重灌讀卡機控制軟體',0,25,'','還沒分範圍就重灌。',null],['叫醫師先不要查雲端藥歷',0,0,'','醫師要查重複用藥，不查是病安風險。',null]]},
+  b:{q:'全院都查不到，健保署網站從外網打得開。',opts:[['查健保 VPN 專線：路由器、線路燈號，看健保署有沒有公告維護，沒有就報修線路',1,0,'','全院都不行，問題在專線那一段。','c'],['重開全院讀卡的電腦',0,30,'','全院的問題不在端點。',null],['等它自己好',2,0,'','有時候真的是健保署在維護，但要先查公告。',null]]},
+  c:{q:'健保署今天沒有公告維護，VPN 路由器的線路燈不亮。',opts:[['報修線路、切備援（有的話），通知各單位先走異常就醫流程，記下中斷時間',1,0,'','中斷時間要記，之後補登跟回報都會用到。',null],['報修就好，不用通知單位',2,0,'','各診間會一直打來問。',null],['叫各單位自己打給健保署',0,0,'','健保署會叫他們找院內資訊室。',null]]}},
+ dns:{dom:'net',start:'a',a:{q:'{room}說 HIS 打不開，可是上網正常。',opts:[['問：隔壁也一樣嗎？我遠端用 IP 連 HIS 試試看',1,0,'','上網正常、只有 HIS 打不開，先分是名稱還是連線的問題。','b'],['重開 HIS 伺服器',0,30,'data+hisdown','其他人都在用 HIS，你一重開全院停。',null],['叫他重開電腦',2,5,'','可能會好，但原因不知道。','b']]},
+  b:{q:'只有這台。ping HIS 的主機名稱失敗，ping IP 是通的。',opts:[['是 DNS 的問題：看這台的 DNS 設定和 hosts 檔',1,0,'','名稱查不到、IP 通，就是 DNS。','c'],['把 HIS 的 IP 寫進這台的 hosts 就好',2,0,'rep','今天能用，哪天 HIS 換 IP 這台就連不到，也沒人記得它改過。',null],['換網路線',0,5,'','網路是通的，跟線沒關係。',null]]},
+  c:{q:'這台的 DNS 被手動設成 8.8.8.8，問了才知道是之前廠商來改的。',opts:[['改回自動取得院內 DNS，確認 hosts 沒被改，記錄下來，順便查還有沒有別台也被改',1,0,'','廠商改過的通常不會只有這一台。',null],['改回來就好',2,0,'rep','同一個廠商改過的其他台，下次再打來。',null],['把 HIS 的名稱也登記到外部 DNS',0,0,'sec','內部系統的名稱放上網際網路。',null]]}},
+ poe:{dom:'net',start:'a',a:{q:'{room}的網路電話全部沒聲音，WiFi 也連不上。',opts:[['看那一層的 PoE 交換器：有沒有電、PoE 功率是不是爆了、log 有沒有電源告警',1,0,'','電話跟 AP 一起掛，共同點是 PoE 供電。','b'],['一支一支電話重插',0,15,'','整層都掛，不是電話的問題。',null],['叫總機處理',0,10,'','總機只會再打給你。',null]]},
+  b:{q:'交換器有電，但 log 寫 PoE 電源模組故障，只剩一半功率。',opts:[['先讓護理站電話和 AP 這些重要的 port 優先供電，報修電源模組，告訴單位哪些暫時不能用',1,0,'','功率不夠就排優先順序，重要的先活。',null],['重開交換器',2,10,'rep','重開後一樣只剩一半功率，還多斷一次。',null],['拿家用 PoE 供電器一個一個接',0,10,'sec','沒納管的設備到處接。',null]]}},
+ monitornet:{dom:'net',start:'a',a:{q:'{room}的中央監視站收不到幾床床邊監視器的資料。',opts:[['先問護理師：床邊機本身有沒有顯示？是哪幾床收不到、還是全部？',1,0,'','床邊機有沒有在動，決定是儀器還是傳輸的問題。','b'],['重開中央監視站電腦',0,10,'rep','重開那幾分鐘，所有病人都沒人看著。',null],['跟他說這是儀器組的事',0,0,'','可能是網路，推出去單位會記得你。',null]]},
+  b:{q:'床邊機都正常，只有 3 到 6 床收不到，剛好接在同一台交換器。',opts:[['看那台交換器：port 狀態、醫療設備 VLAN、多播設定，同時通知醫工，請護理師先盯床邊機',1,0,'','同一台交換器就先查那台，醫工也要一起知道。','c'],['重開那台交換器',2,10,'rep','其他床也會跟著斷幾分鐘，而且還不知道原因。',null],['請護理師每床巡一次就好',0,0,'','人力取代不了中央監視，這是病安。',null]]},
+  c:{q:'昨晚有人調整過那台交換器，多播的設定被改掉了。',opts:[['依變更紀錄回復設定，確認 3 到 6 床都收到，請醫工和單位一起驗證，補變更檢討',1,0,'','回復之後要有人一起確認，變更也要檢討。',null],['改回來就好',2,0,'rep','沒有檢討，下次改別台又出事。',null],['請單位先把病人移床',0,0,'','移床是醫療決定，而且問題就在網路。',null]]}},
+});
+GUIDE.slowapp=GUIDE.slow;
+GUIDE.printjam={say:'「印表機卡紙了，紙拉不出來。」',opts:[[REBOOT,.15,3,'卡紙重開沒用，紙還在裡面。'],['「前面的蓋子打開，順著出紙的方向慢慢抽，不要硬扯。」',.6,4,'卡紙大多電話就能教。'],['「面板上有寫卡在哪一格嗎？」',.5,3,'照面板指示找最快。']]};
+GUIDE.portdown={say:'「右下角那個網路圖示有個紅叉叉。」',opts:[[REBOOT,.15,4,'線或 port 的問題重開沒用。'],['「電腦後面那條網路線，兩頭都拔起來再插緊。」',.4,4,'線鬆掉最常見。'],['「牆上網路孔旁邊的小燈有沒有亮？」',.2,3,'不亮多半要人過去看。']]};
+GUIDE.dns={say:'「HIS 點下去一直轉，可是 Google 開得起來。」',opts:[[REBOOT,.3,4,'剛好清掉 DNS 快取會好，但原因不知道。'],['「我遠端看一下你的網路設定。」',.55,6,'遠端就能把 DNS 改回來。']]};
+GUIDE.xlsexport={say:'「報表匯出來 Excel 打不開，說格式不符。」',opts:[[REBOOT,.05,3,'跟重開沒關係。'],['「跳出來的視窗按『是』，看能不能開。」',.6,2,'多半是副檔名的問題。']]};
 // 平日 08:30–17:30 在位子上的專責工程師（NPC），值班可以把自己領域的單升級給他們
 const NPC_SPEC={net:'網路組 阿凱',sec:'資安 小瑜',db:'DBA 老張',app:'應用組 小翔',sys:'系統組 阿偉',med:'PACS 阿哲',hw:null};
 function specAvailable(dom){if(!S||S.role!=='duty')return false;const k=S.shiftKeyUsed;if(k!=='day')return false;const clock=S.shift.start+S.time;return NPC_SPEC[dom]&&clock>=8*60+30&&clock<17*60+30;}
@@ -910,12 +941,12 @@ function escalate(t){const dom=domOf(t);if(!specAvailable(dom))return;const nm=N
  t.assignee={name:nm,color:'#9aa6b8',npc:true};t.npc=true;t.escalated=true;S.escalCount=(S.escalCount||0)+1;q.push(t);toast(nm+'接走了：'+t.title+(q.length>1?'（他手上還排了 '+(q.length-1)+' 件）':''));}
 function tickNPC(dtMin){if(!S.npcQueue)return;for(const dom in S.npcQueue){const q=S.npcQueue[dom];while(q.length&&q[0].state!=='pending')q.shift();if(!q.length)continue;const t=q[0];t.npcWait=(t.npcWait||0)+dtMin;if(t.npcWait<10)continue;t.prog+=dtMin*0.9;if(t.prog>=t.dur){t.assignee=null;finishTask(t);}}}
 const SPEC_EV={
- net:[[15,'office','新儀器要上線，廠商要「一個 VLAN」',20,120,'normal',null,1,'boss','vlan'],[60,'ward3','護理站 WiFi 一直斷，要去量測',30,90,'normal',null,0,'call','wifi_survey'],[110,'office','防火牆規則申請：伺服器對外開 3389',10,60,'normal',null,1,'boss','fwrule'],[200,'server','核心交換器韌體更新（維護時段）',25,60,'sched',null,0,'sched','check'],[300,'office','廠商工程師來了：帶筆電要接網路做儀器維護',10,30,'normal',null,0,'visit','byod_vendor'],[380,'office','月報：網路可用率與事件統計',20,120,'normal',null,1,'boss','check']],
- sec:[[10,'office','SOC 來電：端點告警需確認',20,60,'normal',null,1,'call','soc'],[30,'office','衛福部來函：上月資安事件通報紀錄補件，三天內',20,200,'normal',null,1,'boss','check'],[180,'office','資安署情資：某品牌 VPN 漏洞，限期清查回覆',25,120,'prio',null,1,'boss','vulnscan'],[50,'office','弱掃報告出來，120 個高風險',25,180,'normal',null,1,'boss','vulnscan'],[120,'office','同仁通報釣魚信',20,40,'prio',null,1,'call','phish'],[220,'office','資安稽核缺失回覆，今天到期',25,150,'normal',null,1,'boss','check'],[280,'office','簽核：院長新買的 iPad 要連院內網看 HIS',10,25,'prio',null,1,'boss','byod_ipad'],[400,'office','SOC 來電：另一台端點告警',20,60,'normal',null,1,'call','soc'],[330,'office','資安委員會：你要報本月事件統計',20,40,'prio',null,1,'boss','check']],
- db:[[10,'office','資料修正單：門診要改病人過敏註記',15,90,'normal',null,1,'boss','datafix'],[70,'office','院長要的報表跑不出來',20,60,'prio',null,1,'boss','report'],[150,'server','DB 磁碟剩 3%',20,30,'prio',null,0,'alert','dbspace'],[240,'office','研究員申請 DB 唯讀帳號',10,120,'normal',null,1,'boss','dbgrant'],[300,'server','04:00 排程改白天驗證：HIS 資料庫回應緩慢演練',30,60,'sched',null,0,'sched','check'],[420,'server','備份作業（14:00 排程，須待滿 30 分鐘）',30,90,'backup',null,0,'sched','backup']],
- dev:[[10,'office','門診說開藥畫面存檔後劑量不見了',25,30,'prio',null,1,'call','bugfix'],[80,'office','護理部要在給藥畫面加一個欄位，明天就要',15,120,'normal',null,1,'boss','change'],[150,'office','使用者：系統壞了，按儲存沒反應',10,40,'normal',null,1,'call','userq'],[200,'pr','公關室來電：醫院官網打不開',20,25,'prio',null,1,'call','web'],[360,'office','13:00 HIS 上版',30,30,'sched',null,1,'sched','deploy'],[430,'office','使用者：報表匯出 Excel 打不開',10,60,'normal',null,1,'call','userq']],
+ net:[[15,'office','新儀器要上線，廠商要「一個 VLAN」',20,120,'normal',null,1,'boss','vlan'],[60,'ward3','護理站 WiFi 一直斷，要去量測',30,90,'normal',null,0,'call','wifi_survey'],[110,'office','防火牆規則申請：伺服器對外開 3389',10,60,'normal',null,1,'boss','fwrule'],[200,'server','核心交換器韌體更新（維護時段）',25,60,'sched',null,0,'sched','firmware'],[300,'office','廠商工程師來了：帶筆電要接網路做儀器維護',10,30,'normal',null,0,'visit','byod_vendor'],[250,'opd','門診整層 HIS 很慢，門診說是網路',20,40,'prio',null,0,'call','slowapp'],[330,'ward2','病房整層網路時好時壞，HIS 一直斷線',25,25,'prio',null,0,'call','loop'],[380,'office','月報：網路可用率與事件統計',20,120,'normal',null,1,'boss','monthly']],
+ sec:[[10,'office','SOC 來電：端點告警需確認',20,60,'normal',null,1,'call','soc'],[30,'office','衛福部來函：上月資安事件通報紀錄補件，三天內',20,200,'normal',null,1,'boss','govletter'],[180,'office','資安署情資：某品牌 VPN 漏洞，限期清查回覆',25,120,'prio',null,1,'boss','vulnintel'],[50,'office','弱掃報告出來，120 個高風險',25,180,'normal',null,1,'boss','vulnscan'],[120,'office','同仁通報釣魚信',20,40,'prio',null,1,'call','phish'],[220,'office','資安稽核缺失回覆，今天到期',25,150,'normal',null,1,'boss','auditreply'],[280,'office','簽核：院長新買的 iPad 要連院內網看 HIS',10,25,'prio',null,1,'boss','byod_ipad'],[400,'office','SOC 來電：另一台端點告警',20,60,'normal',null,1,'call','soc'],[330,'office','資安委員會：你要報本月事件統計',20,40,'prio',null,1,'boss','committee']],
+ db:[[10,'office','資料修正單：門診要改病人過敏註記',15,90,'normal',null,1,'boss','datafix'],[70,'office','院長要的報表跑不出來',20,60,'prio',null,1,'boss','report'],[150,'server','DB 磁碟剩 3%',20,30,'prio',null,0,'alert','dbspace'],[240,'office','研究員申請 DB 唯讀帳號',10,120,'normal',null,1,'boss','dbgrant'],[300,'server','HIS 資料庫全院回應變慢，門診一直打來',30,30,'prio',null,0,'alert','dbslow'],[420,'server','備份作業（14:00 排程，須待滿 30 分鐘）',30,90,'backup',null,0,'sched','backup']],
+ dev:[[10,'office','門診說開藥畫面存檔後劑量不見了',25,30,'prio',null,1,'call','bugfix'],[80,'office','護理部要在給藥畫面加一個欄位，明天就要',15,120,'normal',null,1,'boss','change'],[150,'office','使用者：系統壞了，按儲存沒反應',10,40,'normal',null,1,'call','userq'],[200,'pr','公關室來電：醫院官網打不開',20,25,'prio',null,1,'call','web'],[360,'office','13:00 HIS 上版',30,30,'sched',null,1,'sched','deploy'],[430,'office','使用者：報表匯出 Excel 打不開',10,60,'normal',null,1,'call','xlsexport']],
  pacs:[[15,'er','急診 X 光拍完影像看不到',15,25,'prio',null,0,'call','pacs_er'],[60,'mri','MRI 影像沒傳到 PACS',20,45,'prio',null,0,'call','pacs_send'],[130,'report','放射科報告工作站開影像很慢',20,60,'normal',null,0,'call','pacs_ws'],[200,'office','新的超音波要接 PACS',25,120,'normal',null,1,'boss','pacs_new'],[280,'lobby','病人要燒光碟，燒錄機壞了',10,30,'normal',null,0,'call','pacs_cd'],[340,'server','PACS 主節點 RAID 降級告警',20,60,'prio',null,0,'alert','pacs_dr']],
- sys:[[10,'office','AD 密碼政策今天上線',25,120,'normal',null,1,'boss','adpolicy'],[70,'server','檔案伺服器 C: 剩 1%',15,40,'prio',null,0,'alert','disk'],[140,'office','HIS 網站憑證三天後到期',20,180,'normal',null,1,'boss','cert'],[220,'server','新伺服器要上線，廠商已經裝好',30,120,'normal',null,0,'boss','newsrv'],[300,'office','新人到職要開帳號與電腦',25,120,'normal',null,1,'boss','onboard'],[380,'server','Windows 更新排程（維護時段）',25,60,'sched',null,0,'sched','check']],
+ sys:[[10,'office','AD 密碼政策今天上線',25,120,'normal',null,1,'boss','adpolicy'],[70,'server','檔案伺服器 C: 剩 1%',15,40,'prio',null,0,'alert','disk'],[140,'office','HIS 網站憑證三天後到期',20,180,'normal',null,1,'boss','cert'],[220,'server','新伺服器要上線，廠商已經裝好',30,120,'normal',null,0,'boss','newsrv'],[300,'office','新人到職要開帳號與電腦',25,120,'normal',null,1,'boss','onboard'],[380,'server','Windows 伺服器更新與重啟（維護時段）',25,60,'sched',null,0,'sched','patch']],
 };
 const TRIAGE={
  xray:{clues:['主機電源燈有亮，風扇也在轉。','儀器那邊沒有錯誤碼，照相功能正常。','螢幕電源燈是橘色一直閃。'],correct:0,why:'儀器沒事、主機有開、螢幕橘燈一直閃，就是訊號線或輸入源的問題，電腦端自己弄就好。'},
@@ -929,6 +960,10 @@ const TRIAGE={
 const EV=[
  [0,'office','交接：看值班排程與昨夜告警',10,60,'sched',null,0,'sched'],
  [4,'opd','診間 12 電腦開不了機',15,40],
+ [95,'opd','診間 7 電腦網路不通，隔壁都正常',15,40],
+ [150,'opd','門診說健保雲端藥歷查不到，讀卡上傳失敗',20,30,'prio'],
+ [215,'ward2','護理站中央監視站收不到 3 到 6 床的資料',20,20,'prio'],
+ [265,'cashier','批價櫃台 HIS 打不開，可是上網正常',15,30],
  [13,'ward3','給藥車平板連不到 WiFi',15,45],
  [21,'exec','院長室投影機接不上筆電',10,20,'prio',null,0,'boss'],
  [29,'hr','共享資料夾存取被拒',10,90,'normal',null,1],
@@ -972,6 +1007,7 @@ const EV=[
 // ---- 班別 ----
 const EV_EVE=[ // 小夜 16:00–00:00：晚診到 21:00、急診重、行政沒人、21:00 日結批次
  [0,'office','交接：看白班未結工單與晚間排程',10,60,'sched',null,0,'sched'],
+ [145,'ward4','病房整層網路時好時壞，HIS 一直斷線',25,25,'prio'],
  [63,'opd','晚診診間 8 讀卡機讀不到',10,40],
  [76,'er','檢傷台螢幕沒畫面',10,30,'prio'],
  [90,'ward4','給藥車平板連不到 WiFi',15,45],
@@ -999,6 +1035,7 @@ const EV_EVE=[ // 小夜 16:00–00:00：晚診到 21:00、急診重、行政沒
 ];
 const EV_NIGHT=[ // 大夜 00:00–08:00：電話少、排程多、機房多
  [0,'office','交接：確認今晚排程清單（備份／版更／重啟）',10,60,'sched',null,0,'sched'],
+ [150,'ward2','病房網路電話全部沒聲音，WiFi 也斷了',20,25,'prio'],
  [80,'server','00:20 磁帶／備份媒體更換',15,60,'sched',null,0,'sched'],
  [100,'er','檢傷台電腦當機',15,30,'prio'],
  [150,'or','開刀房：半夜急刀，麻醉記錄工作站開不了機',15,20,'prio','or'],
@@ -1021,6 +1058,7 @@ const EV_NIGHT=[ // 大夜 00:00–08:00：電話少、排程多、機房多
 const EV_HOL=[ // 假日白班 08:00–17:30：只有上午診、行政沒人、急診重、主管在家打電話
  [0,'office','交接：看值班排程與昨夜告警',10,60,'sched',null,0,'sched'],
  [8,'opd','假日上午診診間 5 電腦開不了機',15,40],
+ [120,'opd','假日上午診診間 2 電腦網路不通',15,40],
  [25,'er','檢傷台電腦當機',15,30,'prio'],
  [38,'ward3','給藥車平板連不到 WiFi',15,45],
  [59,'xray','X 光工作站螢幕沒畫面',15,40,'normal','xray'],
@@ -1635,4 +1673,3 @@ function endDay(bad){S.over=true;const done=S.tasks.filter(t=>t.state==='done'),
  document.getElementById('again').onclick=()=>{document.getElementById('end').hidden=true;document.getElementById('start').hidden=false;document.getElementById('page1').hidden=false;document.getElementById('page2').hidden=true;S=null;};}
 applyDeepen();applyDeepen2();document.getElementById("reroll").click();renderPreShop();
 </script>
-</body></html>
