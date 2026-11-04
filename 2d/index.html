@@ -302,11 +302,11 @@ function tickNPCs(dt){const F=FLOORS[viewKey()];if(!F||!F.npcs)return;const now=
  const r=a.room;const tx=r.x+1+Math.floor(rnd()*(r.w-2)),ty=r.y+1+Math.floor(rnd()*(r.h-2));const p=bfs(a.key,a.x,a.y,tx,ty);if(p&&p.length<8){a.path=p;a.steps=[{type:'walk',x:tx,y:ty}];}});}
 // 額外單位的任務模板（固定 id 以外的單位，依 base 抽）
 const TPL={
- ward:[['平板同意書簽不了',15,25,'prio'],['給藥車平板連不到 WiFi',15,45],['整層網路時好時壞',25,25,'prio'],['護理師帳號被鎖',5,30,'normal',1],['整站印表機不印',15,50],['護理站電腦當機',15,45],['給藥車電腦斷線',15,45]],
+ ward:[['平板同意書簽不了',15,25,'prio'],['藍牙條碼槍掃不到手圈',10,25,'prio'],['行動護理車筆電沒在充電',15,30],['給藥車平板連不到 WiFi',15,45],['整層網路時好時壞',25,25,'prio'],['護理師帳號被鎖',5,30,'normal',1],['整站印表機不印',15,50],['護理站電腦當機',15,45],['給藥車電腦斷線',15,45]],
  icu:[['中央監視站電腦當機',15,20,'prio'],['中央監視站收不到幾床床邊機的資料',20,20,'prio'],['護理師帳號被鎖',5,30,'normal',1],['印表機不印',10,40]],
- opd:[['診間電腦開不了機',15,40],['診間電腦網路不通',15,40],['讀卡機讀不到健保卡',10,40],['診間螢幕閃爍',10,60],['整層 HIS 開藥很慢',20,40],['處方列印不出',10,30,'prio']],
- er:[['檢傷台電腦當機',15,30,'prio'],['無線掃描槍連不上',10,35],['急診護理站印表機不印',10,40]],
- lab:[['檢驗儀器報告傳不到 LIS',15,40,'normal',0,'lab'],['條碼印表機不印',10,40],['檢驗科電腦當機',15,45]],
+ opd:[['診間電腦開不了機',15,40],['開 HIS 跳錯誤視窗',15,30],['鍵盤打不出字',10,30],['診間電腦網路不通',15,40],['讀卡機讀不到健保卡',10,40],['診間螢幕閃爍',10,60],['整層 HIS 開藥很慢',20,40],['處方列印不出',10,30,'prio']],
+ er:[['檢傷台電腦當機',15,30,'prio'],['檢體標籤印不出來',10,20,'prio'],['無線掃描槍連不上',10,35],['急診護理站印表機不印',10,40]],
+ lab:[['檢驗儀器報告傳不到 LIS',15,40,'normal',0,'lab'],['檢體標籤印不出來',10,25,'prio'],['條碼印表機不印',10,40],['檢驗科電腦當機',15,45]],
  pharmacy:[['自動包藥機的電腦當機',15,25,'prio'],['藥袋印表機不印',10,30],['藥局 HIS 很慢',20,40]],
  dialysis:[['透析機資料傳不到系統',15,40,'normal',0,'dial'],['洗腎室電腦開不了機',15,40]],
  or:[['手術排程電腦當機',15,25,'prio'],['麻醉記錄工作站螢幕沒畫面',10,25,'prio']],cath:[['工作站要更新驅動',20,90]],
@@ -776,7 +776,7 @@ function applyDeepen(){for(const k in DEEPEN){const pr=PROC[k];if(!pr)continue;f
  // 一步樹的第一步若只有 null 下一步，接到新加的 b
  for(const k in DEEPEN){const pr=PROC[k];if(!pr)continue;if(pr.b&&pr.a){pr.a.opts.forEach(o=>{if(o[1]===1&&o[5]==null)o[5]='b';});}}}
 
-const PROC_KEY=[['交接：','takeover'],['卡紙','printjam'],['匯出 Excel','xlsexport'],['網路不通','portdown'],['時好時壞','loop'],['健保雲端','nhivpn'],['上網正常','dns'],['網路電話','poe'],['監視站收不到','monitornet'],['值班日誌','handover'],['叫號','signage'],['RAID','pacs_dr'],['燒光碟','pacs_cd'],['燒錄','pacs_cd'],['要接 PACS','pacs_new'],['沒傳到 PACS','pacs_send'],['開影像很慢','pacs_ws'],['影像很慢','pacs_ws'],['X 光拍完','pacs_er'],['傳影像失敗','pacs_er'],['加密共享','soc'],['C2','soc'],['DHCP','floornet'],['整層斷線','floornet'],['資安署','vulnintel'],['DB 唯讀','dbgrant'],['更新後開不了','boot'],['訪客網路','wifi'],['官網','web'],['機房巡檢','patrol'],['巡檢（排程）','patrol'],['批次','batch'],['媒體更換','tape'],['韌體更新','firmware'],['版更','patch'],['服務檢查','svccheck'],['開診前','clinicprep'],['日誌','handover'],['交接','handover'],['稽核缺失','auditreply'],['月報','monthly'],['來函','govletter'],['委員會：','committee'],['事件統計','committee'],['情資','vulnscan'],['廠商工程師','byod_vendor'],['小米路由器','byod_router'],['Raspberry','byod_pi'],['iPad','byod_ipad'],['Switch','byod_switch'],['監視器主機','byod_iot'],['家屬要 WiFi','byod_guest'],['施工的廠商','byod_contractor'],['轉檔工具','install2'],['開不了機','boot'],['WiFi','wifi'],['讀卡機','card'],['螢幕','display'],['投影','display'],['共享資料夾','share'],['當機','crash'],['SOC','soc'],['帳號被鎖','lock'],['很慢','slow'],['報稅軟體','install'],['掃描槍','scanner'],['印表機','printer'],['印不出','printer'],['UPS','ups'],['中毒','virus'],['損毀','restore'],['到職','onboard'],['驅動','update'],['韌體','update'],['版更','update'],['信箱','mail'],['PDF','pdf'],['簡報檔','pdf'],['視訊','av'],['叫號','signage'],['PACS','pacs'],['資料庫回應','dbslow'],['溫度','temp'],['斷線','wifi']];
+const PROC_KEY=[['交接：','takeover'],['條碼槍','ccd'],['充電','charge'],['鍵盤','kbm'],['滑鼠','kbm'],['一下有一下沒有','cable'],['標籤','label'],['跳錯誤','hiserr'],['卡紙','printjam'],['匯出 Excel','xlsexport'],['網路不通','portdown'],['時好時壞','loop'],['健保雲端','nhivpn'],['上網正常','dns'],['網路電話','poe'],['監視站收不到','monitornet'],['值班日誌','handover'],['叫號','signage'],['RAID','pacs_dr'],['燒光碟','pacs_cd'],['燒錄','pacs_cd'],['要接 PACS','pacs_new'],['沒傳到 PACS','pacs_send'],['開影像很慢','pacs_ws'],['影像很慢','pacs_ws'],['X 光拍完','pacs_er'],['傳影像失敗','pacs_er'],['加密共享','soc'],['C2','soc'],['DHCP','floornet'],['整層斷線','floornet'],['資安署','vulnintel'],['DB 唯讀','dbgrant'],['更新後開不了','boot'],['訪客網路','wifi'],['官網','web'],['機房巡檢','patrol'],['巡檢（排程）','patrol'],['批次','batch'],['媒體更換','tape'],['韌體更新','firmware'],['版更','patch'],['服務檢查','svccheck'],['開診前','clinicprep'],['日誌','handover'],['交接','handover'],['稽核缺失','auditreply'],['月報','monthly'],['來函','govletter'],['委員會：','committee'],['事件統計','committee'],['情資','vulnscan'],['廠商工程師','byod_vendor'],['小米路由器','byod_router'],['Raspberry','byod_pi'],['iPad','byod_ipad'],['Switch','byod_switch'],['監視器主機','byod_iot'],['家屬要 WiFi','byod_guest'],['施工的廠商','byod_contractor'],['轉檔工具','install2'],['開不了機','boot'],['WiFi','wifi'],['讀卡機','card'],['螢幕','display'],['投影','display'],['共享資料夾','share'],['當機','crash'],['SOC','soc'],['帳號被鎖','lock'],['很慢','slow'],['報稅軟體','install'],['掃描槍','scanner'],['印表機','printer'],['印不出','printer'],['UPS','ups'],['中毒','virus'],['損毀','restore'],['到職','onboard'],['驅動','update'],['韌體','update'],['版更','update'],['信箱','mail'],['PDF','pdf'],['簡報檔','pdf'],['視訊','av'],['叫號','signage'],['PACS','pacs'],['資料庫回應','dbslow'],['溫度','temp'],['斷線','wifi']];
 function procOf(t){if(t.procKey&&PROC[t.procKey])return PROC[t.procKey];if(t.id!=null&&!t.procKey&&/平板.*同意書|電子同意書/.test(t.title)){t.procKey=rnd()<0.5?'econsent_net':'econsent_app';return PROC[t.procKey];}if(t.id!=null&&!t.procKey&&/很慢/.test(t.title)&&!/影像|資料庫/.test(t.title)){t.procKey=rnd()<0.5?'slowapp':'slow';return PROC[t.procKey];}if(t.tri)return null;if(t.kind==='backup')return PROC.backup;for(const [k,v] of PROC_KEY)if(t.title.includes(k))return PROC[v];if(t.src==='sched')return PROC.check;return null;}
 function domOf(t){const p=procOf(t);return p?p.dom:(t.tri?'med':'sys');}
 const SKILLS={sys:{name:'系統／AD',desc:'Windows、AD、帳號權限、伺服器'},net:{name:'網路',desc:'交換器、WiFi、VLAN、PACS 走的路'},sec:{name:'資安',desc:'MDE、SOC 告警、中毒處理、軟體審核'},db:{name:'資料庫',desc:'HIS DB、備份、鎖定與長查詢'},hw:{name:'硬體維修',desc:'開不了機、螢幕、讀卡機、印表機、掃描槍'},app:{name:'應用系統',desc:'HIS 功能、信箱、檔案還原、官網'},med:{name:'醫療設備',desc:'X光／MRI／心導管工作站，分得出電腦還是儀器'}};
@@ -843,7 +843,7 @@ function openETA(t,after){S.paused=true;const d=document.getElementById('dlg'),b
   if(m===0){t.pat-=10;toast('對方：「儘快是多快？」（耐心 -10）');}else{t.promise=S.time+m;t.promiseMin=m;const g=etaGuess(t);if(m>=g*2&&m>=30){t.pat-=5;toast('對方：「要這麼久喔？那我先問問看別人。」');}else toast('對方：「好，'+m+' 分鐘喔，我等你。」');}
   if(after)after();};list.appendChild(bt);});b.appendChild(list);}
 function tickGuide(dtMin){const P=S.player,g=P.guide;g.remain-=dtMin;S.phoneMin+=dtMin;if(g.remain>0)return;const t=g.task;P.guide=null;
- if(rnd()<g.p){S.guideOk++;t.byPhone=true;finishTask(t);toast('對方：'+['「好了欸！」','「喔喔可以了，謝謝啦。」','「有了有了，可以了。」'][Math.floor(rnd()*3)]+(g.txt===REBOOT?'（重開機萬歲）':''));}else{S.guideFail++;t.assignee=null;t.pat-=10;t.guideFailed=true;if(/螢幕|開不了機|印表機|掃描槍|讀卡機|投影/.test(t.title)&&rnd()<0.35)t.notReally=true;{const best=guideOf(t).opts.reduce((a,b)=>b[1]>a[1]?b:a);S.lessons.push({task:t,q:'電話教：'+guideOf(t).say,txt:g.txt,note:g.note,best:best[0]===g.txt?'直接過去':best[0],bestNote:best[0]===g.txt?'這類問題電話成功率本來就低':best[3],sev:1});}toast('對方：'+['「還是不行欸。」','「沒有啊，一樣。」','「你要不要直接過來看？」'][Math.floor(rnd()*3)]+g.note+' 還是得跑一趟。');}}
+ if(rnd()<g.p){S.guideOk++;t.byPhone=true;finishTask(t);toast('對方：'+['「好了欸！」','「喔喔可以了，謝謝啦。」','「有了有了，可以了。」'][Math.floor(rnd()*3)]+(g.txt===REBOOT?'（重開機萬歲）':''));}else{S.guideFail++;t.assignee=null;t.pat-=10;t.guideFailed=true;if(/螢幕|開不了機|印表機|掃描槍|讀卡機|投影|鍵盤|滑鼠|條碼槍|標籤/.test(t.title)&&rnd()<0.35)t.notReally=true;{const best=guideOf(t).opts.reduce((a,b)=>b[1]>a[1]?b:a);S.lessons.push({task:t,q:'電話教：'+guideOf(t).say,txt:g.txt,note:g.note,best:best[0]===g.txt?'直接過去':best[0],bestNote:best[0]===g.txt?'這類問題電話成功率本來就低':best[3],sev:1});}toast('對方：'+['「還是不行欸。」','「沒有啊，一樣。」','「你要不要直接過來看？」'][Math.floor(rnd()*3)]+g.note+' 還是得跑一趟。');}}
 function beginWork(t){const a=S.player;if(a.busy&&a.busy.task!==t)cancelBusy(a);S.tasks.forEach(x=>{if(x!==t&&x.assignee===a&&x.state==='pending'&&!(a.guide&&a.guide.task===x))x.assignee=null;});t.assignee=a;a.busy={task:t};a.path=[];a.steps=[];}
 // ---- 專責工程師：各領域的單與決策樹 ----
 const SPEC={
@@ -937,11 +937,33 @@ PROC.econsent_app={dom:'app',start:'a',a:A,
   b:{q:'每台平板都一樣，網路正常，其他系統都開得起來，只有按「簽名完成」後跳「上傳失敗」。',opts:[['網路正常、其他系統能用，是同意書程式的問題：截圖錯誤訊息、記下時間和病歷號，轉給程式組',1,0,'','有截圖、時間跟病歷號，程式組才查得到。','c'],['重開 AP',0,15,'rep','網路沒問題，重開 AP 整區斷線。',null],['一台一台重開平板',0,15,'','每台都一樣，不是平板的問題。',null]]},
   c:{q:'程式組回覆：今天早上更新後，簽名上傳的服務沒起來，正在處理，大概 30 分鐘。',opts:[['回覆單位預計時間，請他們先簽紙本，記下哪幾位病人之後要補電子檔',1,0,'','單位知道要等多久、這段時間怎麼辦，就不會一直打來。',null],['跟單位說「程式組在處理」就掛電話',2,0,'','單位不知道要等多久，也不知道這段時間怎麼辦。',null],['叫他們等 30 分鐘再簽',0,0,'','病人等著要做檢查、進開刀房，不能乾等。',null]]}};
 GUIDE.econsent_net=GUIDE.econsent_app={say:'「平板簽同意書一直轉圈圈，病人在等。」',opts:[[REBOOT,.25,3,'平板重開有時會好，但原因不知道。'],['「其他平板也一樣嗎？WiFi 圖示有連上嗎？」',.3,3,'先問範圍，多半還是要人過去看。']]};})();
+Object.assign(PROC,{
+ ccd:{dom:'hw',start:'a',a:{q:'{room}的藍牙條碼槍掃病人手圈都沒反應。',opts:[['先分是哪一段：槍有沒有亮紅光、有沒有「嗶」，開記事本掃一次看電腦有沒有收到字',1,0,'','槍、藍牙、電腦、HIS，一段一段排除最快。','b'],['直接換一支',2,8,'','有備品可以先換，但原因沒找。','b'],['重灌電腦',0,45,'data','不用做到這樣。',null]]},
+  b:{q:'槍會亮也會嗶，記事本裡沒有字。',opts:[['藍牙配對掉了：掃配對條碼重新配對，看藍牙接收器有沒有被拔掉',1,0,'','會嗶但電腦沒收到，多半是配對掉了。','c'],['重開電腦',2,5,'','有時候會重新抓到，但配對問題還在。','c'],['換一台電腦',0,15,'','槍沒配對，換電腦也一樣。',null]]},
+  c:{q:'配對好了，記事本有字，但 HIS 給藥畫面還是沒反應。',opts:[['游標要停在 HIS 的條碼欄位才收得到：教護理師點一下欄位再掃，確認手圈對得到病人',1,0,'','記事本收得到，就剩游標位置的問題。',null],['跟他說 HIS 壞了，轉程式組',0,0,'','記事本收得到，是游標位置的問題，程式組會丟回來。',null],['請護理師改用手打病歷號',2,0,'','手打容易打錯，給藥核對就是要掃。',null]]}},
+ charge:{dom:'hw',start:'a',a:{q:'{room}說行動護理車的筆電插著電還是沒在充電，電量剩 10%。',opts:[['看是哪一段：插座有沒有電、變壓器燈有沒有亮、推車的電池開關有沒有開',1,0,'','從插座、變壓器到電池，一段一段看。','b'],['換一台推車',2,10,'','可以先救急，但原因沒找。','b'],['叫他們插著電繼續用就好',0,0,'rep','電量歸零，給藥做到一半關機。',null]]},
+  b:{q:'變壓器燈有亮，筆電顯示「已接上電源，未充電」。',opts:[['換一顆確定是好的變壓器試；還是不充就是電池老化，換電池或送修，先調一台備用車',1,0,'','先排除變壓器，再判斷是不是電池壞了。',null],['重開筆電',2,5,'rep','偶爾會恢復充電，但電池可能已經壞了。',null],['把電池拆掉，直接插電用',0,0,'','推車一移動拔到插頭就直接關機。',null]]}},
+ kbm:{dom:'hw',start:'a',a:{q:'{room}的鍵盤打不出字（或滑鼠不會動）。',opts:[['先看是哪一段：換一個 USB 孔、看鍵盤的 Num Lock 燈會不會亮，無線的看電池和接收器',1,0,'','多半是孔、電池或接收器的問題。','b'],['重開電腦',2,5,'','有時候會好，但多半是線或電池。','b'],['重灌電腦',0,45,'data','不用做到這樣。',null]]},
+  b:{q:'換了孔還是不行，接到隔壁電腦也一樣不能用。',opts:[['是鍵盤或滑鼠壞了：直接換一組備品，舊的登記報廢',1,0,'','接到別台也不行，就是它壞了，換掉最快。',null],['拆開來清',0,10,'','多半是打翻飲料，清了也撐不久。',null],['叫他先用螢幕小鍵盤',2,0,'','撐一下可以，但開藥打字會很慢。',null]]}},
+ cable:{dom:'net',start:'a',a:{q:'{room}說電腦網路一下有一下沒有，椅子一動就斷。',opts:[['先看網路線：外皮有沒有被壓扁、水晶頭的卡榫有沒有斷，換一條好的線試',1,0,'','椅子一動就斷，九成是線。','b'],['重開電腦',0,5,'','線斷斷續續，重開沒用。','b'],['先查交換器的 port',2,10,'','也是方向，但椅子一動就斷，先看線最快。','b']]},
+  b:{q:'換了新線就正常了。舊線是從桌子底下拉過去，被椅子的輪子壓到。',opts:[['把線改走桌邊或用線槽固定，順便看同一間其他的線',1,0,'','不改走線，新線過幾天又被壓壞。',null],['換好就走',2,0,'rep','新線過幾天又被壓壞。',null],['用膠帶把舊線纏一纏',0,0,'rep','裡面的芯線斷了，膠帶接不回來。',null]]}},
+ label:{dom:'hw',start:'a',a:{q:'{room}的標籤機印不出檢體標籤。',opts:[['先看標籤機：面板燈號、標籤紙和碳帶有沒有裝好或用完，按一下 Feed 走一張',1,0,'','標籤機多半是紙或碳帶的問題。','b'],['在電腦重裝驅動',0,20,'','還沒看標籤機本身。','b'],['叫他們先手寫標籤',0,0,'','檢體手寫標籤容易貼錯人，是病安風險。',null]]},
+  b:{q:'標籤印得出來了，但位置一直往下偏，條碼印到一半。',opts:[['重新校正標籤紙（讓機器重新偵測紙張間距），印一張測試條碼，用條碼槍掃掃看',1,0,'','換紙之後沒校正最常見；條碼一定要實際掃得到才算好。',null],['到 HIS 把列印位置往上調',2,10,'rep','換一捲紙又偏掉，其他台也會跟著被改。',null],['換一台標籤機',2,15,'','可能只是要校正，不用換。',null]]}},
+ hiserr:{dom:'app',start:'a',a:{q:'{room}開 HIS 跳錯誤視窗，看診卡住了。',opts:[['先問錯誤訊息寫什麼、請他截圖，是只有這台還是大家都這樣',1,0,'','錯誤訊息跟範圍，決定是這台的問題還是程式的問題。','b'],['叫他重開電腦',2,5,'','可能會好，但錯誤訊息沒留下來，下次又來。','b'],['直接轉程式組',0,0,'','沒有錯誤訊息和範圍，程式組會先問你。','b']]},
+  b:{q:'只有這台。錯誤寫「找不到元件／版本不符」，這台昨天剛重灌過。',opts:[['重灌後 HIS 元件沒裝齊：用院內的 HIS 安裝程式補裝，確認版本跟其他台一樣',1,0,'','只有這台、剛重灌，就是端點安裝的問題，你自己就能處理。','c'],['把隔壁電腦的 HIS 資料夾整個複製過來',0,10,'rep','版本跟設定混在一起，之後更怪。',null],['轉程式組',2,10,'','可以，但這是端點安裝的問題，你自己就能處理。',null]]},
+  c:{q:'補裝之後可以開了。',opts:[['用醫師帳號實際開一筆醫囑、印一張處方測試，記下這台重灌漏裝了什麼',1,0,'','開藥跟列印才會用到的元件，要實際做過一次才知道有沒有裝到。',null],['看到登入畫面就走',2,0,'rep','開藥或列印才會用到的元件，可能還沒裝到。',null]]}},
+});
+GUIDE.ccd={say:'「條碼槍掃手圈都沒反應，正要給藥欸。」',opts:[[REBOOT,.3,4,'有時候會重新抓到藍牙。'],['「先點一下 HIS 的條碼欄位再掃。」',.4,2,'游標不在欄位上最常見。'],['「槍放回座上，掃一下座上的配對條碼。」',.45,3,'配對掉了。']]};
+GUIDE.charge={say:'「推車插著電，電量還是一直掉。」',opts:[[REBOOT,.05,3,'跟重開沒關係。'],['「牆上插座跟變壓器的燈有亮嗎？推車的電池開關有開嗎？」',.35,4,'插座或開關沒開，電話就能解。']]};
+GUIDE.kbm={say:'「鍵盤打不出字，滑鼠也怪怪的。」',opts:[[REBOOT,.3,4,'有時候會好。'],['「USB 拔起來換一個孔插。」',.45,2,'最常見。'],['「無線的嗎？底下那顆電池換一下。」',.4,3,'沒電最常見。']]};
+GUIDE.cable={say:'「網路一下有一下沒有，好煩。」',opts:[[REBOOT,.1,4,'線的問題重開沒用。'],['「電腦後面那條網路線，看看有沒有被椅子壓到。」',.35,3,'壓到的話電話就問得出來，但還是要換線。']]};
+GUIDE.label={say:'「標籤機都印不出來，檢體在等。」',opts:[[REBOOT,.15,3,'標籤機多半是紙或碳帶的問題。'],['「標籤機上面的燈是什麼顏色？紙跟碳帶還有嗎？」',.45,3,'用完或沒裝好，電話就能教。'],['「按一下標籤機上的 Feed，看會不會走一張。」',.35,2,'走紙順便校正。']]};
+GUIDE.hiserr={say:'「HIS 跳一個錯誤視窗，我看不懂。」',opts:[[REBOOT,.3,4,'有時候會好，但錯誤訊息沒留下來。'],['「先截圖傳給我，我遠端看。」',.5,5,'有錯誤訊息才好判斷。']]};
 // 平日 08:30–17:30 在位子上的專責工程師（NPC），值班可以把自己領域的單升級給他們
 const NPC_SPEC={net:'網路組 阿凱',sec:'資安 小瑜',db:'DBA 老張',app:'應用組 小翔',sys:'系統組 阿偉',med:'PACS 阿哲',hw:null};
 function specAvailable(dom){if(!S||S.role!=='duty')return false;const k=S.shiftKeyUsed;if(k!=='day')return false;const clock=S.shift.start+S.time;return NPC_SPEC[dom]&&clock>=8*60+30&&clock<17*60+30;}
 function askBoss(t){const clock=S.shift.start+S.time;if(S.role!=='duty'||S.shiftKeyUsed!=='day'||clock<8*60+30||clock>=17*60+30){toast('主任不在。');return;}t.askedBoss=true;t.prog-=20;S.askBossN=(S.askBossN||0)+1;toast('主任：「照規定走啦。」（你等他回電等了 20 分鐘）');const pr=procOf(t);if(pr){t.bossHint=true;}}
-const isBasic=t=>{const d=domOf(t);return d==='hw'||t.dur<=10||/帳號被鎖|讀卡機|螢幕|印表機|開不了機|卡紙|PDF|投影|叫號|掃描槍/.test(t.title);};
+const isBasic=t=>{const d=domOf(t);return d==='hw'||t.dur<=10||/帳號被鎖|讀卡機|螢幕|印表機|開不了機|卡紙|PDF|投影|叫號|掃描槍|條碼槍|鍵盤|滑鼠|標籤|充電/.test(t.title);};
 const SCOLD=['「這種你自己來好不好。」','「值班是幹嘛的？」','「我在改 config，你丟一個印表機給我？」','「下次先看一下再轉。」'];
 function escalate(t){const dom=domOf(t);if(!specAvailable(dom))return;const nm=NPC_SPEC[dom];S.npcQueue=S.npcQueue||{};const q=S.npcQueue[dom]=S.npcQueue[dom]||[];S.npcBlock=S.npcBlock||{};
  if(S.npcBlock[dom]>S.time){toast(nm+'已讀不回。（剛被你惹毛，'+Math.ceil(S.npcBlock[dom]-S.time)+' 分鐘後再說）');return;}
@@ -972,6 +994,10 @@ const TRIAGE={
 const EV=[
  [0,'office','交接：看值班排程與昨夜告警',10,60,'sched',null,0,'sched'],
  [4,'opd','診間 12 電腦開不了機',15,40],
+ [50,'ward4','護理站藍牙條碼槍掃不到病人手圈',10,25,'prio'],
+ [120,'opd','診間鍵盤打不出字',10,30],
+ [230,'er','急診檢體標籤印不出來',10,20,'prio'],
+ [300,'opd','診間 9 開 HIS 跳錯誤視窗',15,30],
  [95,'opd','診間 7 電腦網路不通，隔壁都正常',15,40],
  [150,'opd','門診說健保雲端藥歷查不到，讀卡上傳失敗',20,30,'prio'],
  [215,'ward2','護理站中央監視站收不到 3 到 6 床的資料',20,20,'prio'],
@@ -1022,6 +1048,8 @@ const EV_EVE=[ // 小夜 16:00–00:00：晚診到 21:00、急診重、行政沒
  [0,'office','交接：看白班未結工單與晚間排程',10,60,'sched',null,0,'sched'],
  [145,'ward4','病房整層網路時好時壞，HIS 一直斷線',25,25,'prio'],
  [60,'ward2','平板同意書簽完存不了，病人在等',15,25,'prio'],
+ [100,'ward3','行動護理車筆電插著電沒在充電',15,30],
+ [200,'opd','晚診診間電腦網路一下有一下沒有',15,35],
  [63,'opd','晚診診間 8 讀卡機讀不到',10,40],
  [76,'er','檢傷台螢幕沒畫面',10,30,'prio'],
  [90,'ward4','給藥車平板連不到 WiFi',15,45],
@@ -1050,6 +1078,8 @@ const EV_EVE=[ // 小夜 16:00–00:00：晚診到 21:00、急診重、行政沒
 const EV_NIGHT=[ // 大夜 00:00–08:00：電話少、排程多、機房多
  [0,'office','交接：確認今晚排程清單（備份／版更／重啟）',10,60,'sched',null,0,'sched'],
  [150,'ward2','病房網路電話全部沒聲音，WiFi 也斷了',20,25,'prio'],
+ [90,'er','急診檢體標籤印出來位置跑掉',10,20,'prio'],
+ [200,'ward3','藍牙條碼槍掃不到手圈，正要給藥',10,20,'prio'],
  [80,'server','00:20 磁帶／備份媒體更換',15,60,'sched',null,0,'sched'],
  [100,'er','檢傷台電腦當機',15,30,'prio'],
  [150,'or','開刀房：半夜急刀，麻醉記錄工作站開不了機',15,20,'prio','or'],
@@ -1074,6 +1104,7 @@ const EV_HOL=[ // 假日白班 08:00–17:30：只有上午診、行政沒人、
  [8,'opd','假日上午診診間 5 電腦開不了機',15,40],
  [120,'opd','假日上午診診間 2 電腦網路不通',15,40],
  [200,'ward4','平板同意書簽不了，家屬在等著簽',15,25,'prio'],
+ [150,'ward3','滑鼠不會動，護理站在打交班紀錄',10,30],
  [25,'er','檢傷台電腦當機',15,30,'prio'],
  [38,'ward3','給藥車平板連不到 WiFi',15,45],
  [59,'xray','X 光工作站螢幕沒畫面',15,40,'normal','xray'],
