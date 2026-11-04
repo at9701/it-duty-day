@@ -780,7 +780,7 @@ const TRAITS={none:{name:'普通',desc:'做了幾年，不快不慢。沒有學�
 function hasSkill(a,d){return a.skills&&a.skills.has(d);}
 function skillMult(a,t){let m=1;if(hasSkill(a,domOf(t)))m*=1.3;if(a.trait==='rookie')m*=0.8;if(a.trait==='caffeine'&&a===S.player&&buffMult()<=1)m*=0.95;return m;}
 const SKILL={};
-function openProc(t){if(t.notReally){t.notReally=false;t.prog=t.dur-2;S.procN++;S.procOk++;toast(['到現場一看：插頭根本沒插。他說「我以為有插」。','到現場：訊號線接在另一台螢幕上。「我剛剛有拔啊」。','到現場：電源延長線的開關是關的。'][Math.floor(rnd()*3)]+' 2 分鐘搞定。');S.lessons.push({task:t,q:'電話教他重接，他說弄了還是不行',txt:'相信他弄了',note:'到現場才發現根本沒插。這種事電話裡聽不出來。',best:'叫他邊講邊做：「你現在手有摸到那條線嗎？」',bestNote:'電話教要一步一步問，不要只問「弄了嗎」。',sev:1});beginWork(t);return;}
+function openProc(t){if(t.notReally){t.notReally=false;t.prog=t.dur-2;S.procN++;S.procOk++;toast(['到現場一看：插頭根本沒插。他說「我以為有插」。','到現場：訊號線接在另一台螢幕上。「我剛剛有拔啊」。','到現場：插頭被清潔推車撞得半鬆，插緊就好。'][Math.floor(rnd()*3)]+' 2 分鐘搞定。');S.lessons.push({task:t,q:'電話教他重接，他說弄了還是不行',txt:'相信他弄了',note:'到現場才發現根本沒插。這種事電話裡聽不出來。',best:'叫他邊講邊做：「你現在手有摸到那條線嗎？」',bestNote:'電話教要一步一步問，不要只問「弄了嗎」。',sev:1});beginWork(t);return;}
  const pr=procOf(t);if(!pr){beginWork(t);return;}S.paused=true;const d=document.getElementById('dlg'),b=document.getElementById('dlgBox');d.hidden=false;
  const expert=hasSkill(S.player,pr.dom);let hint=expert;const steps=[];
  const render=(key)=>{const st=pr[key];b.innerHTML='';const h=document.createElement('h2');h.textContent=locName(t.room)+'：'+t.title;b.appendChild(h);
@@ -798,7 +798,7 @@ function openProc(t){if(t.notReally){t.notReally=false;t.prog=t.dur-2;S.procN++;
 // GUIDE[類別]={say:對方在電話裡說的, opts:[[你說的話, 成功機率, 講幾分鐘, 說明, flag]]}。「你重開機看看」每一類都有，機率不一樣。
 const REBOOT='你先重開機看看。';
 const GUIDE={
- boot:{say:'「按了沒反應啊，燈都沒亮。」',opts:[[REBOOT,.05,3,'都開不了機了還重開。'],['「主機後面電源線拔掉再插，延長線開關有開嗎？」',.45,5,'診間最常見：清潔阿姨踢到。'],['「螢幕右下角那個燈是什麼顏色？」',.35,6,'橘燈是沒訊號，有時候只是螢幕被關掉。'],['「先用隔壁診間的電腦，我等一下過去。」',0,2,'等於放棄電話教，直接跑。']]},
+ boot:{say:'「按了沒反應啊，燈都沒亮。」',opts:[[REBOOT,.05,3,'都開不了機了還重開。'],['「主機後面那條電源線，跟牆上的插頭都壓緊一下，再按一次。」',.45,5,'診間最常見：拖地或推車撞到，插頭半鬆。'],['「螢幕右下角那個燈是什麼顏色？」',.35,6,'橘燈是沒訊號，有時候只是螢幕被關掉。'],['「先用隔壁診間的電腦，我等一下過去。」',0,2,'等於放棄電話教，直接跑。']]},
  wifi:{say:'「平板右上角那個 WiFi 一直在轉圈圈。」',opts:[[REBOOT,.3,4,'平板重開有時會重新拿憑證。'],['「飛航模式開了關、再關掉。」',.35,3,'比重開快。'],['「設定裡把醫院網路忘記再重新連，帳號用工號。」',.5,8,'憑證重新拿，多半會好。'],['「把它推到護理站櫃台旁邊再試。」',.15,2,'訊號問題才有用。']]},
  card:{say:'「健保卡插進去都沒反應欸。」',opts:[[REBOOT,.5,5,'讀卡服務卡住，重開有一半會好。'],['「USB 拔掉換一個孔插。」',.55,2,'最快。'],['「桌面有個健保讀卡的圖示，點開按重新連線。」',.5,4,'要對方會找圖示。']]},
  display:{say:'「螢幕是黑的，可是電腦有在跑。」',opts:[[REBOOT,.3,4,'有時會好，但原因不是這個。'],['「螢幕上的電源鈕按一下，看燈。」',.4,2,'常常只是螢幕被關掉。'],['「鍵盤按 Windows 鍵加 P，選複製。」',.45,3,'接投影或雙螢幕時最常見。'],['「把螢幕線拔掉重插，兩頭都要。」',.4,4,'線鬆。']]},
