@@ -419,7 +419,7 @@ function route(from,to){const steps=[];let cur={b:from.b,f:from.f,x:from.x};
 // o: 1 對、2 可以但有後果、0 錯。pen 多耗分鐘。flag: sec 資安踩線 / data 弄丟資料 / rep 之後再壞。下一步 null = 開始動手
 const PROC={
  boot:{dom:'hw',start:'a',
-  a:{q:'診間說電腦開不了機。到現場第一步？',opts:[
+  a:{q:'{room}說電腦開不了機。到現場第一步？',opts:[
    ['看主機電源燈、聽風扇、看螢幕訊號燈',1,0,'','先分清楚是電源、顯示還是系統的問題，三個查法不一樣。','b'],
    ['先換備機讓他們看診',2,15,'','能先上線，但備機要加網域、裝 HIS、設印表機，原機還是要處理。','b'],
    ['直接重灌',0,45,'data','還沒分出是硬體還是系統，桌面資料沒了。',null],
@@ -433,7 +433,7 @@ const PROC={
    ['重灌',0,30,'data','硬碟都快掛了還往上裝。',null],
    ['先用備機，原機帶回去慢慢弄',2,10,'','可以，但今天這張單還是沒結。',null]]}},
  wifi:{dom:'net',start:'a',
-  a:{q:'護理站給藥車連不到 WiFi。先問什麼？',opts:[
+  a:{q:'{room}的給藥車連不到 WiFi。先問什麼？',opts:[
    ['問：只有這台還是整站都不行？其他手機平板呢？',1,0,'','一台壞就看那台，整站壞才看 AP 或交換器。','b'],
    ['先重開 AP',0,20,'rep','整站跟著斷，而且多半不是 AP。','b'],
    ['叫他們換一台',2,10,'','有備品可以，但原因沒找。','b']]},
@@ -445,7 +445,7 @@ const PROC={
    ['重新派發憑證、測試連線、順便查同批還有幾台快過期',1,0,'','一次解一批，不然下禮拜天天接電話。',null],
    ['只修這台',2,0,'rep','今天好了，同批的明天打來。',null]]}},
  card:{dom:'hw',start:'a',
-  a:{q:'掛號櫃台讀卡機讀不到健保卡。',opts:[
+  a:{q:'{room}的讀卡機讀不到健保卡。',opts:[
    ['換 USB 孔、看裝置管理員有沒有抓到',1,0,'','先確認電腦有認到那台讀卡機。','b'],
    ['直接換讀卡機',2,8,'','有備品可以先換，原因沒找。',null],
    ['重灌',0,45,'data','不用做到這樣。',null]]},
@@ -462,7 +462,7 @@ const PROC={
    ['換另一種接頭（DP↔HDMI）、調更新率',1,0,'','閃爍常是線材品質或更新率不合。',null],
    ['降解析度',2,0,'','能用但看診很痛苦。',null]]}},
  share:{dom:'sys',start:'a',
-  a:{q:'人事室說共享資料夾存取被拒。',opts:[
+  a:{q:'{room}說共享資料夾存取被拒。',opts:[
    ['先確認是一個人還是整個單位不行',1,0,'','範圍決定查帳號還是查權限。','b'],
    ['把資料夾開給 Everyone',0,5,'sec+leak','人事資料全院看得到。',null],
    ['請他重開機',0,15,'','權限問題重開沒用。','b']]},
@@ -496,7 +496,7 @@ const PROC={
    ['解鎖，並問手機／第二台電腦是否存著舊密碼',1,0,'','鎖定八成是別的裝置用舊密碼一直試。',null],
    ['解鎖就好',2,0,'rep','十分鐘後又鎖。',null]]}},
  slow:{dom:'net',start:'a',
-  a:{q:'門診說 HIS 很慢。',opts:[
+  a:{q:'{room}說 HIS 很慢。',opts:[
    ['問範圍：一台、一層、還是全院？',1,0,'','範圍問出來，方向就出來了。','b'],
    ['重開那台電腦',0,15,'','整層都慢，重開一台沒有用。','b'],
    ['重開那層交換器',0,25,'rep+floordown','整層斷線，還不一定是它。','b']]},
@@ -525,7 +525,7 @@ const PROC={
    ['掃配對條碼重新配對、測試',1,0,'','重新配對就好。',null],
    ['換電池',2,5,'','也可能，但先配對。',null]]}},
  printer:{dom:'hw',start:'a',
-  a:{q:'護理站印表機整站不印。',opts:[
+  a:{q:'{room}的印表機不印。',opts:[
    ['看印表機面板有沒有錯誤、ping 它的 IP',1,0,'','先確認印表機本身是活的。','b'],
    ['換印表機',2,15,'','常常不是它壞。',null],
    ['每台電腦重裝驅動',0,30,'','整站都不印就不是驅動的問題。','b']]},
@@ -574,7 +574,7 @@ const PROC={
    ['在非手術時段更新、更新後跑一次功能驗證',1,0,'','更新完要驗證過才算完成。',null],
    ['更新完就走',2,0,'rep','明天手術發現不能用。',null]]}},
  mail:{dom:'app',start:'a',
-  a:{q:'副院長手機信箱同步不了。',opts:[
+  a:{q:'{room}說手機收不到信、信箱同步不了。',opts:[
    ['問：最近有沒有改密碼？其他裝置正常嗎？',1,0,'','最近改過密碼的話，八成就是這個。','b'],
    ['直接移除帳號重加',2,5,'','能解，但沒找到原因。',null]]},
   b:{q:'他說上週有改過密碼。',opts:[
@@ -599,7 +599,7 @@ const PROC={
    ['換網路線／換交換器埠',1,0,'','燈不亮是線或埠的問題。',null],
    ['重開主機',2,5,'rep','只是暫時好，之後會再來。',null]]}},
  pacs:{dom:'net',start:'a',
-  a:{q:'急診 PACS 看不到影像。',opts:[
+  a:{q:'{room}：PACS 看不到影像。',opts:[
    ['確認一台、一區、還是全院',1,0,'','先問清楚範圍，再決定看哪裡。','b'],
    ['重開 PACS 伺服器',0,30,'data+pacsdown','重開的時候全院都看不到影像，而且問題不一定在它。',null]]},
   b:{q:'確認了，只有急診這一區看不到。',opts:[
@@ -784,7 +784,6 @@ const DEEPEN={
  patch:{a:[['只更新不重啟',2,0,'rep','沒重啟更新根本沒生效。','b']],b:[['重開一次整台',2,10,'rep','能解，原因還在。',null]]},
  svccheck:{a:[['打給各單位問「有沒有問題」',2,5,'','這個時間他們還沒上班。','b']],b:{q:'PACS 開影像正常，但 LIS 查報告回「連線逾時」。',opts:[['看 LIS 介接服務是否起來、DB 連線數',1,0,'','介接服務最常沒自啟。',null],['等 8 點檢驗科上班再說',0,0,'rep','急診七點就要抽血了。',null],['重啟整台 LIS',2,15,'rep','可以，但先看服務有沒有起來。',null]]}},
  clinicprep:{a:[['只巡昨天有壞的那幾間',2,0,'rep','今天壞的是別間。','b']],b:[['先關掉那間診',0,0,'','那間早上是滿診。',null]]},
- handover:{a:[['用 LINE 傳一段',2,0,'','LINE 訊息不算交接紀錄。','b']],b:[['把你的手機號碼給他',2,0,'','你會在睡覺時接電話。',null]]},
  auditreply:{a:[['請各系統負責人自己回',2,10,'','最後彙整的還是你，等於多繞一圈。','b']],b:[['刪掉那一項',0,0,'sec','稽核手上有底稿，刪掉也沒用。',null]]},
  monthly:{a:[['用上個月的改日期',0,0,'','主任一眼就看得出來。','b']],b:{q:'主任：「漏接率為什麼比上月高？」',opts:[['對照排班：上月有兩天只排一人，附數據提人力需求',1,0,'','數字要能講出原因，月報才有用。',null],['說是系統統計怪怪的',0,0,'','主任會自己去查系統。',null],['說下月會改善',2,0,'','主任會接著問：怎麼改善？',null]]}},
  govletter:{a:[['先打電話問承辦可不可以展延',2,5,'','可以問，但先把能補的補。','b']],b:{q:'找不到其中一件的通報收執。',opts:[['從通報系統重新下載，或請承辦補發',1,0,'','收執在系統上都查得到。',null],['自己做一張',0,0,'sec','這是偽造公文。',null],['說遺失',2,0,'','說遺失會被要求寫說明。',null]]}},
@@ -846,7 +845,7 @@ function applyDeepen(){for(const k in DEEPEN){const pr=PROC[k];if(!pr)continue;f
  // 一步樹的第一步若只有 null 下一步，接到新加的 b
  for(const k in DEEPEN){const pr=PROC[k];if(!pr)continue;if(pr.b&&pr.a){pr.a.opts.forEach(o=>{if(o[1]===1&&o[5]==null)o[5]='b';});}}}
 
-const PROC_KEY=[['官網','web'],['機房巡檢','patrol'],['巡檢（排程）','patrol'],['批次','batch'],['媒體更換','tape'],['韌體更新','firmware'],['版更','patch'],['服務檢查','svccheck'],['開診前','clinicprep'],['日誌','handover'],['交接','handover'],['稽核缺失','auditreply'],['月報','monthly'],['來函','govletter'],['委員會：','committee'],['事件統計','committee'],['情資','vulnscan'],['廠商工程師','byod_vendor'],['小米路由器','byod_router'],['Raspberry','byod_pi'],['iPad','byod_ipad'],['Switch','byod_switch'],['監視器主機','byod_iot'],['家屬要 WiFi','byod_guest'],['施工的廠商','byod_contractor'],['轉檔工具','install2'],['開不了機','boot'],['WiFi','wifi'],['讀卡機','card'],['螢幕','display'],['投影','display'],['共享資料夾','share'],['當機','crash'],['SOC','soc'],['帳號被鎖','lock'],['很慢','slow'],['報稅軟體','install'],['掃描槍','scanner'],['印表機','printer'],['印不出','printer'],['UPS','ups'],['中毒','virus'],['損毀','restore'],['到職','onboard'],['驅動','update'],['韌體','update'],['版更','update'],['信箱','mail'],['PDF','pdf'],['簡報檔','pdf'],['視訊','av'],['叫號','signage'],['PACS','pacs'],['資料庫回應','dbslow'],['溫度','temp'],['斷線','wifi']];
+const PROC_KEY=[['交接：','takeover'],['值班日誌','handover'],['叫號','signage'],['RAID','pacs_dr'],['燒光碟','pacs_cd'],['燒錄','pacs_cd'],['要接 PACS','pacs_new'],['沒傳到 PACS','pacs_send'],['開影像很慢','pacs_ws'],['影像很慢','pacs_ws'],['X 光拍完','pacs_er'],['傳影像失敗','pacs_er'],['加密共享','soc'],['C2','soc'],['DHCP','floornet'],['整層斷線','floornet'],['資安署','vulnintel'],['DB 唯讀','dbgrant'],['更新後開不了','boot'],['訪客網路','wifi'],['官網','web'],['機房巡檢','patrol'],['巡檢（排程）','patrol'],['批次','batch'],['媒體更換','tape'],['韌體更新','firmware'],['版更','patch'],['服務檢查','svccheck'],['開診前','clinicprep'],['日誌','handover'],['交接','handover'],['稽核缺失','auditreply'],['月報','monthly'],['來函','govletter'],['委員會：','committee'],['事件統計','committee'],['情資','vulnscan'],['廠商工程師','byod_vendor'],['小米路由器','byod_router'],['Raspberry','byod_pi'],['iPad','byod_ipad'],['Switch','byod_switch'],['監視器主機','byod_iot'],['家屬要 WiFi','byod_guest'],['施工的廠商','byod_contractor'],['轉檔工具','install2'],['開不了機','boot'],['WiFi','wifi'],['讀卡機','card'],['螢幕','display'],['投影','display'],['共享資料夾','share'],['當機','crash'],['SOC','soc'],['帳號被鎖','lock'],['很慢','slow'],['報稅軟體','install'],['掃描槍','scanner'],['印表機','printer'],['印不出','printer'],['UPS','ups'],['中毒','virus'],['損毀','restore'],['到職','onboard'],['驅動','update'],['韌體','update'],['版更','update'],['信箱','mail'],['PDF','pdf'],['簡報檔','pdf'],['視訊','av'],['叫號','signage'],['PACS','pacs'],['資料庫回應','dbslow'],['溫度','temp'],['斷線','wifi']];
 function procOf(t){if(t.procKey&&PROC[t.procKey])return PROC[t.procKey];if(t.tri)return null;if(t.kind==='backup')return PROC.backup;for(const [k,v] of PROC_KEY)if(t.title.includes(k))return PROC[v];if(t.src==='sched')return PROC.check;return null;}
 function domOf(t){const p=procOf(t);return p?p.dom:(t.tri?'med':'sys');}
 const SKILLS={sys:{name:'系統／AD',desc:'Windows、AD、帳號權限、伺服器'},net:{name:'網路',desc:'交換器、WiFi、VLAN、PACS 走的路'},sec:{name:'資安',desc:'MDE、SOC 告警、中毒處理、軟體審核'},db:{name:'資料庫',desc:'HIS DB、備份、鎖定與長查詢'},hw:{name:'硬體維修',desc:'開不了機、螢幕、讀卡機、印表機、掃描槍'},app:{name:'應用系統',desc:'HIS 功能、信箱、檔案還原、官網'},med:{name:'醫療設備',desc:'X光／MRI／心導管工作站，分得出電腦還是儀器'}};
@@ -858,11 +857,11 @@ function openProc(t){if(t.notReally){t.notReally=false;t.prog=t.dur-2;S.procN++;
  const pr=procOf(t);if(!pr){beginWork(t);return;}S.paused=true;const d=document.getElementById('dlg'),b=document.getElementById('dlgBox');d.hidden=false;
  const expert=hasSkill(S.player,pr.dom);let hint=expert;const steps=[];
  const render=(key)=>{const st=pr[key];b.innerHTML='';const h=document.createElement('h2');h.textContent=locName(t.room)+'：'+t.title;b.appendChild(h);
-  const p=document.createElement('p');p.textContent=st.q;b.appendChild(p);if(expert){const e=document.createElement('p');e.className='hint';e.textContent='這是你的專長，★ 是你一看就知道的做法。';b.appendChild(e);}
+  const p=document.createElement('p');p.textContent=st.q.replace(/\{room\}/g,t.room.name);b.appendChild(p);if(expert){const e=document.createElement('p');e.className='hint';e.textContent='這是你的專長，★ 是你一看就知道的做法。';b.appendChild(e);}
   const list=document.createElement('div');list.className='list';
   st.opts.forEach(([txt,o,pen,f,note,next])=>{const bt=document.createElement('button');bt.style.textAlign='left';bt.textContent=(hint&&o===1?'★ ':'')+txt;
-   bt.onclick=()=>{S.procN++;{const bo=st.opts.find(x=>x[1]===1)||['','','','',''];(S.decisions=S.decisions||[]).push({tm:S.time,room:locName(t.room),title:t.title,q:st.q,txt,o,note,best:bo[0],bestNote:bo[4]});}let extra=0;if(!S.env.spare&&txt.includes('備機'))extra+=20;if(!S.env.vendor&&txt.includes('廠商')&&o!==1)extra+=30;if(extra){t.prog-=extra;toast((txt.includes('備機')?'沒有備機庫存，先去倉庫找':'沒有維護合約，廠商慢慢來')+'（+'+extra+' 分）');}
-   if(o===1){S.procOk++;toast('對，就是這樣做。'+note);}else{if(o===0)S.procBad++;t.prog-=pen*(S.player.trait==='vet'?0.7:1);applyFlags(f,t,txt);const best=st.opts.find(o=>o[1]===1);S.lessons.push({task:t,q:st.q,txt,note,best:best?best[0]:'',bestNote:best?best[4]:'',sev:o===0?2:1});toast((o===2?'可以啦，但：':'這樣不行：')+note+(pen?'（多耗 '+pen+' 分）':''));}
+   bt.onclick=()=>{S.procN++;{const bo=st.opts.find(x=>x[1]===1)||['','','','',''];(S.decisions=S.decisions||[]).push({tm:S.time,room:locName(t.room),title:t.title,q:st.q.replace(/\{room\}/g,t.room.name),txt,o,note,best:bo[0],bestNote:bo[4]});}let extra=0;if(!S.env.spare&&txt.includes('備機'))extra+=20;if(!S.env.vendor&&txt.includes('廠商')&&o!==1)extra+=30;if(extra){t.prog-=extra;toast((txt.includes('備機')?'沒有備機庫存，先去倉庫找':'沒有維護合約，廠商慢慢來')+'（+'+extra+' 分）');}
+   if(o===1){S.procOk++;toast('對，就是這樣做。'+note);}else{if(o===0)S.procBad++;t.prog-=pen*(S.player.trait==='vet'?0.7:1);applyFlags(f,t,txt);const best=st.opts.find(o=>o[1]===1);S.lessons.push({task:t,q:st.q.replace(/\{room\}/g,t.room.name),txt,note,best:best?best[0]:'',bestNote:best?best[4]:'',sev:o===0?2:1});toast((o===2?'可以啦，但：':'這樣不行：')+note+(pen?'（多耗 '+pen+' 分）':''));}
     if(o===1&&next&&pr[next]){hint=expert;render(next);}else{d.hidden=true;S.paused=false;beginWork(t);}};list.appendChild(bt);});
   if(S.role==='duty'&&S.shiftKeyUsed==='day'&&!t.bossHint&&pr.dom==='sec'&&!hint){const ab=document.createElement('button');ab.textContent='打給主任請示（+20 分，照他說的做）';ab.onclick=()=>{askBoss(t);hint=true;render(key);};list.appendChild(ab);}
   if(S.player.trait==='rookie'&&!hint){const ask=document.createElement('button');ask.textContent='打給學長問一下（+5 分）';ask.onclick=()=>{t.prog-=5;S.asked++;hint=true;render(key);};list.appendChild(ask);}
@@ -932,7 +931,14 @@ Object.assign(PROC,{
  patch:{dom:'sys',start:'a',a:{q:'AP 伺服器版更與重啟。',opts:[['快照／備份、確認服務相依順序、公告、更新、重啟後逐一驗證服務',1,0,'','版更的重點在重啟後的驗證。','b'],['直接更新重啟',0,0,'rep+hisdown','HIS 起來了但 PACS 介接沒起來，早上才發現。',null]]},b:{q:'重啟後有一個服務沒自動啟動。',opts:[['手動啟動、查為什麼沒自啟、設成自動、記錄',1,0,'','先手動啟動沒關係，但要記下來，不然下次又要猜。',null],['手動啟動就好',2,0,'rep','下次重啟一樣沒起來。',null]]}},
  svccheck:{dom:'sys',start:'a',a:{q:'重啟完了，要一個一個檢查服務。',opts:[['逐項：HIS 登入＋開一筆醫囑、PACS 開一張影像、LIS 查一筆報告，再打給急診確認',1,0,'','「服務有起來」和「使用者能用」是兩件事。',null],['看服務清單全綠就好',0,0,'rep','全綠，但 DB 連線池沒起來，急診七點打來。',null]]}},
  clinicprep:{dom:'hw',start:'a',a:{q:'開診前要先巡一輪診間。',opts:[['每間：電腦開機、HIS 登入、讀卡機讀一張卡、測試列印一張',1,0,'','開診前十分鐘發現印表機沒紙，比開診後發現好。','b'],['走一圈看電腦有亮就好',0,0,'rep','診 5 的讀卡機昨天就壞了。',null]]},b:{q:'診 3 印表機測試頁印不出來，離開診 20 分鐘。',opts:[['換備用印表機，原機帶回修',1,0,'','開診前只做換不做修。',null],['現場修',0,15,'','開診了還在修。',null]]}},
- handover:{dom:'sys',start:'a',a:{q:'要寫日誌、跟下一班交接了。',opts:[['未結工單、今天的告警、答應過單位的時間、注意事項，寫完口頭再講一次',1,0,'','交接漏一件，下一班的人被罵的是你那件。','b'],['寫「無異常」',0,0,'rep','三張沒結的單變成沒人知道。',null]]},b:{q:'下一班的人說「你講的那台我不熟」。',opts:[['帶他看一下、把聯絡人寫進日誌',1,0,'','多五分鐘，少一通半夜電話。',null],['他會的啦',2,0,'rep','他不會的，到時候電話還是打給你。',null]]}},
+ takeover:{dom:'sys',start:'a',a:{q:'上一班的同事等著下班，要交接給你。你先怎麼接？',opts:[['請他對著日誌講一遍：還沒結的單、昨晚的告警、答應單位幾點要回的事，有問題當場問',1,0,'','人還在的時候問最快，他一走就只剩日誌了。','b'],['日誌看一下就好，讓他先下班',2,5,'','日誌寫得再好也會漏，漏的要自己慢慢問。','b'],['先接電話，交接等一下再說',0,10,'rep','上一班答應單位的事你不知道，對方再打來就變成你的事。',null],['看 LINE 群組昨晚有沒有人留話',0,5,'','交接散在聊天紀錄裡，漏了也找不到人負責。',null]]},
+  b:{q:'日誌上有一筆：「ICU 中央監視站凌晨斷線兩次，重開後正常，先觀察。」你要？',opts:[['記下來，上班時間一到就打給 ICU 確認狀況，排時間查斷線原因',1,0,'','「先觀察」沒有人接手，就是沒有人在觀察。',null],['上一班說正常了，就不管它',0,0,'rep','中午再斷一次，ICU 會問你早上為什麼沒處理。',null],['直接打給網路組請他們查',2,5,'','可以，但你自己先看過，轉單的時候才講得清楚。',null]]}},
+ handover:{dom:'sys',start:'a',a:{q:'快下班了，要把這一班交給下一班。你怎麼交？',opts:[['日誌寫清楚：還沒結的單、今天的告警、答應單位幾點回覆的事，等下一班來再對著日誌講一次',1,0,'','有寫又有講，下一班才接得住。','b'],['日誌寫「無異常」，反正事情都處理了',0,0,'rep','還有三張單沒結，下一班不知道，單位再打來就炸了。',null],['在 LINE 群組丟一段，人到了就走',2,0,'','LINE 訊息會被洗掉，事後也查不到；至少日誌要寫。','b'],['不用寫，等下一班來口頭講就好',0,0,'rep','講完就沒了，下一班忘了一件、被問有沒有交接，你拿不出東西。',null]]},
+  b:{q:'下一班的同事看完日誌說：「你寫 ICU 那台要觀察，可是那台我不熟。」',opts:[['帶他去看那台在哪、怎麼重開，把 ICU 聯絡人和分機寫進日誌',1,0,'','多花五分鐘，下一班就不用半夜打給你。',null],['跟他說「應該不會再斷啦」',0,0,'rep','真的又斷了，他只能打給已經下班的你。',null],['把你的手機號碼給他，有事打給你',2,0,'','可以救急，但你會在睡覺時接電話；能寫進日誌的先寫。',null]]}},
+ floornet:{dom:'net',start:'a',a:{q:'{room}整層網路出問題：有的電腦斷線，有的拿到 192.168 開頭的 IP。先做什麼？',opts:[['看那一層交換器的 log 跟 DHCP 租約，找出是哪個網路孔在發 IP',1,0,'','拿到奇怪的 IP，八成是有人私接會發 DHCP 的設備。','b'],['一台一台幫他們重開機',0,20,'','重開還是拿到錯的 IP，白跑一層樓。',null],['重開那一層的交換器',2,10,'','會好一下，但私接的設備還在，等一下又來。','b'],['先叫廠商來看',0,30,'','等廠商到，整層已經停擺一個小時。',null]]},
+  b:{q:'找到了：診間桌下一台家用路由器，網路線插反了，整層都被它發了 IP。',opts:[['拔掉、關掉那個網路孔，拍照留證，通知單位主管並寫事件紀錄',1,0,'','私接要留紀錄，不然下週又會出現。',null],['拔掉就好，不用講',2,0,'rep','醫師下週又帶來接。',null],['幫他設定好，讓他繼續用',0,0,'sec','私接的無線基地台就是一個後門。',null]]}},
+ vulnintel:{dom:'sec',start:'a',a:{q:'資安署通報：某品牌 VPN 有高風險漏洞，三天內要清查回覆。先做什麼？',opts:[['從資產清冊查出有沒有用這個品牌、幾台、什麼版本，對照公告的受影響版本',1,0,'','先知道自己有沒有、有幾台，才回得出去。','b'],['直接回覆「本院未使用」',0,0,'sec','沒查就回，之後查到有用就是不實回報。',null],['先把 VPN 全關了',0,0,'','全院遠端看診、廠商維護一起停，院長會先打來。',null],['等原廠出修補再說',2,10,'','期限內還是要回報清查結果。','b']]},
+  b:{q:'查到兩台在受影響的版本，原廠修補明天才出。',opts:[['先套原廠公告的暫時緩解措施，查 log 有沒有被打過的跡象，回報進度和預計修補時間',1,0,'','暫時措施加上查有沒有被打，回報才完整。',null],['等修補出來再一起回',2,0,'','期限會過，先回進度。',null],['先回「已修補」',0,0,'sec','還沒修就寫已修，被抽查就是不實回報。',null]]}},
  auditreply:{dom:'sec',start:'a',a:{q:'資安稽核缺失回覆，今天到期。',opts:[['每項缺失：原因、矯正措施、完成期限、佐證（截圖／紀錄），缺的先寫改善計畫',1,0,'','稽核要的是證據，不是承諾。','b'],['全部回「已改善」',0,0,'sec','下次稽核會抽查，查到就是重大缺失。',null]]},b:{q:'有一項（弱密碼帳號）真的還沒改完。',opts:[['誠實寫進度與期限，附已改比例',1,0,'','寫實話的缺失不會被加重。',null],['先寫已完成，之後補',0,0,'sec','被抽到就是偽造。',null]]}},
  monthly:{dom:'app',start:'a',a:{q:'主任要這個月的月報：事件數跟可用率。',opts:[['資料來源寫清楚、跟上月同期比、異常項目寫原因與處置',1,0,'','主任要看的是「為什麼」不是數字。',null],['把工單系統匯出的表直接貼上',0,0,'','主任會問你這個數字是什麼意思。',null]]}},
  govletter:{dom:'sec',start:'a',a:{q:'衛福部來函：補上月資安事件通報紀錄。',opts:[['查通報系統紀錄、補齊附件、主任簽核、在期限前上傳並留收執',1,0,'','回公文要有證據、有簽核，而且要在期限內。',null],['回覆「上月無事件」',0,0,'sec','上月有一件你忘了。',null]]}},
