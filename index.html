@@ -375,7 +375,7 @@ function tickNPCs(dt){const F=FLOORS[viewKey()];if(!F||!F.npcs)return;const now=
  const r=a.room;let tx,ty;if(a.home){tx=a.home.x+Math.floor(rnd()*a.home.w);ty=a.home.y+Math.floor(rnd()*a.home.h);}else{tx=r.x+1+Math.floor(rnd()*(r.w-2));ty=r.y+(rnd()<0.5?1:r.h-2);}const p=bfs(a.key,a.x,a.y,tx,ty);if(p&&p.length<8){a.path=p;a.steps=[{type:'walk',x:tx,y:ty}];}});}
 // 額外單位的任務模板（固定 id 以外的單位，依 base 抽）
 const TPL={
- ward:[['給藥車平板連不到 WiFi',15,45],['整層網路時好時壞',25,25,'prio'],['護理師帳號被鎖',5,30,'normal',1],['整站印表機不印',15,50],['護理站電腦當機',15,45],['給藥車電腦斷線',15,45]],
+ ward:[['平板同意書簽不了',15,25,'prio'],['給藥車平板連不到 WiFi',15,45],['整層網路時好時壞',25,25,'prio'],['護理師帳號被鎖',5,30,'normal',1],['整站印表機不印',15,50],['護理站電腦當機',15,45],['給藥車電腦斷線',15,45]],
  icu:[['中央監視站電腦當機',15,20,'prio'],['中央監視站收不到幾床床邊機的資料',20,20,'prio'],['護理師帳號被鎖',5,30,'normal',1],['印表機不印',10,40]],
  opd:[['診間電腦開不了機',15,40],['診間電腦網路不通',15,40],['讀卡機讀不到健保卡',10,40],['診間螢幕閃爍',10,60],['整層 HIS 開藥很慢',20,40],['處方列印不出',10,30,'prio']],
  er:[['檢傷台電腦當機',15,30,'prio'],['無線掃描槍連不上',10,35],['急診護理站印表機不印',10,40]],
@@ -850,7 +850,7 @@ function applyDeepen(){for(const k in DEEPEN){const pr=PROC[k];if(!pr)continue;f
  for(const k in DEEPEN){const pr=PROC[k];if(!pr)continue;if(pr.b&&pr.a){pr.a.opts.forEach(o=>{if(o[1]===1&&o[5]==null)o[5]='b';});}}}
 
 const PROC_KEY=[['交接：','takeover'],['卡紙','printjam'],['匯出 Excel','xlsexport'],['網路不通','portdown'],['時好時壞','loop'],['健保雲端','nhivpn'],['上網正常','dns'],['網路電話','poe'],['監視站收不到','monitornet'],['值班日誌','handover'],['叫號','signage'],['RAID','pacs_dr'],['燒光碟','pacs_cd'],['燒錄','pacs_cd'],['要接 PACS','pacs_new'],['沒傳到 PACS','pacs_send'],['開影像很慢','pacs_ws'],['影像很慢','pacs_ws'],['X 光拍完','pacs_er'],['傳影像失敗','pacs_er'],['加密共享','soc'],['C2','soc'],['DHCP','floornet'],['整層斷線','floornet'],['資安署','vulnintel'],['DB 唯讀','dbgrant'],['更新後開不了','boot'],['訪客網路','wifi'],['官網','web'],['機房巡檢','patrol'],['巡檢（排程）','patrol'],['批次','batch'],['媒體更換','tape'],['韌體更新','firmware'],['版更','patch'],['服務檢查','svccheck'],['開診前','clinicprep'],['日誌','handover'],['交接','handover'],['稽核缺失','auditreply'],['月報','monthly'],['來函','govletter'],['委員會：','committee'],['事件統計','committee'],['情資','vulnscan'],['廠商工程師','byod_vendor'],['小米路由器','byod_router'],['Raspberry','byod_pi'],['iPad','byod_ipad'],['Switch','byod_switch'],['監視器主機','byod_iot'],['家屬要 WiFi','byod_guest'],['施工的廠商','byod_contractor'],['轉檔工具','install2'],['開不了機','boot'],['WiFi','wifi'],['讀卡機','card'],['螢幕','display'],['投影','display'],['共享資料夾','share'],['當機','crash'],['SOC','soc'],['帳號被鎖','lock'],['很慢','slow'],['報稅軟體','install'],['掃描槍','scanner'],['印表機','printer'],['印不出','printer'],['UPS','ups'],['中毒','virus'],['損毀','restore'],['到職','onboard'],['驅動','update'],['韌體','update'],['版更','update'],['信箱','mail'],['PDF','pdf'],['簡報檔','pdf'],['視訊','av'],['叫號','signage'],['PACS','pacs'],['資料庫回應','dbslow'],['溫度','temp'],['斷線','wifi']];
-function procOf(t){if(t.procKey&&PROC[t.procKey])return PROC[t.procKey];if(t.id!=null&&!t.procKey&&/很慢/.test(t.title)&&!/影像|資料庫/.test(t.title)){t.procKey=rnd()<0.5?'slowapp':'slow';return PROC[t.procKey];}if(t.tri)return null;if(t.kind==='backup')return PROC.backup;for(const [k,v] of PROC_KEY)if(t.title.includes(k))return PROC[v];if(t.src==='sched')return PROC.check;return null;}
+function procOf(t){if(t.procKey&&PROC[t.procKey])return PROC[t.procKey];if(t.id!=null&&!t.procKey&&/平板.*同意書|電子同意書/.test(t.title)){t.procKey=rnd()<0.5?'econsent_net':'econsent_app';return PROC[t.procKey];}if(t.id!=null&&!t.procKey&&/很慢/.test(t.title)&&!/影像|資料庫/.test(t.title)){t.procKey=rnd()<0.5?'slowapp':'slow';return PROC[t.procKey];}if(t.tri)return null;if(t.kind==='backup')return PROC.backup;for(const [k,v] of PROC_KEY)if(t.title.includes(k))return PROC[v];if(t.src==='sched')return PROC.check;return null;}
 function domOf(t){const p=procOf(t);return p?p.dom:(t.tri?'med':'sys');}
 const SKILLS={sys:{name:'系統／AD',desc:'Windows、AD、帳號權限、伺服器'},net:{name:'網路',desc:'交換器、WiFi、VLAN、PACS 走的路'},sec:{name:'資安',desc:'MDE、SOC 告警、中毒處理、軟體審核'},db:{name:'資料庫',desc:'HIS DB、備份、鎖定與長查詢'},hw:{name:'硬體維修',desc:'開不了機、螢幕、讀卡機、印表機、掃描槍'},app:{name:'應用系統',desc:'HIS 功能、信箱、檔案還原、官網'},med:{name:'醫療設備',desc:'X光／MRI／心導管工作站，分得出電腦還是儀器'}};
 const TRAITS={none:{name:'普通',desc:'做了幾年，不快不慢。沒有學長可以問，因為你就是學長。'},talk:{name:'嘴甜',desc:'很會講。電話教人成功率高兩成，民眾打來問官網的時候會提示你怎麼回。'},fit:{name:'體力好',desc:'走路快四分之一，比較不會想上廁所。'},vet:{name:'老鳥',desc:'總務、儀器組、廠商都認識。選錯做法多花的時間打七折，出事的後果也會晚一點才到。'},caffeine:{name:'咖啡成癮',desc:'咖啡對你特別有用（效果 1.5 倍），但更容易想上廁所，沒喝的時候還會慢一點。'},rookie:{name:'剛報到',desc:'什麼都慢兩成，但選做法的時候可以打給學長問，問一次 5 分鐘。'}};
@@ -1002,6 +1002,14 @@ GUIDE.printjam={say:'「印表機卡紙了，紙拉不出來。」',opts:[[REBOO
 GUIDE.portdown={say:'「右下角那個網路圖示有個紅叉叉。」',opts:[[REBOOT,.15,4,'線或 port 的問題重開沒用。'],['「電腦後面那條網路線，兩頭都拔起來再插緊。」',.4,4,'線鬆掉最常見。'],['「牆上網路孔旁邊的小燈有沒有亮？」',.2,3,'不亮多半要人過去看。']]};
 GUIDE.dns={say:'「HIS 點下去一直轉，可是 Google 開得起來。」',opts:[[REBOOT,.3,4,'剛好清掉 DNS 快取會好，但原因不知道。'],['「我遠端看一下你的網路設定。」',.55,6,'遠端就能把 DNS 改回來。']]};
 GUIDE.xlsexport={say:'「報表匯出來 Excel 打不開，說格式不符。」',opts:[[REBOOT,.05,3,'跟重開沒關係。'],['「跳出來的視窗按『是』，看能不能開。」',.6,2,'多半是副檔名的問題。']]};
+(()=>{const A={q:'{room}說平板簽同意書有問題，病人在等著簽。先問什麼？',opts:[['問清楚：是打不開、簽完存不了，還是很慢？只有這台還是每台平板都一樣？平板 WiFi 有沒有連上？',1,0,'','先問出是哪一種、範圍多大，才分得出是程式還是網路。','b'],['叫他們先改簽紙本',2,0,'','可以先救急，但紙本之後要掃描歸檔，原因也還沒找。','b'],['直接說是程式的問題，轉給程式組',0,0,'','還沒分清楚就轉，程式組會丟回來。','b'],['叫他們把平板重開',2,3,'','有時候會好，但不知道原因。','b']]};
+PROC.econsent_net={dom:'net',start:'a',a:A,
+  b:{q:'只有這台不行，其他平板都正常。這台 WiFi 顯示已連線，同意書一直轉圈；用同一個帳號在別台登入是正常的。',opts:[['是這台的網路：看它連的是哪個 SSID、有沒有拿到 IP、802.1X 憑證有沒有過期',1,0,'','同一個帳號在別台正常，程式就沒問題，問題在這台的連線。','c'],['轉給程式組',0,0,'','同一個帳號在別台正常，程式沒問題，程式組會丟回來。',null],['重裝同意書 App',2,10,'','可能會好，但問題不在 App。',null]]},
+  c:{q:'這台自己連到訪客網路，院內系統連不到。',opts:[['從 MDM 把訪客網路的設定移除，改回院內網路、確認憑證，請護理師再簽一次，確認有存進病歷',1,0,'','移除訪客網路的設定，它才不會自己又連回去；簽完要確認真的存進病歷。',null],['手動連回院內網路就好',2,0,'rep','平板記得訪客網路，下次又自己連過去。',null],['把院內 WiFi 密碼給護理站，以後自己連',0,0,'sec','院內 WiFi 密碼從此流出去。',null]]}};
+PROC.econsent_app={dom:'app',start:'a',a:A,
+  b:{q:'每台平板都一樣，網路正常，其他系統都開得起來，只有按「簽名完成」後跳「上傳失敗」。',opts:[['網路正常、其他系統能用，是同意書程式的問題：截圖錯誤訊息、記下時間和病歷號，轉給程式組',1,0,'','有截圖、時間跟病歷號，程式組才查得到。','c'],['重開 AP',0,15,'rep','網路沒問題，重開 AP 整區斷線。',null],['一台一台重開平板',0,15,'','每台都一樣，不是平板的問題。',null]]},
+  c:{q:'程式組回覆：今天早上更新後，簽名上傳的服務沒起來，正在處理，大概 30 分鐘。',opts:[['回覆單位預計時間，請他們先簽紙本，記下哪幾位病人之後要補電子檔',1,0,'','單位知道要等多久、這段時間怎麼辦，就不會一直打來。',null],['跟單位說「程式組在處理」就掛電話',2,0,'','單位不知道要等多久，也不知道這段時間怎麼辦。',null],['叫他們等 30 分鐘再簽',0,0,'','病人等著要做檢查、進開刀房，不能乾等。',null]]}};
+GUIDE.econsent_net=GUIDE.econsent_app={say:'「平板簽同意書一直轉圈圈，病人在等。」',opts:[[REBOOT,.25,3,'平板重開有時會好，但原因不知道。'],['「其他平板也一樣嗎？WiFi 圖示有連上嗎？」',.3,3,'先問範圍，多半還是要人過去看。']]};})();
 // 平日 08:30–17:30 在位子上的專責工程師（NPC），值班可以把自己領域的單升級給他們
 const NPC_SPEC={net:'網路組 阿凱',sec:'資安 小瑜',db:'DBA 老張',app:'應用組 小翔',sys:'系統組 阿偉',med:'PACS 阿哲',hw:null};
 function specAvailable(dom){if(!S||S.role!=='duty')return false;const k=S.shiftKeyUsed;if(k!=='day')return false;const clock=S.shift.start+S.time;return NPC_SPEC[dom]&&clock>=8*60+30&&clock<17*60+30;}
@@ -1040,6 +1048,7 @@ const EV=[
  [95,'opd','診間 7 電腦網路不通，隔壁都正常',15,40],
  [150,'opd','門診說健保雲端藥歷查不到，讀卡上傳失敗',20,30,'prio'],
  [215,'ward2','護理站中央監視站收不到 3 到 6 床的資料',20,20,'prio'],
+ [175,'ward3','病房平板同意書簽不了，病人在等著簽',15,25,'prio'],
  [265,'cashier','批價櫃台 HIS 打不開，可是上網正常',15,30],
  [13,'ward3','給藥車平板連不到 WiFi',15,45],
  [21,'exec','院長室投影機接不上筆電',10,20,'prio',null,0,'boss'],
@@ -1085,6 +1094,7 @@ const EV=[
 const EV_EVE=[ // 小夜 16:00–00:00：晚診到 21:00、急診重、行政沒人、21:00 日結批次
  [0,'office','交接：看白班未結工單與晚間排程',10,60,'sched',null,0,'sched'],
  [145,'ward4','病房整層網路時好時壞，HIS 一直斷線',25,25,'prio'],
+ [60,'ward2','平板同意書簽完存不了，病人在等',15,25,'prio'],
  [63,'opd','晚診診間 8 讀卡機讀不到',10,40],
  [76,'er','檢傷台螢幕沒畫面',10,30,'prio'],
  [90,'ward4','給藥車平板連不到 WiFi',15,45],
@@ -1136,6 +1146,7 @@ const EV_HOL=[ // 假日白班 08:00–17:30：只有上午診、行政沒人、
  [0,'office','交接：看值班排程與昨夜告警',10,60,'sched',null,0,'sched'],
  [8,'opd','假日上午診診間 5 電腦開不了機',15,40],
  [120,'opd','假日上午診診間 2 電腦網路不通',15,40],
+ [200,'ward4','平板同意書簽不了，家屬在等著簽',15,25,'prio'],
  [25,'er','檢傷台電腦當機',15,30,'prio'],
  [38,'ward3','給藥車平板連不到 WiFi',15,45],
  [59,'xray','X 光工作站螢幕沒畫面',15,40,'normal','xray'],
