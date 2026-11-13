@@ -147,6 +147,15 @@ th{color:var(--muted);font-weight:500}
 td.c{text-align:left;color:var(--fg)}td.c.bad{color:var(--crit)}td.c.meh{color:var(--warn)}td.c.good{color:var(--ok)}
 .quote{border-left:3px solid var(--accent);padding:6px 10px;margin-top:10px;font-style:italic}
 .fpsNote{position:fixed;right:14px;top:14px;z-index:5;font-size:11px;color:var(--muted);background:rgba(23,28,38,.8);padding:3px 8px;border-radius:4px}
+#joy{position:fixed;left:18px;bottom:150px;z-index:6;width:96px;height:96px;border-radius:50%;background:rgba(23,28,38,.7);border:1px solid var(--line);touch-action:none;display:flex;align-items:center;justify-content:center}
+#joy i{width:40px;height:40px;border-radius:50%;background:var(--accent);opacity:.85;pointer-events:none}
+#coach{position:fixed;inset:0;z-index:30;background:rgba(5,7,10,.55);display:flex;align-items:center;justify-content:center;padding:16px}
+#coach .cbox{position:relative;z-index:2;max-width:380px;width:100%;background:var(--panel);border:1px solid var(--accent);border-radius:10px;padding:16px 18px;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+#coach .cbox b{font-size:18px}#coach .cbox p{margin:8px 0 14px;line-height:1.6}#coach .row{display:flex;gap:8px;align-items:center}#coach small{color:var(--muted)}
+#coHi{position:fixed;z-index:1;border:3px solid var(--accent);border-radius:12px;box-shadow:0 0 0 9999px rgba(5,7,10,.35);pointer-events:none;animation:coPulse 1s ease-in-out infinite alternate}
+@keyframes coPulse{to{border-color:rgba(95,211,166,.35)}}
+@media (max-width:640px){#dkNext{position:fixed;right:14px;bottom:74px}}
+@media (prefers-reduced-motion:reduce){#coHi{animation:none}}
 @media (prefers-reduced-motion:reduce){.toast{transition:none}.ring,.card.ring .bar,.dock .big .badge.ring{animation:none}}
 @media (max-width:640px){.hud{min-width:0}.hud .stats{display:none}.status{max-width:calc(100vw - 28px);bottom:84px}.dock .big{width:50px;height:50px}.dock .big i{font-size:18px}}
 </style>
@@ -181,8 +190,9 @@ td.c{text-align:left;color:var(--fg)}td.c.bad{color:var(--crit)}td.c.meh{color:v
 <div class="dock" id="dock" hidden>
   <div class="col">
     <span class="seg" id="spd" title="×1 = 1 秒半分鐘，一班 16 分鐘"><button class="on" data-s="1">×1</button><button data-s="2">×2</button><button data-s="4">×4</button><button data-s="8">×8</button></span>
-    <button id="pause">暫停</button>
+    <span style="display:flex;gap:6px"><button id="pause" style="flex:1">暫停</button><button id="snd" title="音效開關" aria-label="音效開關">🔊</button><button id="help" title="操作說明" aria-label="操作說明">？</button></span>
   </div>
+  <button class="big" id="dkNext" title="帶我去最急的工單（F）"><i>🧭</i>帶路</button>
   <button class="big" id="dkWC" title="廁所"><i>🚻</i>廁所<span class="badge" id="wcBadge" hidden></span></button>
   <button class="big" id="dkMap" title="院區"><i>🗺️</i>院區</button>
   <button class="big" id="dkBag" title="包包／動作"><i>🎒</i>包包<span class="badge" id="bagBadge" hidden></span></button>
@@ -217,6 +227,8 @@ td.c{text-align:left;color:var(--fg)}td.c.bad{color:var(--crit)}td.c.meh{color:v
 
 <div class="transit" id="transit" hidden></div>
 <div class="toast" id="toast"></div>
+<div id="joy" hidden><i></i></div>
+<div id="coach" hidden><div id="coHi" hidden></div><div class="cbox"><b id="coT"></b><p id="coP"></p><div class="row"><small id="coN"></small><span style="flex:1"></span><button id="coSkip">跳過</button><button class="primary" id="coNext">下一步</button></div></div></div>
 
 <div class="overlay" id="start">
   <div class="box">
@@ -860,17 +872,33 @@ const SKILL={};
 function openProc(t){if(t.notReally){t.notReally=false;t.prog=t.dur-2;S.procN++;S.procOk++;toast(['到現場一看：插頭根本沒插。他說「我以為有插」。','到現場：訊號線接在另一台螢幕上。「我剛剛有拔啊」。','到現場：插頭被清潔推車撞得半鬆，插緊就好。'][Math.floor(rnd()*3)]+' 2 分鐘搞定。');S.lessons.push({task:t,q:'電話教他重接，他說弄了還是不行',txt:'相信他弄了',note:'到現場才發現根本沒插。這種事電話裡聽不出來。',best:'叫他邊講邊做：「你現在手有摸到那條線嗎？」',bestNote:'電話教要一步一步問，不要只問「弄了嗎」。',sev:1});beginWork(t);return;}
  const pr=procOf(t);if(!pr){beginWork(t);return;}S.paused=true;const d=document.getElementById('dlg'),b=document.getElementById('dlgBox');d.hidden=false;
  const expert=hasSkill(S.player,pr.dom);let hint=expert;const steps=[];
- const render=(key)=>{const st=pr[key];b.innerHTML='';const h=document.createElement('h2');h.textContent=locName(t.room)+'：'+t.title;b.appendChild(h);
+ const render=(key)=>{const st=pr[key];b.innerHTML='';const h=document.createElement('h2');h.textContent=locName(t.room)+'：'+t.title;b.appendChild(h);b.appendChild(whoRow(t));
   const p=document.createElement('p');p.textContent=st.q.replace(/\{room\}/g,t.room.name);b.appendChild(p);if(expert){const e=document.createElement('p');e.className='hint';e.textContent='這是你的專長，★ 是你一看就知道的做法。';b.appendChild(e);}
   const list=document.createElement('div');list.className='list';
   st.opts.map(o=>[Math.random(),o]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]).forEach(([txt,o,pen,f,note,next])=>{const bt=document.createElement('button');bt.style.textAlign='left';bt.textContent=(hint&&o===1?'★ ':'')+txt;
    bt.onclick=()=>{S.procN++;{const bo=st.opts.find(x=>x[1]===1)||['','','','',''];(S.decisions=S.decisions||[]).push({tm:S.time,room:locName(t.room),title:t.title,q:st.q.replace(/\{room\}/g,t.room.name),txt,o,note,best:bo[0],bestNote:bo[4]});}let extra=0;if(!S.env.spare&&txt.includes('備機'))extra+=20;if(!S.env.vendor&&txt.includes('廠商')&&o!==1)extra+=30;if(extra){t.prog-=extra;toast((txt.includes('備機')?'沒有備機庫存，先去倉庫找':'沒有維護合約，廠商慢慢來')+'（+'+extra+' 分）');}
-   if(o===1){S.procOk++;toast('對，就是這樣做。'+note);}else{if(o===0)S.procBad++;t.prog-=pen*(S.player.trait==='vet'?0.7:1);applyFlags(f,t,txt);const best=st.opts.find(o=>o[1]===1);S.lessons.push({task:t,q:st.q.replace(/\{room\}/g,t.room.name),txt,note,best:best?best[0]:'',bestNote:best?best[4]:'',sev:o===0?2:1});toast((o===2?'可以啦，但：':'這樣不行：')+note+(pen?'（多耗 '+pen+' 分）':''));}
-    if(o===1&&next&&pr[next]){hint=expert;render(next);}else{d.hidden=true;S.paused=false;beginWork(t);}};list.appendChild(bt);});
+   const best=st.opts.find(o=>o[1]===1);if(o===1){S.procOk++;}else{if(o===0)S.procBad++;t.prog-=pen*(S.player.trait==='vet'?0.7:1);applyFlags(f,t,txt);S.lessons.push({task:t,q:st.q.replace(/\{room\}/g,t.room.name),txt,note,best:best?best[0]:'',bestNote:best?best[4]:'',sev:o===0?2:1});}
+    const go=()=>{if(o===1&&next&&pr[next]){hint=expert;render(next);}else{d.hidden=true;S.paused=false;beginWork(t);}};
+    showFb(b,h.textContent,{o,txt,note,pen,best:o===1?null:best,more:o===1&&next&&pr[next]},go);};list.appendChild(bt);});
   if(S.role==='duty'&&S.shiftKeyUsed==='day'&&!t.bossHint&&pr.dom==='sec'&&!hint){const ab=document.createElement('button');ab.textContent='打給主任請示（+20 分，照他說的做）';ab.onclick=()=>{askBoss(t);hint=true;render(key);};list.appendChild(ab);}
   if(S.player.trait==='rookie'&&!hint){const ask=document.createElement('button');ask.textContent='打給學長問一下（+5 分）';ask.onclick=()=>{t.prog-=5;S.asked++;hint=true;render(key);};list.appendChild(ask);}
   b.appendChild(list);};
  render(pr.start);}
+// ---- 對話：誰打來、選完之後的回饋 ----
+const WHO={opd:['🩺','門診護理師'],ward:['💉','病房護理師'],icu:['💉','加護病房護理師'],er:['🚑','急診護理師'],reg:['🧾','掛號櫃台'],cashier:['🧾','批價櫃台'],pharmacy:['💊','藥師'],lab:['🧪','醫檢師'],xray:['🩻','放射師'],ct:['🩻','放射師'],mri:['🩻','放射師'],report:['🩻','放射科醫師'],or:['😷','開刀房護理師'],cath:['❤️','心導管室技術員'],exec:['📋','院長室秘書'],dialysis:['💉','洗腎室護理師'],endo:['🔬','內視鏡室護理師'],rehab:['🦿','復健治療師']};
+function whoRow(t){const row=document.createElement('div');row.style.cssText='display:flex;gap:10px;align-items:center;margin:2px 0 10px';
+ let ic,name;if(t.src==='alert'){ic='🔔';name='監控告警';}else if(t.src==='sched'){ic='🗓️';name='排程工作';}else if(t.src==='boss'){ic='👔';name='主任交辦';}else{const w=WHO[t.room.base]||['☎️',t.room.name+'同仁'];ic=w[0];name=w[1];}
+ const left=t.t+t.pat-S.time,r=t.pat?Math.max(0,Math.min(1,left/t.pat)):1;const person=!(t.src==='alert'||t.src==='sched');
+ const mood=!person?(left<=0?'已經逾時':'剩 '+Math.ceil(left)+' 分'):left<=0?'已經在火大了':r<0.5?'語氣有點急':'語氣還算平穩';const col=left<=0?'var(--crit)':r<0.5?'var(--warn)':'var(--accent)';
+ row.innerHTML='<span style="flex:none;width:42px;height:42px;border-radius:50%;background:var(--panel2);border:2px solid '+col+';display:flex;align-items:center;justify-content:center;font-size:22px">'+ic+'</span><span style="min-width:0;flex:1"><b>'+name+'</b> <small style="color:'+col+'">'+mood+'</small><span style="display:block;height:4px;border-radius:2px;background:var(--line);margin-top:5px;overflow:hidden"><i style="display:block;height:100%;width:'+Math.round(r*100)+'%;background:'+col+'"></i></span></span>';return row;}
+function showFb(b,title,r,go){const col=r.o===1?'var(--accent)':r.o===2?'var(--warn)':'var(--crit)';const head=r.o===1?'✔ 對，就是這樣做':r.o===2?'△ 可以，但有更好的做法':'✘ 這樣不行';
+ if(window.sfx)sfx(r.o===1?'good':r.o===2?'ok':'bad');b.innerHTML='';const h=document.createElement('h2');h.textContent=title;b.appendChild(h);
+ const box=document.createElement('div');box.style.cssText='border-left:5px solid '+col+';background:var(--panel2);border-radius:6px;padding:12px 14px;margin:8px 0 12px';
+ const add=(txt,css)=>{const e=document.createElement('div');e.textContent=txt;if(css)e.style.cssText=css;box.appendChild(e);return e;};
+ add(head,'font-weight:700;font-size:17px;color:'+col+';margin-bottom:6px');add('你選的：'+r.txt,'color:var(--muted);font-size:13px;margin-bottom:6px');if(r.note)add(r.note);
+ if(r.pen)add('多耗 '+r.pen+' 分鐘','color:'+col+';font-size:13px;margin-top:6px');
+ if(r.best){add('比較好的做法','font-weight:700;font-size:13px;margin-top:12px;color:var(--accent)');add(r.best[0]);if(r.best[4])add(r.best[4],'color:var(--muted);font-size:13px;margin-top:2px');}
+ b.appendChild(box);const bt=document.createElement('button');bt.className='primary';bt.textContent=r.more?'下一步':'開始處理';bt.onclick=go;b.appendChild(bt);setTimeout(()=>{try{bt.focus()}catch(e){}},30);}
 // ---- 電話教的選項 ----
 // GUIDE[類別]={say:對方在電話裡說的, opts:[[你說的話, 成功機率, 講幾分鐘, 說明, flag]]}。「你重開機看看」每一類都有，機率不一樣。
 const REBOOT='你先重開機看看。';
@@ -1806,6 +1834,7 @@ const camera=new THREE.PerspectiveCamera(42,1,0.1,200);
 const hemi=new THREE.HemisphereLight(0xdfe8ff,0x2a2f3a,0.75);scene.add(hemi);
 const sun=new THREE.DirectionalLight(0xfff2dd,0.95);sun.position.set(14,22,10);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-32;sun.shadow.camera.right=32;sun.shadow.camera.top=24;sun.shadow.camera.bottom=-24;sun.shadow.camera.near=1;sun.shadow.camera.far=60;sun.shadow.bias=-0.0008;scene.add(sun);sun.target.position.set(24,0,9);scene.add(sun.target);
 const amb=new THREE.AmbientLight(0xffffff,0.25);scene.add(amb);
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(400,400),new THREE.MeshLambertMaterial({color:0x2a3546}));ground.rotation.x=-Math.PI/2;ground.position.set(24,-0.08,9);scene.add(ground);
 function resize(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();extCam.aspect=w/h;extCam.updateProjectionMatrix();}
 // ---------- 共用素材 ----------
 const geo=new THREE.BoxGeometry(1,1,1);
@@ -2558,11 +2587,11 @@ function tickActors(key,now){const F=FLOORS[key];const list=[...(F.npcs||[]),...
   e.g.position.set(wx,0.3+(walking?Math.abs(Math.sin(e.phase))*0.03:0),wz);e.g.rotation.y=e.ang;});
  for(const [a,e] of AG){if(!seen.has(a))e.g.visible=false;}}
 function draw3d(){const now=performance.now();if(!S){renderExterior(now);return;}
- if(S!==curS){curS=S;for(const [a,e] of AG)scene.remove(e.g);AG.clear();curKey=null;document.getElementById('hud').hidden=false;document.getElementById('status').hidden=false;document.getElementById('dock').hidden=false;}
+ if(S!==curS){curS=S;for(const [a,e] of AG)scene.remove(e.g);AG.clear();curKey=null;document.getElementById('hud').hidden=false;document.getElementById('status').hidden=false;document.getElementById('dock').hidden=false;maybeCoach();}
  const key=viewKey();if(key!==curKey){for(const [a,e] of AG){if(a.key!==key||a.transit){scene.remove(e.g);e.g.traverse(o=>{if(o.geometry&&o.geometry!==BLOBGEO)o.geometry.dispose();});AG.delete(a);}}buildFloor(key);}const F=FLOORS[key];const P=S.player;
  // 鏡頭跟人（看別層時看整層）
- if(S.view&&S.view!==P.key){const fx=window.__fx?(window.__fx[0]+window.__fx[1])/2:W/2;camT.lerp(new THREE.Vector3(fx,0,window.__fz||6),0.2);}else{camT.lerp(new THREE.Vector3(P.x+P.px+0.5,0,P.y+P.py+0.5),0.1);}
- placeCam();tickActors(key,now);tickLEDs(now);
+ if(S.view&&S.view!==P.key){const fx=window.__fx?(window.__fx[0]+window.__fx[1])/2:W/2;camT.lerp(new THREE.Vector3(fx,0,window.__fz||6),0.2);}else{camT.lerp(new THREE.Vector3(Math.max(7,Math.min(W-7,P.x+P.px+0.5)),0,Math.max(5,Math.min(H-4,P.y+P.py+0.5))),0.1);}
+ placeCam();tickActors(key,now);tickLEDs(now);tickGuide(key,now);tickSfx(now);
  // 任務方塊
  const vis=visible().filter(t=>t.room.key===key);markers.forEach(m=>{m.mesh.visible=false;if(m.ring)m.ring.visible=false;});{let n=0;for(const t of S.tasks){if(t._dev!==t.room.key&&t.state!=='done'&&(t.t<=S.time||t.state==='ringing')){bindTask(t);if(++n>=3)break;}}}
  vis.forEach((t,i)=>{let m=markers.find(m=>m.t===t);if(!m){const mesh=new THREE.Mesh(geo,bmat(0xffffff));mesh.scale.set(0.36,0.36,0.36);FG.add(mesh);m={mesh,t};markers.push(m);}
@@ -2583,16 +2612,18 @@ function draw3d(){const now=performance.now();if(!S){renderExterior(now);return;
  (F.npcs||[]).forEach((a,i)=>{const t=vis.find(t=>t.room===a.room&&!t.assignee);if(!t||a!==F.npcs.find(n=>n.room===a.room))return;const late=S.time>t.t+t.pat;label('npc_'+i,a.x+a.px+0.5,1.45,a.y+a.py+0.5,'bubble'+(late?' late':''),late?'快一點！':'幫忙一下',()=>hitTask(t));});
  // 名牌
  [...S.helpers,S.player].forEach((a,i)=>{if(a.away>0||a.transit||a.key!==key)return;let h='<span style="color:'+a.color+'">'+a.name+'</span>'+(a.phone||a.guide?' ☎':'')+(a===P&&S.eating?' 🍱':'');if(a.busy){const t=a.busy.task;h+='<span class="pg"><i style="width:'+Math.round(Math.max(0,Math.min(1,t.prog/t.dur))*100)+'%;background:'+a.color+'"></i></span>';}label('nm_'+i,a.x+a.px+0.5,1.5,a.y+a.py+0.5,'name',h,null);});
- if(!P.transit&&P.key===key&&!P.busy&&!P.phone&&!P.guide){const here=visible().find(t=>canWork(t,P)&&(!t.assignee||t.assignee===P));if(here)label('hint_sp',P.x+P.px+0.5,0.0,P.y+P.py+0.9,'hintkey','空白鍵：處理',()=>startWork(here,P));}
+ if(!P.transit&&P.key===key&&!P.busy&&!P.phone&&!P.guide){const here=visible().find(t=>canWork(t,P)&&(!t.assignee||t.assignee===P));if(here)label('hint_sp',P.x+P.px+0.5,0.0,P.y+P.py+0.9,'hintkey',TOUCH?'點這裡：處理':'空白鍵：處理',()=>startWork(here,P));}
  // 廁所：站上去就提示；小七／美食街：到了自動把包包打開
  {const onWC=!P.transit&&P.key===key&&G(key)[P.y][P.x]===7;
   if(S.wc>0)label('hint_wc',P.x+P.px+0.5,0.0,P.y+P.py+0.9,'hintkey','廁所中… 剩 '+Math.ceil(S.wc)+' 分',null);
-  else if(onWC&&!P.phone&&!P.guide&&!moving(P))label('hint_wc',P.x+P.px+0.5,0.0,P.y+P.py+0.9,'hintkey','空白鍵：上廁所（5 分）',doWC);
+  else if(onWC&&!P.phone&&!P.guide&&!moving(P))label('hint_wc',P.x+P.px+0.5,0.0,P.y+P.py+0.9,'hintkey',TOUCH?'點這裡：上廁所（5 分）':'空白鍵：上廁所（5 分）',doWC);
   const hr=roomAt(P);const isShop=hr&&MENU[hr.id]&&hr!==OFFICE;if(isShop&&!moving(P)&&S._lastShop!==hr.id){S._lastShop=hr.id;openDrawer('dkBag');}
   if(isShop&&!moving(P)&&S.buying<=0&&!S.eating)label('hint_shop',P.x+P.px+0.5,0.0,P.y+P.py+0.9,'hintkey','🎒 看這裡能買什麼',()=>openDrawer('dkBag'));}
  sweepLabels();
  // 夜班光線
- const clockMin=((S.shift.start+S.time)%1440+1440)%1440;const night=clockMin<6*60||clockMin>=18*60;hemi.intensity=night?0.45:0.75;sun.intensity=night?0.35:0.95;amb.intensity=night?0.18:0.25;scene.background.setHex(night?0x06080c:0x0b0e14);
+ {const cm=((S.shift.start+S.time)%1440+1440)%1440,hr=cm/60;const up=Math.max(0,Math.min(1,(hr-5.5)/1.5)),dn=Math.max(0,Math.min(1,(19-hr)/1.5));const day=Math.min(up,dn);const edge=day>0&&day<1?1-Math.abs(day*2-1):0;
+  hemi.intensity=0.45+0.3*day;sun.intensity=0.35+0.6*day;amb.intensity=0.18+0.07*day;sun.color.setRGB(1,0.95-0.2*edge,0.87-0.37*edge);
+  const bg=scene.background;bg.setRGB(0.03+0.10*day+0.08*edge,0.04+0.13*day+0.02*edge,0.06+0.17*day);scene.fog.color.copy(bg);ground.material.color.setRGB(0.07+0.10*day+0.05*edge,0.09+0.12*day,0.12+0.15*day);}
  document.getElementById('transit').hidden=!P.transit||!!S.view;if(P.transit&&!S.view)document.getElementById('transit').textContent=P.transit.label+'\n'+Math.ceil(P.transit.remain)+' 分';
  renderer.render(scene,camera);
  // fps 監看：太慢就降
@@ -2623,6 +2654,57 @@ let extN=1;
 function renderExterior(now){const dk=(typeof diffKey!=='undefined')?diffKey:'hard';if(dk!==extDiff)buildExterior(dk);const span=(extN-1)*15+30;const a=now/16000;const d=Math.max(44,span*1.15);const lx=-Math.max(9,span*0.28);extCam.position.set(lx+Math.sin(a)*d,15+Math.sin(now/9000)*2,Math.cos(a)*d+6);extCam.lookAt(lx,5,0);extCam.aspect=innerWidth/innerHeight;extCam.updateProjectionMatrix();renderer.render(extScene,extCam);
  document.getElementById('hud').hidden=true;document.getElementById('status').hidden=true;document.getElementById('dock').hidden=true;['drTasks','drBag','drMap'].forEach(id=>document.getElementById(id).hidden=true);sweepLabels();}
 // 沒進遊戲時也要一直畫（開場背景）
+// ---------- 導引點：往哪裡走，地上看得到 ----------
+const TOUCH=window.matchMedia&&matchMedia('(pointer:coarse)').matches;
+const GN=72;const guideMesh=new THREE.InstancedMesh(new THREE.CircleGeometry(0.09,10),new THREE.MeshBasicMaterial({color:0x5fd3a6,transparent:true,opacity:0.85,depthWrite:false}),GN);guideMesh.frustumCulled=false;guideMesh.count=0;scene.add(guideMesh);
+const destRing=new THREE.Mesh(new THREE.RingGeometry(0.28,0.36,28),new THREE.MeshBasicMaterial({color:0x5fd3a6,transparent:true,opacity:0.9,depthWrite:false}));destRing.rotation.x=-Math.PI/2;destRing.visible=false;scene.add(destRing);
+const _gm=new THREE.Matrix4(),_gq=new THREE.Quaternion().setFromEuler(new THREE.Euler(-Math.PI/2,0,0)),_gp=new THREE.Vector3(),_gs=new THREE.Vector3();
+function tickGuide(key,now){const P=S.player;const path=(P.key===key&&!P.transit&&P.path)?P.path:[];const n=Math.min(GN,path.length);
+ for(let i=0;i<n;i++){const k=1+0.35*Math.sin(now/160-i*0.7);_gp.set(path[i][0]+0.5,0.035,path[i][1]+0.5);_gs.set(k,k,k);_gm.compose(_gp,_gq,_gs);guideMesh.setMatrixAt(i,_gm);}
+ guideMesh.count=n;guideMesh.instanceMatrix.needsUpdate=true;
+ if(n){const e=path[path.length-1];destRing.visible=true;destRing.position.set(e[0]+0.5,0.04,e[1]+0.5);const k=1+0.18*Math.sin(now/200);destRing.scale.set(k,k,k);}else destRing.visible=false;}
+// ---------- 帶路：直接去最急的那一張 ----------
+function goUrgent(){if(!S||S.over||S.paused)return;const P=S.player;if(P.phone||P.guide||S.wc>0||P.transit||S.meeting>0)return;
+ const ts=visible().filter(t=>!t.assignee||t.assignee===P).sort((a,b)=>((a.kind==='prio'?0:1)-(b.kind==='prio'?0:1))||((a.t+a.pat)-(b.t+b.pat)));
+ if(!ts.length){toast('現在沒有等你處理的工單');return;}const t=ts[0];toast('帶你去：'+locName(t.room)+'・'+t.title);hitTask(t);}
+document.getElementById('dkNext').onclick=goUrgent;
+window.addEventListener('keydown',e=>{if(e.key==='f'||e.key==='F'){if(e.target&&/INPUT|TEXTAREA/.test(e.target.tagName))return;goUrgent();}});
+// ---------- 音效（合成音，不用載檔案） ----------
+let AC=null,mute=false;try{mute=localStorage.getItem('itduty_mute')==='1'}catch(e){}
+const sndBtn=document.getElementById('snd');const sndUI=()=>{sndBtn.textContent=mute?'🔇':'🔊';sndBtn.setAttribute('aria-pressed',mute?'false':'true');};sndUI();
+sndBtn.onclick=()=>{mute=!mute;try{localStorage.setItem('itduty_mute',mute?'1':'0')}catch(e){}sndUI();if(!mute)sfx('good');};
+const wake=()=>{if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}else if(AC.state==='suspended')AC.resume();};
+window.addEventListener('pointerdown',wake,true);window.addEventListener('keydown',wake,true);
+function tone(f,t0,dur,type,vol){const o=AC.createOscillator(),g=AC.createGain();o.type=type||'sine';o.frequency.value=f;const t=AC.currentTime+t0;g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(vol||0.12,t+0.015);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+dur+0.03);}
+const SFX={ring:()=>{for(let r=0;r<2;r++)for(let i=0;i<6;i++)tone(i%2?1320:1040,r*0.55+i*0.06,0.06,'square',0.05);},alert:()=>{[0,0.18,0.36].forEach(t=>tone(880,t,0.11,'triangle',0.11));},
+ good:()=>{tone(660,0,0.12);tone(880,0.1,0.12);tone(1320,0.2,0.2);},ok:()=>{tone(620,0,0.14);tone(620,0.16,0.16);},bad:()=>{tone(330,0,0.18,'sawtooth',0.07);tone(220,0.16,0.3,'sawtooth',0.07);},done:()=>{tone(784,0,0.09);tone(1175,0.08,0.16);}};
+function sfx(n){if(mute||!AC||AC.state!=='running'||!SFX[n])return;try{SFX[n]()}catch(e){}}
+window.sfx=sfx;
+let _sfxT=0,_sfxS=null,_nRing=0,_nPrio=0,_nDone=0;
+function tickSfx(now){if(now-_sfxT<400)return;_sfxT=now;const nr=ringing().length,np=S.tasks.filter(t=>t.kind==='prio'&&t.state!=='done'&&t.state!=='ringing'&&t.t<=S.time).length,nd=S.tasks.filter(t=>t.state==='done').length;
+ if(_sfxS===S){if(nr>_nRing)sfx('ring');else if(np>_nPrio)sfx('alert');if(nd>_nDone)sfx('done');}_sfxS=S;_nRing=nr;_nPrio=np;_nDone=nd;}
+// ---------- 搖桿（觸控裝置） ----------
+{const joy=document.getElementById('joy'),knob=joy.firstElementChild;let jv=null,jt=0;if(TOUCH)joy.hidden=false;
+ const set=e=>{const r=joy.getBoundingClientRect();let x=(e.clientX-r.left-r.width/2)/(r.width/2),y=(e.clientY-r.top-r.height/2)/(r.height/2);const m=Math.hypot(x,y);if(m>1){x/=m;y/=m;}knob.style.transform='translate('+(x*26)+'px,'+(y*26)+'px)';jv=m<0.25?null:{x,y};};
+ joy.addEventListener('pointerdown',e=>{joy.setPointerCapture(e.pointerId);set(e);e.preventDefault();});joy.addEventListener('pointermove',e=>{if(e.buttons||e.pointerType==='touch')set(e);});
+ const end=()=>{jv=null;knob.style.transform='';};joy.addEventListener('pointerup',end);joy.addEventListener('pointercancel',end);
+ setInterval(()=>{if(!jv||!S||S.over||S.paused)return;const P=S.player;if(moving(P)||P.phone||P.guide||P.transit||S.wc>0)return;
+  const wx=Math.cos(yaw)*jv.x+Math.sin(yaw)*jv.y,wz=-Math.sin(yaw)*jv.x+Math.cos(yaw)*jv.y;const dx=Math.abs(wx)>=Math.abs(wz)?Math.sign(wx):0,dy=dx?0:Math.sign(wz);const nx=P.x+dx,ny=P.y+dy;
+  if(walk(P.key,nx,ny)){if(P.busy)cancelBusy(P);S.view=null;P.steps=[{type:'walk',x:nx,y:ny}];nextStep(P);}},70);}
+// ---------- 新手引導 ----------
+const COACH=[[null,'歡迎來值班','電話和工單會一直進來，撐到下班為止。先花 20 秒看一下怎麼操作。'],
+ ['#dkTasks','工單都在這裡','點「工單」看全部的單，按「處理」人就會自己走過去。紅色的是急件。'],
+ ['#dkNext','不知道先做哪一張','按「帶路」會直接帶你去最急的那一張，地上的綠點就是路線。'],
+ [null,'移動和視角',TOUCH?'點地板就會走過去，也可以用左下角的搖桿。單指拖曳轉視角，兩指縮放。':'點地板就會走過去，也可以用 WASD 或方向鍵。按住拖曳轉視角，滾輪縮放。走到工單旁邊按空白鍵處理，按 F 帶路。'],
+ ['#status','顧好自己','記得吃飯、上廁所。餓太久或憋太久，做事會變慢。'],
+ [null,'重點是怎麼處理','每張單都會問你要怎麼做。選完會告訴你對不對、為什麼，下班後還有一張檢討單。']];
+let coI=-1,coWas=false;const coEl=document.getElementById('coach'),coHi=document.getElementById('coHi');
+function coShow(){const c=COACH[coI];document.getElementById('coT').textContent=c[1];document.getElementById('coP').textContent=c[2];document.getElementById('coN').textContent=(coI+1)+'／'+COACH.length;document.getElementById('coNext').textContent=coI===COACH.length-1?'開始值班':'下一步';
+ const el=c[0]&&document.querySelector(c[0]);if(el&&el.getClientRects().length){const r=el.getBoundingClientRect();coHi.hidden=false;coHi.style.cssText='left:'+(r.left-6)+'px;top:'+(r.top-6)+'px;width:'+(r.width+12)+'px;height:'+(r.height+12)+'px';}else coHi.hidden=true;}
+function coStart(){if(!S||S.over||coI>=0)return;coWas=S.paused;S.paused=true;coI=0;coEl.hidden=false;coShow();}
+function coEnd(){coEl.hidden=true;coI=-1;try{localStorage.setItem('itduty_coach','1')}catch(e){}if(S&&!coWas&&document.getElementById('dlg').hidden)S.paused=false;}
+document.getElementById('coNext').onclick=()=>{if(++coI>=COACH.length)coEnd();else coShow();};document.getElementById('coSkip').onclick=coEnd;document.getElementById('help').onclick=coStart;
+function maybeCoach(){if(navigator.webdriver)return;let seen=false;try{seen=localStorage.getItem('itduty_coach')==='1'}catch(e){}if(!seen)setTimeout(coStart,600);}
 let _idleT=0;(function idle(){requestAnimationFrame(idle);if(!S||S.over||S.paused){if(!S)draw3d();else{const now=performance.now();if(now-_idleT<120&&!drag)return;_idleT=now;placeCam();tickLEDs(now);renderer.render(scene,camera);}}})();// 暫停／結算時降到約 8fps，拖曳鏡頭時照常
 window.addEventListener('resize',resize);resize();
 // ---------- 右下功能鍵與抽屜 ----------

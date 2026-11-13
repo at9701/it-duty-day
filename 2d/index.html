@@ -787,17 +787,33 @@ const SKILL={};
 function openProc(t){if(t.notReally){t.notReally=false;t.prog=t.dur-2;S.procN++;S.procOk++;toast(['到現場一看：插頭根本沒插。他說「我以為有插」。','到現場：訊號線接在另一台螢幕上。「我剛剛有拔啊」。','到現場：插頭被清潔推車撞得半鬆，插緊就好。'][Math.floor(rnd()*3)]+' 2 分鐘搞定。');S.lessons.push({task:t,q:'電話教他重接，他說弄了還是不行',txt:'相信他弄了',note:'到現場才發現根本沒插。這種事電話裡聽不出來。',best:'叫他邊講邊做：「你現在手有摸到那條線嗎？」',bestNote:'電話教要一步一步問，不要只問「弄了嗎」。',sev:1});beginWork(t);return;}
  const pr=procOf(t);if(!pr){beginWork(t);return;}S.paused=true;const d=document.getElementById('dlg'),b=document.getElementById('dlgBox');d.hidden=false;
  const expert=hasSkill(S.player,pr.dom);let hint=expert;const steps=[];
- const render=(key)=>{const st=pr[key];b.innerHTML='';const h=document.createElement('h2');h.textContent=locName(t.room)+'：'+t.title;b.appendChild(h);
+ const render=(key)=>{const st=pr[key];b.innerHTML='';const h=document.createElement('h2');h.textContent=locName(t.room)+'：'+t.title;b.appendChild(h);b.appendChild(whoRow(t));
   const p=document.createElement('p');p.textContent=st.q.replace(/\{room\}/g,t.room.name);b.appendChild(p);if(expert){const e=document.createElement('p');e.className='hint';e.textContent='這是你的專長，★ 是你一看就知道的做法。';b.appendChild(e);}
   const list=document.createElement('div');list.className='list';
   st.opts.map(o=>[Math.random(),o]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]).forEach(([txt,o,pen,f,note,next])=>{const bt=document.createElement('button');bt.style.textAlign='left';bt.textContent=(hint&&o===1?'★ ':'')+txt;
    bt.onclick=()=>{S.procN++;let extra=0;if(!S.env.spare&&txt.includes('備機'))extra+=20;if(!S.env.vendor&&txt.includes('廠商')&&o!==1)extra+=30;if(extra){t.prog-=extra;toast((txt.includes('備機')?'沒有備機庫存，先去倉庫找':'沒有維護合約，廠商慢慢來')+'（+'+extra+' 分）');}
-   if(o===1){S.procOk++;toast('對，就是這樣做。'+note);}else{if(o===0)S.procBad++;t.prog-=pen*(S.player.trait==='vet'?0.7:1);applyFlags(f,t,txt);const best=st.opts.find(o=>o[1]===1);S.lessons.push({task:t,q:st.q.replace(/\{room\}/g,t.room.name),txt,note,best:best?best[0]:'',bestNote:best?best[4]:'',sev:o===0?2:1});toast((o===2?'可以啦，但：':'這樣不行：')+note+(pen?'（多耗 '+pen+' 分）':''));}
-    if(o===1&&next&&pr[next]){hint=expert;render(next);}else{d.hidden=true;S.paused=false;beginWork(t);}};list.appendChild(bt);});
+   const best=st.opts.find(o=>o[1]===1);if(o===1){S.procOk++;}else{if(o===0)S.procBad++;t.prog-=pen*(S.player.trait==='vet'?0.7:1);applyFlags(f,t,txt);S.lessons.push({task:t,q:st.q.replace(/\{room\}/g,t.room.name),txt,note,best:best?best[0]:'',bestNote:best?best[4]:'',sev:o===0?2:1});}
+    const go=()=>{if(o===1&&next&&pr[next]){hint=expert;render(next);}else{d.hidden=true;S.paused=false;beginWork(t);}};
+    showFb(b,h.textContent,{o,txt,note,pen,best:o===1?null:best,more:o===1&&next&&pr[next]},go);};list.appendChild(bt);});
   if(S.role==='duty'&&S.shiftKeyUsed==='day'&&!t.bossHint&&pr.dom==='sec'&&!hint){const ab=document.createElement('button');ab.textContent='打給主任請示（+20 分，照他說的做）';ab.onclick=()=>{askBoss(t);hint=true;render(key);};list.appendChild(ab);}
   if(S.player.trait==='rookie'&&!hint){const ask=document.createElement('button');ask.textContent='打給學長問一下（+5 分）';ask.onclick=()=>{t.prog-=5;S.asked++;hint=true;render(key);};list.appendChild(ask);}
   b.appendChild(list);};
  render(pr.start);}
+// ---- 對話：誰打來、選完之後的回饋 ----
+const WHO={opd:['🩺','門診護理師'],ward:['💉','病房護理師'],icu:['💉','加護病房護理師'],er:['🚑','急診護理師'],reg:['🧾','掛號櫃台'],cashier:['🧾','批價櫃台'],pharmacy:['💊','藥師'],lab:['🧪','醫檢師'],xray:['🩻','放射師'],ct:['🩻','放射師'],mri:['🩻','放射師'],report:['🩻','放射科醫師'],or:['😷','開刀房護理師'],cath:['❤️','心導管室技術員'],exec:['📋','院長室秘書'],dialysis:['💉','洗腎室護理師'],endo:['🔬','內視鏡室護理師'],rehab:['🦿','復健治療師']};
+function whoRow(t){const row=document.createElement('div');row.style.cssText='display:flex;gap:10px;align-items:center;margin:2px 0 10px';
+ let ic,name;if(t.src==='alert'){ic='🔔';name='監控告警';}else if(t.src==='sched'){ic='🗓️';name='排程工作';}else if(t.src==='boss'){ic='👔';name='主任交辦';}else{const w=WHO[t.room.base]||['☎️',t.room.name+'同仁'];ic=w[0];name=w[1];}
+ const left=t.t+t.pat-S.time,r=t.pat?Math.max(0,Math.min(1,left/t.pat)):1;const person=!(t.src==='alert'||t.src==='sched');
+ const mood=!person?(left<=0?'已經逾時':'剩 '+Math.ceil(left)+' 分'):left<=0?'已經在火大了':r<0.5?'語氣有點急':'語氣還算平穩';const col=left<=0?'var(--crit)':r<0.5?'var(--warn)':'var(--accent)';
+ row.innerHTML='<span style="flex:none;width:42px;height:42px;border-radius:50%;background:var(--panel2);border:2px solid '+col+';display:flex;align-items:center;justify-content:center;font-size:22px">'+ic+'</span><span style="min-width:0;flex:1"><b>'+name+'</b> <small style="color:'+col+'">'+mood+'</small><span style="display:block;height:4px;border-radius:2px;background:var(--line);margin-top:5px;overflow:hidden"><i style="display:block;height:100%;width:'+Math.round(r*100)+'%;background:'+col+'"></i></span></span>';return row;}
+function showFb(b,title,r,go){const col=r.o===1?'var(--accent)':r.o===2?'var(--warn)':'var(--crit)';const head=r.o===1?'✔ 對，就是這樣做':r.o===2?'△ 可以，但有更好的做法':'✘ 這樣不行';
+ if(window.sfx)sfx(r.o===1?'good':r.o===2?'ok':'bad');b.innerHTML='';const h=document.createElement('h2');h.textContent=title;b.appendChild(h);
+ const box=document.createElement('div');box.style.cssText='border-left:5px solid '+col+';background:var(--panel2);border-radius:6px;padding:12px 14px;margin:8px 0 12px';
+ const add=(txt,css)=>{const e=document.createElement('div');e.textContent=txt;if(css)e.style.cssText=css;box.appendChild(e);return e;};
+ add(head,'font-weight:700;font-size:17px;color:'+col+';margin-bottom:6px');add('你選的：'+r.txt,'color:var(--muted);font-size:13px;margin-bottom:6px');if(r.note)add(r.note);
+ if(r.pen)add('多耗 '+r.pen+' 分鐘','color:'+col+';font-size:13px;margin-top:6px');
+ if(r.best){add('比較好的做法','font-weight:700;font-size:13px;margin-top:12px;color:var(--accent)');add(r.best[0]);if(r.best[4])add(r.best[4],'color:var(--muted);font-size:13px;margin-top:2px');}
+ b.appendChild(box);const bt=document.createElement('button');bt.className='primary';bt.textContent=r.more?'下一步':'開始處理';bt.onclick=go;b.appendChild(bt);setTimeout(()=>{try{bt.focus()}catch(e){}},30);}
 // ---- 電話教的選項 ----
 // GUIDE[類別]={say:對方在電話裡說的, opts:[[你說的話, 成功機率, 講幾分鐘, 說明, flag]]}。「你重開機看看」每一類都有，機率不一樣。
 const REBOOT='你先重開機看看。';

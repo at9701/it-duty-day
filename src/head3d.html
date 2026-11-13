@@ -139,6 +139,15 @@ th{color:var(--muted);font-weight:500}
 td.c{text-align:left;color:var(--fg)}td.c.bad{color:var(--crit)}td.c.meh{color:var(--warn)}td.c.good{color:var(--ok)}
 .quote{border-left:3px solid var(--accent);padding:6px 10px;margin-top:10px;font-style:italic}
 .fpsNote{position:fixed;right:14px;top:14px;z-index:5;font-size:11px;color:var(--muted);background:rgba(23,28,38,.8);padding:3px 8px;border-radius:4px}
+#joy{position:fixed;left:18px;bottom:150px;z-index:6;width:96px;height:96px;border-radius:50%;background:rgba(23,28,38,.7);border:1px solid var(--line);touch-action:none;display:flex;align-items:center;justify-content:center}
+#joy i{width:40px;height:40px;border-radius:50%;background:var(--accent);opacity:.85;pointer-events:none}
+#coach{position:fixed;inset:0;z-index:30;background:rgba(5,7,10,.55);display:flex;align-items:center;justify-content:center;padding:16px}
+#coach .cbox{position:relative;z-index:2;max-width:380px;width:100%;background:var(--panel);border:1px solid var(--accent);border-radius:10px;padding:16px 18px;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+#coach .cbox b{font-size:18px}#coach .cbox p{margin:8px 0 14px;line-height:1.6}#coach .row{display:flex;gap:8px;align-items:center}#coach small{color:var(--muted)}
+#coHi{position:fixed;z-index:1;border:3px solid var(--accent);border-radius:12px;box-shadow:0 0 0 9999px rgba(5,7,10,.35);pointer-events:none;animation:coPulse 1s ease-in-out infinite alternate}
+@keyframes coPulse{to{border-color:rgba(95,211,166,.35)}}
+@media (max-width:640px){#dkNext{position:fixed;right:14px;bottom:74px}}
+@media (prefers-reduced-motion:reduce){#coHi{animation:none}}
 @media (prefers-reduced-motion:reduce){.toast{transition:none}.ring,.card.ring .bar,.dock .big .badge.ring{animation:none}}
 @media (max-width:640px){.hud{min-width:0}.hud .stats{display:none}.status{max-width:calc(100vw - 28px);bottom:84px}.dock .big{width:50px;height:50px}.dock .big i{font-size:18px}}
 </style>
@@ -173,8 +182,9 @@ td.c{text-align:left;color:var(--fg)}td.c.bad{color:var(--crit)}td.c.meh{color:v
 <div class="dock" id="dock" hidden>
   <div class="col">
     <span class="seg" id="spd" title="×1 = 1 秒半分鐘，一班 16 分鐘"><button class="on" data-s="1">×1</button><button data-s="2">×2</button><button data-s="4">×4</button><button data-s="8">×8</button></span>
-    <button id="pause">暫停</button>
+    <span style="display:flex;gap:6px"><button id="pause" style="flex:1">暫停</button><button id="snd" title="音效開關" aria-label="音效開關">🔊</button><button id="help" title="操作說明" aria-label="操作說明">？</button></span>
   </div>
+  <button class="big" id="dkNext" title="帶我去最急的工單（F）"><i>🧭</i>帶路</button>
   <button class="big" id="dkWC" title="廁所"><i>🚻</i>廁所<span class="badge" id="wcBadge" hidden></span></button>
   <button class="big" id="dkMap" title="院區"><i>🗺️</i>院區</button>
   <button class="big" id="dkBag" title="包包／動作"><i>🎒</i>包包<span class="badge" id="bagBadge" hidden></span></button>
@@ -209,6 +219,8 @@ td.c{text-align:left;color:var(--fg)}td.c.bad{color:var(--crit)}td.c.meh{color:v
 
 <div class="transit" id="transit" hidden></div>
 <div class="toast" id="toast"></div>
+<div id="joy" hidden><i></i></div>
+<div id="coach" hidden><div id="coHi" hidden></div><div class="cbox"><b id="coT"></b><p id="coP"></p><div class="row"><small id="coN"></small><span style="flex:1"></span><button id="coSkip">跳過</button><button class="primary" id="coNext">下一步</button></div></div></div>
 
 <div class="overlay" id="start">
   <div class="box">
