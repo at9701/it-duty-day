@@ -147,6 +147,13 @@ th{color:var(--muted);font-weight:500}
 td.c{text-align:left;color:var(--fg)}td.c.bad{color:var(--crit)}td.c.meh{color:var(--warn)}td.c.good{color:var(--ok)}
 .quote{border-left:3px solid var(--accent);padding:6px 10px;margin-top:10px;font-style:italic}
 .fpsNote{position:fixed;right:14px;top:14px;z-index:5;font-size:11px;color:var(--muted);background:rgba(23,28,38,.8);padding:3px 8px;border-radius:4px}
+.goals{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;font-size:11px}.goals span{padding:1px 7px;border-radius:999px;border:1px solid var(--line);white-space:nowrap}.goals .ok{color:var(--warn);border-color:var(--warn)}.goals .no{color:var(--muted);text-decoration:line-through}
+#labels .fxlab{background:var(--crit);color:#fff;font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;transform:translate(-50%,-50%);animation:ring .7s steps(2) infinite;white-space:nowrap}
+#fxBan{position:fixed;left:50%;top:max(14px,env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:25;max-width:min(560px,calc(100vw - 28px));background:#3a1520;border:2px solid var(--crit);border-radius:10px;padding:10px 16px;box-shadow:0 8px 30px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:2px}
+#fxBan b{color:var(--crit);font-size:16px}#fxBan small{color:var(--muted)}
+#vig{position:fixed;inset:0;z-index:24;pointer-events:none;opacity:0;box-shadow:inset 0 0 140px 40px rgba(239,107,107,.75)}#vig.on{animation:vig 1.4s ease-out}
+@keyframes vig{0%{opacity:1}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){#vig.on,#labels .fxlab{animation:none}}
 #joy{position:fixed;left:18px;bottom:150px;z-index:6;width:96px;height:96px;border-radius:50%;background:rgba(23,28,38,.7);border:1px solid var(--line);touch-action:none;display:flex;align-items:center;justify-content:center}
 #joy i{width:40px;height:40px;border-radius:50%;background:var(--accent);opacity:.85;pointer-events:none}
 #coach{position:fixed;inset:0;z-index:30;background:rgba(5,7,10,.55);display:flex;align-items:center;justify-content:center;padding:16px}
@@ -175,6 +182,7 @@ td.c{text-align:left;color:var(--fg)}td.c.bad{color:var(--crit)}td.c.meh{color:v
     <div class="stat"><b id="open">0</b><span>待處理</span></div>
     <div class="stat"><b id="missed">0</b><span>漏接</span></div>
   </div>
+  <div class="goals" id="goals"></div>
 </div>
 <div class="fpsNote" id="fpsNote" hidden></div>
 
@@ -228,6 +236,8 @@ td.c{text-align:left;color:var(--fg)}td.c.bad{color:var(--crit)}td.c.meh{color:v
 <div class="transit" id="transit" hidden></div>
 <div class="toast" id="toast"></div>
 <div id="joy" hidden><i></i></div>
+<div id="vig"></div>
+<div id="fxBan" hidden></div>
 <div id="coach" hidden><div id="coHi" hidden></div><div class="cbox"><b id="coT"></b><p id="coP"></p><div class="row"><small id="coN"></small><span style="flex:1"></span><button id="coSkip">跳過</button><button class="primary" id="coNext">下一步</button></div></div></div>
 
 <div class="overlay" id="start">
@@ -877,20 +887,38 @@ function openProc(t){if(t.notReally){t.notReally=false;t.prog=t.dur-2;S.procN++;
   const list=document.createElement('div');list.className='list';
   st.opts.map(o=>[Math.random(),o]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]).forEach(([txt,o,pen,f,note,next])=>{const bt=document.createElement('button');bt.style.textAlign='left';bt.textContent=(hint&&o===1?'★ ':'')+txt;
    bt.onclick=()=>{S.procN++;{const bo=st.opts.find(x=>x[1]===1)||['','','','',''];(S.decisions=S.decisions||[]).push({tm:S.time,room:locName(t.room),title:t.title,q:st.q.replace(/\{room\}/g,t.room.name),txt,o,note,best:bo[0],bestNote:bo[4]});}let extra=0;if(!S.env.spare&&txt.includes('備機'))extra+=20;if(!S.env.vendor&&txt.includes('廠商')&&o!==1)extra+=30;if(extra){t.prog-=extra;toast((txt.includes('備機')?'沒有備機庫存，先去倉庫找':'沒有維護合約，廠商慢慢來')+'（+'+extra+' 分）');}
-   const best=st.opts.find(o=>o[1]===1);if(o===1){S.procOk++;}else{if(o===0)S.procBad++;t.prog-=pen*(S.player.trait==='vet'?0.7:1);applyFlags(f,t,txt);S.lessons.push({task:t,q:st.q.replace(/\{room\}/g,t.room.name),txt,note,best:best?best[0]:'',bestNote:best?best[4]:'',sev:o===0?2:1});}
+   const best=st.opts.find(o=>o[1]===1);addFav(t.room,o===1?2:o===2?-1:-6);if(o===1){S.procOk++;}else{if(o===0)S.procBad++;t.prog-=pen*(S.player.trait==='vet'?0.7:1);applyFlags(f,t,txt);S.lessons.push({task:t,q:st.q.replace(/\{room\}/g,t.room.name),txt,note,best:best?best[0]:'',bestNote:best?best[4]:'',sev:o===0?2:1});}
     const go=()=>{if(o===1&&next&&pr[next]){hint=expert;render(next);}else{d.hidden=true;S.paused=false;beginWork(t);}};
     showFb(b,h.textContent,{o,txt,note,pen,best:o===1?null:best,more:o===1&&next&&pr[next]},go);};list.appendChild(bt);});
   if(S.role==='duty'&&S.shiftKeyUsed==='day'&&!t.bossHint&&pr.dom==='sec'&&!hint){const ab=document.createElement('button');ab.textContent='打給主任請示（+20 分，照他說的做）';ab.onclick=()=>{askBoss(t);hint=true;render(key);};list.appendChild(ab);}
   if(S.player.trait==='rookie'&&!hint){const ask=document.createElement('button');ask.textContent='打給學長問一下（+5 分）';ask.onclick=()=>{t.prog-=5;S.asked++;hint=true;render(key);};list.appendChild(ask);}
   b.appendChild(list);};
  render(pr.start);}
+// ---- 各單位對你的印象（0–100，起始 60）----
+const favOf=r=>(S.fav[r.id]===undefined?60:S.fav[r.id]);
+const favOn=r=>r&&r.base!=='office'&&r.base!=='server';
+function addFav(r,d){if(!S||!favOn(r))return;S.fav[r.id]=Math.max(0,Math.min(100,favOf(r)+d));}
+const favWord=v=>v>=75?'很信任你':v>=50?'印象普通':v>=30?'對你有點不滿':'對你很不滿';
+const favFace=v=>v>=75?'😊':v>=50?'🙂':v>=30?'😒':'😠';
+// 印象好的單位願意多等、印象差的沒耐心，差到一個程度會直接打給主任
+setInterval(()=>{if(!S||S.over||S.paused)return;for(const t of S.tasks){if(t.t>S.time||t.state==='done')continue;if(!favOn(t.room))continue;const person=t.src==='call'||t.src==='boss';
+  if(!t._fv){t._fv=1;if(person){const v=favOf(t.room);if(v>=75)t.pat=Math.round(t.pat*1.25);else if(v<30){t.pat=Math.max(5,Math.round(t.pat*0.7));if(v<20&&!S.favBoss[t.room.id]){S.favBoss[t.room.id]=1;S.complaintsBoss++;toast(locName(t.room)+'對你很不滿，這次直接打給主任了');}}}}
+  if(!t._ov&&person&&S.time>t.t+t.pat){t._ov=1;addFav(t.room,-5);}}
+ // 做錯的後果出現時，當場講清楚是哪個決定造成的
+ for(const c of S.chain){const e=c.effect;if(e.t<=S.time&&!e._note){e._note=1;addFav(e.room,-8);if(window.fxBanner)fxBanner(e,c.why);else toast('⚠ 後果：'+e.title+'。'+c.why);}}},500);
+// ---- 這一班的三個目標 ----
+function goals(){const pr=S.tasks.filter(t=>t.kind==='prio'&&t.t<=S.time);const lp=pr.filter(t=>t.late||(t.state!=='done'&&S.time>t.t+t.pat)).length,red=S.secViol+S.dataLoss;
+ return [{n:'急件沒有逾時',ok:lp===0,d:lp?lp+' 件逾時':'0 件逾時'},{n:'電話沒有漏接',ok:S.missed===0,d:S.missed?'漏接 '+S.missed+' 通':'0 通漏接'},{n:'沒踩資安和資料紅線',ok:red===0,d:red?'踩到 '+red+' 次':'0 次'}];}
+function goalsHTML(){const g=goals(),n=g.filter(x=>x.ok).length;const rooms=Object.keys(S.fav).map(id=>ROOMS[id]).filter(Boolean).sort((a,b)=>favOf(b)-favOf(a));const row=r=>'<tr><td>'+favFace(favOf(r))+' '+locName(r)+'</td><td>'+favWord(favOf(r))+'</td><td><b>'+Math.round(favOf(r))+'</b></td></tr>';
+ return '<div style="border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin-bottom:12px"><div style="font-size:26px;letter-spacing:4px;color:var(--warn)">'+'★'.repeat(n)+'<span style="color:var(--line)">'+'★'.repeat(3-n)+'</span></div>'+g.map(x=>'<div style="margin-top:4px"><b style="color:'+(x.ok?'var(--accent)':'var(--crit)')+'">'+(x.ok?'✔':'✘')+'</b> '+x.n+' <small style="color:var(--muted)">'+x.d+'</small></div>').join('')+'</div>'+
+  (rooms.length?'<p><b>各單位對你的印象</b></p><table><tr><th>單位</th><th>印象</th><th>分數</th></tr>'+(rooms.length>8?rooms.slice(0,4).concat(rooms.slice(-4)):rooms).map(row).join('')+'</table>':'');}
 // ---- 對話：誰打來、選完之後的回饋 ----
 const WHO={opd:['🩺','門診護理師'],ward:['💉','病房護理師'],icu:['💉','加護病房護理師'],er:['🚑','急診護理師'],reg:['🧾','掛號櫃台'],cashier:['🧾','批價櫃台'],pharmacy:['💊','藥師'],lab:['🧪','醫檢師'],xray:['🩻','放射師'],ct:['🩻','放射師'],mri:['🩻','放射師'],report:['🩻','放射科醫師'],or:['😷','開刀房護理師'],cath:['❤️','心導管室技術員'],exec:['📋','院長室秘書'],dialysis:['💉','洗腎室護理師'],endo:['🔬','內視鏡室護理師'],rehab:['🦿','復健治療師']};
 function whoRow(t){const row=document.createElement('div');row.style.cssText='display:flex;gap:10px;align-items:center;margin:2px 0 10px';
  let ic,name;if(t.src==='alert'){ic='🔔';name='監控告警';}else if(t.src==='sched'){ic='🗓️';name='排程工作';}else if(t.src==='boss'){ic='👔';name='主任交辦';}else{const w=WHO[t.room.base]||['☎️',t.room.name+'同仁'];ic=w[0];name=w[1];}
  const left=t.t+t.pat-S.time,r=t.pat?Math.max(0,Math.min(1,left/t.pat)):1;const person=!(t.src==='alert'||t.src==='sched');
  const mood=!person?(left<=0?'已經逾時':'剩 '+Math.ceil(left)+' 分'):left<=0?'已經在火大了':r<0.5?'語氣有點急':'語氣還算平穩';const col=left<=0?'var(--crit)':r<0.5?'var(--warn)':'var(--accent)';
- row.innerHTML='<span style="flex:none;width:42px;height:42px;border-radius:50%;background:var(--panel2);border:2px solid '+col+';display:flex;align-items:center;justify-content:center;font-size:22px">'+ic+'</span><span style="min-width:0;flex:1"><b>'+name+'</b> <small style="color:'+col+'">'+mood+'</small><span style="display:block;height:4px;border-radius:2px;background:var(--line);margin-top:5px;overflow:hidden"><i style="display:block;height:100%;width:'+Math.round(r*100)+'%;background:'+col+'"></i></span></span>';return row;}
+ const fv=person&&favOn(t.room)?' <small style="color:var(--muted)">・'+favFace(favOf(t.room))+' '+favWord(favOf(t.room))+'</small>':'';row.innerHTML='<span style="flex:none;width:42px;height:42px;border-radius:50%;background:var(--panel2);border:2px solid '+col+';display:flex;align-items:center;justify-content:center;font-size:22px">'+ic+'</span><span style="min-width:0;flex:1"><b>'+name+'</b> <small style="color:'+col+'">'+mood+'</small>'+fv+'<span style="display:block;height:4px;border-radius:2px;background:var(--line);margin-top:5px;overflow:hidden"><i style="display:block;height:100%;width:'+Math.round(r*100)+'%;background:'+col+'"></i></span></span>';return row;}
 function showFb(b,title,r,go){const col=r.o===1?'var(--accent)':r.o===2?'var(--warn)':'var(--crit)';const head=r.o===1?'✔ 對，就是這樣做':r.o===2?'△ 可以，但有更好的做法':'✘ 這樣不行';
  if(window.sfx)sfx(r.o===1?'good':r.o===2?'ok':'bad');b.innerHTML='';const h=document.createElement('h2');h.textContent=title;b.appendChild(h);
  const box=document.createElement('div');box.style.cssText='border-left:5px solid '+col+';background:var(--panel2);border-radius:6px;padding:12px 14px;margin:8px 0 12px';
@@ -1277,7 +1305,7 @@ function newGame(n){seed=20261027+runs.length*7919;buildWorld(diffKey);const shi
  const tasks=shift.ev.map((e,i)=>{const room=roomById(e[1]);const src=e[8]||'call';return {id:i,special:e[9]||null,t:e[0]+(src==='sched'?0:Math.floor(rnd()*6)),room,title:(src==='boss'?'主任交辦：':'')+e[2],dur:e[3],pat:e[4],kind:e[5]||'normal',tri:e[6]?triOf(e[6]):null,remote:!!e[7],src,
   sx:room.x+1+Math.floor(rnd()*(room.w-2)),sy:room.y+(rnd()<0.5?1:room.h-2),state:src==='call'?'ringing':'pending',visitor:src==='visit',ringAt:0,tries:0,esc:false,assignee:null,prog:0,done:null,late:false,asked:0,mis:0,answeredAt:null};});
  tasks.forEach(t=>{t.ringAt=t.t;if(ENV.ticket&&t.state==='ringing'&&t.special!=='web'&&rnd()<0.3){t.state='pending';t.ticket=true;t.title=t.title;}if(t.state==='pending')t.answeredAt=t.t;});
- S={shift,shiftKeyUsed,time:0,n,tasks,player:mkActor('#5fd3a6','你',0),helpers:[],paused:false,over:false,walkMin:0,workMin:0,waitMin:0,phoneMin:0,transitMin:0,missed:0,escalated:0,bladder:35,wcCount:0,lunch:0,lunchDone:false,noLunch:false,eating:null,wc:0,view:null,speed:1,food:(morningBento&&shift.meal&&shiftKey!=='eve')?{type:'food',name:'早上買的便當（冷了）',eat:15,eff:0.95,portable:true,at:'office'}:null,buying:0,lunchEff:1,buffs:[],drinks:0,sleepy:0,asked:0,reboots:0,inv:[],charms:[],chain:[],role:roleKey,spec:roleKey==='spec'?{name:[...specKeys].map(k=>SPEC[k].name).join('＋'),doms:[...specKeys].map(k=>SPEC[k].dom)}:null,auto:roleKey!=='mgr',burnout:0,mgrSelf:0,meeting:0,money:MONEY,spent:0,carry:[],complaintsBoss:0,complaintsCEO:0,patientComplaints:0,procN:0,procOk:0,procBad:0,secViol:0,dataLoss:0,lessons:[],allowRemote:ENV.remote,allowGuide:ENV.guide,env:{...ENV},guideOk:0,guideFail:0};
+ S={shift,shiftKeyUsed,time:0,n,tasks,player:mkActor('#5fd3a6','你',0),helpers:[],paused:false,over:false,walkMin:0,workMin:0,waitMin:0,phoneMin:0,transitMin:0,missed:0,escalated:0,bladder:35,wcCount:0,lunch:0,lunchDone:false,noLunch:false,eating:null,wc:0,view:null,speed:1,food:(morningBento&&shift.meal&&shiftKey!=='eve')?{type:'food',name:'早上買的便當（冷了）',eat:15,eff:0.95,portable:true,at:'office'}:null,buying:0,lunchEff:1,buffs:[],drinks:0,sleepy:0,asked:0,reboots:0,inv:[],charms:[],chain:[],role:roleKey,spec:roleKey==='spec'?{name:[...specKeys].map(k=>SPEC[k].name).join('＋'),doms:[...specKeys].map(k=>SPEC[k].dom)}:null,auto:roleKey!=='mgr',burnout:0,mgrSelf:0,meeting:0,money:MONEY,spent:0,carry:[],complaintsBoss:0,complaintsCEO:0,patientComplaints:0,procN:0,procOk:0,procBad:0,secViol:0,dataLoss:0,lessons:[],fav:{},favBoss:{},allowRemote:ENV.remote,allowGuide:ENV.guide,env:{...ENV},guideOk:0,guideFail:0};
  if(!shift.meal){S.lunchDone=true;S.food=null;}
  S.money=preMoney;S.spent=MONEY-preMoney;preBought.forEach(it=>{if(it.type==='charm')S.inv.push(it.name);else S.carry.push(it);});
  if(roleKey==='spec'){pickedSkills.clear();specKeys.forEach(k=>pickedSkills.add(SPEC[k].dom));if(specKeys.size===1){const d=SPEC[specKey].dom;if(d==='sec')pickedSkills.add('sys');if(d==='net')pickedSkills.add('hw');if(d==='med')pickedSkills.add('net');}}
@@ -1392,7 +1420,7 @@ function tickCalls(){const inOffice=[S.player,...S.helpers].some(a=>a.away<=0&&r
  ringing().forEach(t=>{if(inOffice){answer(t,'分機');return;}
   if(S.time-t.ringAt>10){t.tries++;S.missed++;
    if(t.tries>=2){t.esc=true;S.escalated++;t.kind='prio';t.title='主任轉來：'+t.title;t.state='pending';t._seen=true;t.answeredAt=S.time;toast('打了兩次都沒人接，對方直接去找主任了。'+locName(t.room)+' '+t.title);if(t.special==='web'){S.patientComplaints+=2;S.complaintsCEO++;toast('官網掛著沒人接電話，民眾投訴到院長信箱');}}
-   else{t.ringAt=S.time+5;toast('漏接了：'+locName(t.room)+'，等一下他還會再打');}}});}
+   else{t.ringAt=S.time+5;addFav(t.room,-4);toast('漏接了：'+locName(t.room)+'，等一下他還會再打');}}});}
 function answerByPhone(t){const P=S.player;if(P.phone||P.guide)return;if(!S.env.fwd){toast('分機沒轉手機，人在外面接不到');return;}P.path=[];P.steps=[];P.phone=2;P._call=t;toast('手機接起來，講 2 分鐘');}
 
 // ---------- work ----------
@@ -1400,7 +1428,7 @@ function startWork(t,a){if(t.kind==='backup'&&S.time<t.t){toast('排程是 '+fmt
  if(!canWork(t,a))return;if(t.tri&&a===S.player&&roomAt(a)===t.room){openTriage(t);return;}
  if(a===S.player){openProc(t);return;}
  if(a.busy&&a.busy.task!==t)cancelBusy(a);t.assignee=a;a.busy={task:t};a.path=[];a.steps=[];}
-function finishTask(t){t.state='done';t.done=S.time;if(t.assignee&&t.assignee.npc)t.assignee=null;if(t.assignee&&t.assignee!==S.player&&t.assignee.mood!==undefined){t.assignee.mood=Math.min(100,t.assignee.mood+2);t.assignee.done++;}if(t.assignee===S.player&&S.role==='mgr'&&!t.mgr)S.mgrSelf++;
+function finishTask(t){t.state='done';t.done=S.time;if(t.src==='call'||t.src==='boss')addFav(t.room,S.time>t.t+t.pat?1:6);if(t.assignee&&t.assignee.npc)t.assignee=null;if(t.assignee&&t.assignee!==S.player&&t.assignee.mood!==undefined){t.assignee.mood=Math.min(100,t.assignee.mood+2);t.assignee.done++;}if(t.assignee===S.player&&S.role==='mgr'&&!t.mgr)S.mgrSelf++;
  if(t.willRepeat&&S.charms.includes('靠得住')&&rnd()<0.5){t.willRepeat=false;toast('靠得住在，這台應該不會再壞了');}
  if(t.willRepeat&&S.time+60<S.shift.len){const c={...t,id:S.tasks.length,t:S.time+60+Math.floor(rnd()*40),title:t.title.replace('（又壞了）','')+'（又壞了）',state:'ringing',ringAt:0,tries:0,esc:false,assignee:null,prog:0,done:null,late:false,asked:0,mis:0,answeredAt:null,willRepeat:false,guided:false,guideFailed:false,_seen:false,src:'call'};c.ringAt=c.t;S.tasks.push(c);}t.late=S.time>t.t+t.pat;if(t.assignee)t.assignee.busy=null;t.assignee=null;toast((t.late?'弄好了，但拖太久：':'弄好了：')+t.title);}
 function tickWork(a,dtMin){const t=a.busy.task;const rate=(a===S.player?buffMult()*sleepMult()*(S.role==='mgr'?0.7:1):(a.hp!==undefined&&a.hp<30?0.5:0.85))*skillMult(a,t)*(a===S.player&&S.shift.meal&&S.time>=S.shift.meal.effFrom?S.lunchEff:1);t.prog+=dtMin*rate;if(a===S.player)S.workMin+=dtMin;if(t.prog>=t.dur)finishTask(t);}
@@ -1793,7 +1821,7 @@ function endDay(bad){S.over=true;const done=S.tasks.filter(t=>t.state==='done'),
  const bossTasks=S.tasks.filter(t=>t.src==='boss'&&t.t<=S.time);const bossLate=bossTasks.filter(t=>t.state!=='done'||t.late).length;
  
  const sc=(()=>{if(bad)return 0;let v=100;v-=late.length*3+miss.length*8+S.missed*4+S.escalated*8+S.complaintsBoss*6+S.complaintsCEO*15+S.patientComplaints*8+S.secViol*8+S.dataLoss*5+S.procBad*3+S.guideFail*2;if(bk.state!=='done')v-=15;v+=S.guideOk*2;v-=(S.badEsc||0)*3;v-=(S.regLate||0)*10;v-=(S.broken||0)*2;if(S.role==='mgr'){v-=S.burnout*15;v-=S.helpers.filter(h=>h.mood<30).length*5;v-=S.mgrSelf*2;}return Math.max(0,Math.min(100,Math.round(v)));})();
- runs[runs.length-1].score=sc;try{const pt=S.procOk+S.procBad+S.lessons.filter(l=>l.sev===1).length;HIST.push({d:new Date().toLocaleDateString('zh-TW'),who:S.player.name,shift:runs[runs.length-1].shift,score:sc,right:S.procOk,total:Math.max(pt,S.procOk)});while(HIST.length>30)HIST.shift();localStorage.setItem('itduty_hist',JSON.stringify(HIST));}catch(e){}
+ runs[runs.length-1].score=sc;try{const pt=S.procOk+S.procBad+S.lessons.filter(l=>l.sev===1).length;HIST.push({stars:goals().filter(x=>x.ok).length,d:new Date().toLocaleDateString('zh-TW'),who:S.player.name,shift:runs[runs.length-1].shift,score:sc,right:S.procOk,total:Math.max(pt,S.procOk)});while(HIST.length>30)HIST.shift();localStorage.setItem('itduty_hist',JSON.stringify(HIST));}catch(e){}
  const grade=sc>=90?'S':sc>=80?'A':sc>=65?'B':sc>=50?'C':'D';
  const bossSayExtra=(S.badEsc||0)>=3?'「阿凱跟我講你什麼都丟給他。值班的基本功要自己來。」':'';
  const bossSay=S.role==='mgr'?(bad?'院長：「主任，明天早上八點，把你的人帶上來。」':grade==='S'?'院長：「資訊部今天很安靜，很好。」':grade==='A'?'院長：「還可以，護理部那邊你去講一下。」':grade==='B'?'院長：「我今天接到兩通電話了喔。」':grade==='C'?'院長：「你們是不是人不夠？還是人不對？」':'院長：「下禮拜主管會議，你第一個上去報告。」'):bad?'「……你先回去。明天不用來，後天來，報告帶著。」':grade==='S'?'「今天完全沒人來靠，你是不是偷偷多請了一個人？」':grade==='A'?'「還可以啦，漏接那幾通下次記得轉手機。」':grade==='B'?'「過得去。下午那段你人跑去哪？」':grade==='C'?'「我今天電話接不完。明天早上八點來我這一下。」':'「院長問我資訊部今天是不是沒人上班。」';
@@ -1801,7 +1829,7 @@ function endDay(bad){S.over=true;const done=S.tasks.filter(t=>t.state==='done'),
  const teamNote=S.role==='mgr'?'同事：'+S.helpers.map(h=>h.name+'（做了 '+h.done+' 件，體力 '+Math.round(Math.max(0,h.hp))+'，心情 '+Math.round(h.mood)+(h.out?'，請假回家':'')+'）').join('、')+'。'+(S.burnout?'有人被操到請假，明天少一個人。':'')+(S.mgrSelf?'你自己跑了 '+S.mgrSelf+' 張單。主任在外面跑的時候，辦公室沒人接電話。':''):'';
  const staffNote=S.n===1&&sc<65?'一個人顧 '+BORD.length+' 棟樓、'+S.tasks.filter(t=>t.t<=S.shift.len).length+' 張單，這個分數誰來都差不多。換 2 個人再跑一次看看。':S.n>=3&&sc>=80?'人夠的時候分數就上來了。同一天改 1 個人跑一次，差多少自己看。':'';
  const b=document.getElementById('endBox');
- b.innerHTML=`${bad?'<div style="background:#3a1520;border:2px solid var(--crit);border-radius:6px;padding:12px;margin-bottom:12px"><div style="font-family:var(--mono);color:var(--crit);font-size:16px">BAD END — '+S.badEnd.title+'</div><p style="margin:8px 0 4px;color:var(--fg)">'+fmt(S.time)+'，「'+S.badTask.title+'」超過時限沒處理。</p><p style="margin:4px 0;font-style:italic">隔天新聞：'+S.badEnd.news+'</p><p class="hint">'+S.badEnd.after+'</p></div>':''}
+ b.innerHTML=`${goalsHTML()}${bad?'<div style="background:#3a1520;border:2px solid var(--crit);border-radius:6px;padding:12px;margin-bottom:12px"><div style="font-family:var(--mono);color:var(--crit);font-size:16px">BAD END — '+S.badEnd.title+'</div><p style="margin:8px 0 4px;color:var(--fg)">'+fmt(S.time)+'，「'+S.badTask.title+'」超過時限沒處理。</p><p style="margin:4px 0;font-style:italic">隔天新聞：'+S.badEnd.news+'</p><p class="hint">'+S.badEnd.after+'</p></div>':''}
  <h2>${S.player.name}，${bad?fmt(S.time)+' 提早結束':fmt(S.shift.len)+' '+S.shift.name+'下班（才怪）'}</h2>
  <div class="rep" style="grid-template-columns:auto 1fr;align-items:center"><div style="font-family:var(--mono);font-size:34px;color:${grade==='S'||grade==='A'?'var(--ok)':grade==='B'?'var(--info)':grade==='C'?'var(--warn)':'var(--crit)'}">${grade}</div><div style="text-align:left"><b style="font-size:16px">${sc} 分</b><br><span class="hint">投訴到主任 ${S.complaintsBoss} 件、投訴到院長 ${S.complaintsCEO} 件、病患投訴 ${S.patientComplaints} 件</span>${staffNote?'<br><span style="color:var(--warn)">'+staffNote+'</span>':''}${teamNote?'<br><span class="hint">'+teamNote+'</span>':''}</div></div><p>${DIFF[S.diff].name}（${BORD.length} 棟）${S.shift.name} ${S.role==='mgr'?'你帶 '+S.n+' 個同事':S.role==='spec'?'你是'+S.spec.name+'工程師，值班 '+S.n+' 人':S.n+' 個人'}。你走路 ${Math.round(S.walkMin)} 分、等電梯爬樓梯過空橋 ${Math.round(S.transitMin)} 分、真的在修東西 ${Math.round(S.workMin)} 分、講電話 ${Math.round(S.phoneMin)} 分、問東問西 ${Math.round(S.waitMin)} 分。漏接 ${S.missed} 通，其中 ${S.escalated} 通對方直接打給主任。跑了 ${S.wcCount} 次廁所，喝了 ${S.drinks} 杯提神的，${S.shift.meal?S.shift.meal.label+(S.lunchDone&&S.food?'吃了'+S.food.name:S.lunch>0?'只吃了一半':'沒吃')+'。':''}${S.shift.sleepy?' 最睏的時候 '+Math.round(S.sleepy)+'/100。':''}</p>
  <div class="rep"><div class="ok"><b>${ok.length}</b><span>準時弄好</span></div><div class="late"><b>${late.length}</b><span>拖太久才好</span></div><div class="miss"><b>${miss.length}</b><span>沒弄</span></div></div>
@@ -1813,7 +1841,7 @@ function endDay(bad){S.over=true;const done=S.tasks.filter(t=>t.state==='done'),
  ${S.lessons.length?'<p style="margin-top:12px"><b>檢討：哪裡選錯、應該怎麼做</b></p><table><tr><th>工單</th><th class="c">當時的情況</th><th class="c">你選了</th><th class="c">應該</th></tr>'+S.lessons.map(l=>`<tr><td>${l.task.room.name}<br><span class="hint">${l.task.title.replace('主任交辦：','')}</span></td><td class="c">${l.q||''}</td><td class="c ${l.sev===2?'bad':'meh'}">${l.txt}<br><span class="hint">${l.note}</span></td><td class="c good">${l.best||''}<br><span class="hint">${l.bestNote||''}</span></td></tr>`).join('')+'</table>':'<p style="margin-top:12px">今天做法全部選對。</p>'}
  ${miss.length?'<p style="margin-top:12px"><b>今天沒弄到的</b></p><ul style="margin:4px 0 0;padding-left:18px;font-size:13px">'+miss.map(t=>`<li>${locName(t.room)}：${t.title}（${fmt(t.t)}）</li>`).join('')+'</ul>':''}
  ${runs.length>1?'<p style="margin-top:12px"><b>每一班比一比</b></p><table><tr><th>誰</th><th>班別</th><th>人數</th><th>分數</th><th>準時</th><th>延誤</th><th>沒處理</th><th>漏接</th><th>找主任</th><th>備份</th></tr>'+runs.map(r=>`<tr><td>${r.who}</td><td>${r.shift}</td><td>${r.n} 人</td><td><b>${r.score}</b></td><td>${r.ok}</td><td>${r.late}</td><td>${r.miss}</td><td>${r.missed}</td><td>${r.esc}</td><td>${r.backup?'✓':'✗'}</td></tr>`).join('')+'</table>':'<p class="hint">換個人數或班別再來一次，這裡會排在一起比。</p>'}
- ${HIST.length>1?'<p style="margin-top:12px"><b>你之前的紀錄</b>（存在這台電腦的瀏覽器裡）</p><table><tr><th>日期</th><th>誰</th><th>班別</th><th>分數</th><th>做法選對</th></tr>'+HIST.slice(-8).map(h=>`<tr><td>${h.d}</td><td>${h.who}</td><td>${h.shift}</td><td><b>${h.score}</b></td><td>${h.right}／${h.total}</td></tr>`).join('')+'</table>':''}
+ ${HIST.length>1?'<p style="margin-top:12px"><b>你之前的紀錄</b>（存在這台電腦的瀏覽器裡）</p><table><tr><th>日期</th><th>誰</th><th>班別</th><th>分數</th><th>星星</th><th>做法選對</th></tr>'+HIST.slice(-8).map(h=>`<tr><td>${h.d}</td><td>${h.who}</td><td>${h.shift}</td><td><b>${h.score}</b></td><td style="color:var(--warn)">${h.stars===undefined?'—':'★'.repeat(h.stars)||'0'}</td><td>${h.right}／${h.total}</td></tr>`).join('')+'</table>':''}
  <div class="row"><button class="primary" id="again">再值一班</button></div>`;
  document.getElementById('end').hidden=false;
  document.getElementById('again').onclick=()=>{document.getElementById('end').hidden=true;document.getElementById('start').hidden=false;document.getElementById('page1').hidden=false;document.getElementById('page2').hidden=true;S=null;};}
@@ -2591,7 +2619,7 @@ function draw3d(){const now=performance.now();if(!S){renderExterior(now);return;
  const key=viewKey();if(key!==curKey){for(const [a,e] of AG){if(a.key!==key||a.transit){scene.remove(e.g);e.g.traverse(o=>{if(o.geometry&&o.geometry!==BLOBGEO)o.geometry.dispose();});AG.delete(a);}}buildFloor(key);}const F=FLOORS[key];const P=S.player;
  // 鏡頭跟人（看別層時看整層）
  if(S.view&&S.view!==P.key){const fx=window.__fx?(window.__fx[0]+window.__fx[1])/2:W/2;camT.lerp(new THREE.Vector3(fx,0,window.__fz||6),0.2);}else{camT.lerp(new THREE.Vector3(Math.max(7,Math.min(W-7,P.x+P.px+0.5)),0,Math.max(5,Math.min(H-4,P.y+P.py+0.5))),0.1);}
- placeCam();tickActors(key,now);tickLEDs(now);tickGuide(key,now);tickSfx(now);
+ placeCam();tickActors(key,now);tickLEDs(now);tickGuide(key,now);tickSfx(now);tickFx(key,now);
  // 任務方塊
  const vis=visible().filter(t=>t.room.key===key);markers.forEach(m=>{m.mesh.visible=false;if(m.ring)m.ring.visible=false;});{let n=0;for(const t of S.tasks){if(t._dev!==t.room.key&&t.state!=='done'&&(t.t<=S.time||t.state==='ringing')){bindTask(t);if(++n>=3)break;}}}
  vis.forEach((t,i)=>{let m=markers.find(m=>m.t===t);if(!m){const mesh=new THREE.Mesh(geo,bmat(0xffffff));mesh.scale.set(0.36,0.36,0.36);FG.add(mesh);m={mesh,t};markers.push(m);}
@@ -2599,7 +2627,7 @@ function draw3d(){const now=performance.now();if(!S){renderExterior(now);return;
   if(t.devPos){if(!m.ring){m.ring=new THREE.Mesh(RINGGEO,bmat(0xffffff));m.ring.rotation.x=-Math.PI/2;FG.add(m.ring);}m.ring.material=m.mesh.material;m.ring.visible=true;const sc=1+0.15*Math.sin(now/220+t.id);m.ring.scale.set(sc,sc,sc);m.ring.position.set(t.devPos.x,t.devPos.y+0.02,t.devPos.z+0.1);}m.mesh.rotation.y=now/700;m.mesh.rotation.x=0.6;});
  // 房名＋任務標籤
  const byRoom={};vis.forEach(t=>{(byRoom[t.room.id]=byRoom[t.room.id]||[]).push(t);});const rings=ringing().filter(t=>t.room.key===key);
- F.rooms.forEach(r=>{const ts=(byRoom[r.id]||[]).sort((a,b)=>(a.kind==='prio'?0:1)-(b.kind==='prio'?0:1));let h='<div>'+r.name+'</div>';
+ F.rooms.forEach(r=>{const ts=(byRoom[r.id]||[]).sort((a,b)=>(a.kind==='prio'?0:1)-(b.kind==='prio'?0:1));let h='<div>'+r.name+(S.fav[r.id]!==undefined?' '+favFace(favOf(r)):'')+'</div>';
   if(ts.length||rings.some(t=>t.room===r)){h+='<div class="tl">';ts.slice(0,3).forEach(t=>{const late=S.time>t.t+t.pat;const left=Math.ceil(t.t+t.pat-S.time);const title=t.title.replace(/^(主任交辦|主任轉來|交辦|簽核)：/,'');const tail=t.assignee?(t.assignee.name.replace(/\(.*\)/,'')+(t.assignee.busy&&t.assignee.busy.task===t?'處理中':'路上')):late?'逾時 '+(-left):'剩 '+left;
    h+='<div class="tk'+(t.kind==='prio'?' prio':'')+(late?' late':'')+((t.kind==='sched'||t.kind==='backup')?' sched':'')+'" data-t="'+t.id+'"><span>'+title+'</span><small>'+(t.devKind?DEVNAME[t.devKind]+'・':'')+tail+'</small></div>';});
    if(ts.length>3)h+='<small style="color:var(--muted)">…還有 '+(ts.length-3)+' 件</small>';rings.filter(t=>t.room===r).forEach(t=>{h+='<div class="ring">☎ 來電中（'+Math.ceil(S.time-t.ringAt)+' 分）</div>';});h+='</div>';}
@@ -2609,7 +2637,7 @@ function draw3d(){const now=performance.now();if(!S){renderExterior(now);return;
  label('core_elev',24,1.3,H-1,'core','電梯',null);label('core_stairW',2,1.3,SWALL+2,'core','樓梯 ↕',null);label('core_stairE',46,1.3,SWALL+2,'core','樓梯 ↕',null);label('core_wcM',32,1.3,SWALL+3,'core','男廁',null);label('core_wcF',36.5,1.3,SWALL+3,'core','女廁',null);
  if(F.grid[11][W-1]===6){const nb=BORD[BORD.indexOf(F.b)+1];label('core_brE',W+1,1.4,11.5,'core bridge','空橋 → '+nb+'棟',null);}if(F.grid[11][0]===6){const nb=BORD[BORD.indexOf(F.b)-1];label('core_brW',-1,1.4,11.5,'core bridge',nb+'棟 ← 空橋',null);}
  // NPC 幫忙泡泡
- (F.npcs||[]).forEach((a,i)=>{const t=vis.find(t=>t.room===a.room&&!t.assignee);if(!t||a!==F.npcs.find(n=>n.room===a.room))return;const late=S.time>t.t+t.pat;label('npc_'+i,a.x+a.px+0.5,1.45,a.y+a.py+0.5,'bubble'+(late?' late':''),late?'快一點！':'幫忙一下',()=>hitTask(t));});
+ (F.npcs||[]).forEach((a,i)=>{const t=vis.find(t=>t.room===a.room&&!t.assignee);if(!t||a!==F.npcs.find(n=>n.room===a.room))return;const late=S.time>t.t+t.pat;label('npc_'+i,a.x+a.px+0.5,1.45,a.y+a.py+0.5,'bubble'+(late||fxRooms.has(a.room.id)?' late':''),fxRooms.has(a.room.id)?'都不能用了！':late?'快一點！':'幫忙一下',()=>hitTask(t));});
  // 名牌
  [...S.helpers,S.player].forEach((a,i)=>{if(a.away>0||a.transit||a.key!==key)return;let h='<span style="color:'+a.color+'">'+a.name+'</span>'+(a.phone||a.guide?' ☎':'')+(a===P&&S.eating?' 🍱':'');if(a.busy){const t=a.busy.task;h+='<span class="pg"><i style="width:'+Math.round(Math.max(0,Math.min(1,t.prog/t.dur))*100)+'%;background:'+a.color+'"></i></span>';}label('nm_'+i,a.x+a.px+0.5,1.5,a.y+a.py+0.5,'name',h,null);});
  if(!P.transit&&P.key===key&&!P.busy&&!P.phone&&!P.guide){const here=visible().find(t=>canWork(t,P)&&(!t.assignee||t.assignee===P));if(here)label('hint_sp',P.x+P.px+0.5,0.0,P.y+P.py+0.9,'hintkey',TOUCH?'點這裡：處理':'空白鍵：處理',()=>startWork(here,P));}
@@ -2654,6 +2682,18 @@ let extN=1;
 function renderExterior(now){const dk=(typeof diffKey!=='undefined')?diffKey:'hard';if(dk!==extDiff)buildExterior(dk);const span=(extN-1)*15+30;const a=now/16000;const d=Math.max(44,span*1.15);const lx=-Math.max(9,span*0.28);extCam.position.set(lx+Math.sin(a)*d,15+Math.sin(now/9000)*2,Math.cos(a)*d+6);extCam.lookAt(lx,5,0);extCam.aspect=innerWidth/innerHeight;extCam.updateProjectionMatrix();renderer.render(extScene,extCam);
  document.getElementById('hud').hidden=true;document.getElementById('status').hidden=true;document.getElementById('dock').hidden=true;['drTasks','drBag','drMap'].forEach(id=>document.getElementById(id).hidden=true);sweepLabels();}
 // 沒進遊戲時也要一直畫（開場背景）
+// ---------- 做錯看得見：出事的單位地板發紅、人在抱怨、畫面跳警告 ----------
+const fxRooms=new Set();const fxPl=[];let fxShake=0,_goalT=0;
+const fxPlane=i=>{if(!fxPl[i]){const m=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({color:0xef6b6b,transparent:true,opacity:0.2,depthWrite:false}));m.rotation.x=-Math.PI/2;m.visible=false;scene.add(m);fxPl[i]=m;}return fxPl[i];};
+window.fxBanner=(e,why)=>{const el=document.getElementById('fxBan');el.innerHTML='<b>⚠ 出事了：'+locName(e.room)+'</b><span></span><small></small>';el.children[1].textContent=e.title;el.children[2].textContent='原因：'+why;el.hidden=false;clearTimeout(el._t);el._t=setTimeout(()=>{el.hidden=true;},9000);
+ const v=document.getElementById('vig');v.classList.remove('on');void v.offsetWidth;v.classList.add('on');fxShake=performance.now()+600;sfx('bad');setTimeout(()=>sfx('alert'),450);};
+function tickFx(key,now){fxRooms.clear();let n=0;const F=FLOORS[key];
+ for(const c of S.chain){const t=c.effect;if(t.state==='done'||t.t>S.time||t.room.key!==key)continue;const wide=/整層|全院|所有/.test(t.title);const col=/中毒|加密|勒索|惡意|外洩|登入/.test(t.title)?0xb07cff:0xef6b6b;
+  (wide?F.rooms:[t.room]).forEach(r=>{if(fxRooms.has(r.id))return;fxRooms.add(r.id);const m=fxPlane(n++);m.material.color.setHex(col);m.material.opacity=0.26+0.14*Math.sin(now/260);m.position.set(r.x+r.w/2,0.03,r.y+r.h/2);m.scale.set(r.w,r.h,1);m.visible=true;});
+  label('fx_'+t.id,t.room.x+t.room.w/2,0.9,t.room.y+t.room.h/2,'fxlab','⚠ '+t.title.slice(0,14),()=>hitTask(t));}
+ for(let i=n;i<fxPl.length;i++)fxPl[i].visible=false;
+ if(now<fxShake){camera.position.x+=(Math.random()-0.5)*0.25;camera.position.y+=(Math.random()-0.5)*0.18;}
+ if(now-_goalT>500){_goalT=now;const g=goals();const h=g.map(x=>'<span class="'+(x.ok?'ok':'no')+'" title="'+x.n+'：'+x.d+'">'+(x.ok?'★':'☆')+' '+x.n.replace('沒有','').replace('沒踩資安和資料紅線','紅線').replace('急件逾時','急件').replace('電話漏接','漏接')+'</span>').join('');const el=document.getElementById('goals');if(el._h!==h){el.innerHTML=h;el._h=h;}}}
 // ---------- 導引點：往哪裡走，地上看得到 ----------
 const TOUCH=window.matchMedia&&matchMedia('(pointer:coarse)').matches;
 const GN=72;const guideMesh=new THREE.InstancedMesh(new THREE.CircleGeometry(0.09,10),new THREE.MeshBasicMaterial({color:0x5fd3a6,transparent:true,opacity:0.85,depthWrite:false}),GN);guideMesh.frustumCulled=false;guideMesh.count=0;scene.add(guideMesh);

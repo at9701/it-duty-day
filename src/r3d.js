@@ -770,7 +770,7 @@ function draw3d(){const now=performance.now();if(!S){renderExterior(now);return;
  const key=viewKey();if(key!==curKey){for(const [a,e] of AG){if(a.key!==key||a.transit){scene.remove(e.g);e.g.traverse(o=>{if(o.geometry&&o.geometry!==BLOBGEO)o.geometry.dispose();});AG.delete(a);}}buildFloor(key);}const F=FLOORS[key];const P=S.player;
  // 鏡頭跟人（看別層時看整層）
  if(S.view&&S.view!==P.key){const fx=window.__fx?(window.__fx[0]+window.__fx[1])/2:W/2;camT.lerp(new THREE.Vector3(fx,0,window.__fz||6),0.2);}else{camT.lerp(new THREE.Vector3(Math.max(7,Math.min(W-7,P.x+P.px+0.5)),0,Math.max(5,Math.min(H-4,P.y+P.py+0.5))),0.1);}
- placeCam();tickActors(key,now);tickLEDs(now);tickGuide(key,now);tickSfx(now);
+ placeCam();tickActors(key,now);tickLEDs(now);tickGuide(key,now);tickSfx(now);tickFx(key,now);
  // 任務方塊
  const vis=visible().filter(t=>t.room.key===key);markers.forEach(m=>{m.mesh.visible=false;if(m.ring)m.ring.visible=false;});{let n=0;for(const t of S.tasks){if(t._dev!==t.room.key&&t.state!=='done'&&(t.t<=S.time||t.state==='ringing')){bindTask(t);if(++n>=3)break;}}}
  vis.forEach((t,i)=>{let m=markers.find(m=>m.t===t);if(!m){const mesh=new THREE.Mesh(geo,bmat(0xffffff));mesh.scale.set(0.36,0.36,0.36);FG.add(mesh);m={mesh,t};markers.push(m);}
@@ -778,7 +778,7 @@ function draw3d(){const now=performance.now();if(!S){renderExterior(now);return;
   if(t.devPos){if(!m.ring){m.ring=new THREE.Mesh(RINGGEO,bmat(0xffffff));m.ring.rotation.x=-Math.PI/2;FG.add(m.ring);}m.ring.material=m.mesh.material;m.ring.visible=true;const sc=1+0.15*Math.sin(now/220+t.id);m.ring.scale.set(sc,sc,sc);m.ring.position.set(t.devPos.x,t.devPos.y+0.02,t.devPos.z+0.1);}m.mesh.rotation.y=now/700;m.mesh.rotation.x=0.6;});
  // 房名＋任務標籤
  const byRoom={};vis.forEach(t=>{(byRoom[t.room.id]=byRoom[t.room.id]||[]).push(t);});const rings=ringing().filter(t=>t.room.key===key);
- F.rooms.forEach(r=>{const ts=(byRoom[r.id]||[]).sort((a,b)=>(a.kind==='prio'?0:1)-(b.kind==='prio'?0:1));let h='<div>'+r.name+'</div>';
+ F.rooms.forEach(r=>{const ts=(byRoom[r.id]||[]).sort((a,b)=>(a.kind==='prio'?0:1)-(b.kind==='prio'?0:1));let h='<div>'+r.name+(S.fav[r.id]!==undefined?' '+favFace(favOf(r)):'')+'</div>';
   if(ts.length||rings.some(t=>t.room===r)){h+='<div class="tl">';ts.slice(0,3).forEach(t=>{const late=S.time>t.t+t.pat;const left=Math.ceil(t.t+t.pat-S.time);const title=t.title.replace(/^(主任交辦|主任轉來|交辦|簽核)：/,'');const tail=t.assignee?(t.assignee.name.replace(/\(.*\)/,'')+(t.assignee.busy&&t.assignee.busy.task===t?'處理中':'路上')):late?'逾時 '+(-left):'剩 '+left;
    h+='<div class="tk'+(t.kind==='prio'?' prio':'')+(late?' late':'')+((t.kind==='sched'||t.kind==='backup')?' sched':'')+'" data-t="'+t.id+'"><span>'+title+'</span><small>'+(t.devKind?DEVNAME[t.devKind]+'・':'')+tail+'</small></div>';});
    if(ts.length>3)h+='<small style="color:var(--muted)">…還有 '+(ts.length-3)+' 件</small>';rings.filter(t=>t.room===r).forEach(t=>{h+='<div class="ring">☎ 來電中（'+Math.ceil(S.time-t.ringAt)+' 分）</div>';});h+='</div>';}
@@ -788,7 +788,7 @@ function draw3d(){const now=performance.now();if(!S){renderExterior(now);return;
  label('core_elev',24,1.3,H-1,'core','電梯',null);label('core_stairW',2,1.3,SWALL+2,'core','樓梯 ↕',null);label('core_stairE',46,1.3,SWALL+2,'core','樓梯 ↕',null);label('core_wcM',32,1.3,SWALL+3,'core','男廁',null);label('core_wcF',36.5,1.3,SWALL+3,'core','女廁',null);
  if(F.grid[11][W-1]===6){const nb=BORD[BORD.indexOf(F.b)+1];label('core_brE',W+1,1.4,11.5,'core bridge','空橋 → '+nb+'棟',null);}if(F.grid[11][0]===6){const nb=BORD[BORD.indexOf(F.b)-1];label('core_brW',-1,1.4,11.5,'core bridge',nb+'棟 ← 空橋',null);}
  // NPC 幫忙泡泡
- (F.npcs||[]).forEach((a,i)=>{const t=vis.find(t=>t.room===a.room&&!t.assignee);if(!t||a!==F.npcs.find(n=>n.room===a.room))return;const late=S.time>t.t+t.pat;label('npc_'+i,a.x+a.px+0.5,1.45,a.y+a.py+0.5,'bubble'+(late?' late':''),late?'快一點！':'幫忙一下',()=>hitTask(t));});
+ (F.npcs||[]).forEach((a,i)=>{const t=vis.find(t=>t.room===a.room&&!t.assignee);if(!t||a!==F.npcs.find(n=>n.room===a.room))return;const late=S.time>t.t+t.pat;label('npc_'+i,a.x+a.px+0.5,1.45,a.y+a.py+0.5,'bubble'+(late||fxRooms.has(a.room.id)?' late':''),fxRooms.has(a.room.id)?'都不能用了！':late?'快一點！':'幫忙一下',()=>hitTask(t));});
  // 名牌
  [...S.helpers,S.player].forEach((a,i)=>{if(a.away>0||a.transit||a.key!==key)return;let h='<span style="color:'+a.color+'">'+a.name+'</span>'+(a.phone||a.guide?' ☎':'')+(a===P&&S.eating?' 🍱':'');if(a.busy){const t=a.busy.task;h+='<span class="pg"><i style="width:'+Math.round(Math.max(0,Math.min(1,t.prog/t.dur))*100)+'%;background:'+a.color+'"></i></span>';}label('nm_'+i,a.x+a.px+0.5,1.5,a.y+a.py+0.5,'name',h,null);});
  if(!P.transit&&P.key===key&&!P.busy&&!P.phone&&!P.guide){const here=visible().find(t=>canWork(t,P)&&(!t.assignee||t.assignee===P));if(here)label('hint_sp',P.x+P.px+0.5,0.0,P.y+P.py+0.9,'hintkey',TOUCH?'點這裡：處理':'空白鍵：處理',()=>startWork(here,P));}
@@ -833,6 +833,18 @@ let extN=1;
 function renderExterior(now){const dk=(typeof diffKey!=='undefined')?diffKey:'hard';if(dk!==extDiff)buildExterior(dk);const span=(extN-1)*15+30;const a=now/16000;const d=Math.max(44,span*1.15);const lx=-Math.max(9,span*0.28);extCam.position.set(lx+Math.sin(a)*d,15+Math.sin(now/9000)*2,Math.cos(a)*d+6);extCam.lookAt(lx,5,0);extCam.aspect=innerWidth/innerHeight;extCam.updateProjectionMatrix();renderer.render(extScene,extCam);
  document.getElementById('hud').hidden=true;document.getElementById('status').hidden=true;document.getElementById('dock').hidden=true;['drTasks','drBag','drMap'].forEach(id=>document.getElementById(id).hidden=true);sweepLabels();}
 // 沒進遊戲時也要一直畫（開場背景）
+// ---------- 做錯看得見：出事的單位地板發紅、人在抱怨、畫面跳警告 ----------
+const fxRooms=new Set();const fxPl=[];let fxShake=0,_goalT=0;
+const fxPlane=i=>{if(!fxPl[i]){const m=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({color:0xef6b6b,transparent:true,opacity:0.2,depthWrite:false}));m.rotation.x=-Math.PI/2;m.visible=false;scene.add(m);fxPl[i]=m;}return fxPl[i];};
+window.fxBanner=(e,why)=>{const el=document.getElementById('fxBan');el.innerHTML='<b>⚠ 出事了：'+locName(e.room)+'</b><span></span><small></small>';el.children[1].textContent=e.title;el.children[2].textContent='原因：'+why;el.hidden=false;clearTimeout(el._t);el._t=setTimeout(()=>{el.hidden=true;},9000);
+ const v=document.getElementById('vig');v.classList.remove('on');void v.offsetWidth;v.classList.add('on');fxShake=performance.now()+600;sfx('bad');setTimeout(()=>sfx('alert'),450);};
+function tickFx(key,now){fxRooms.clear();let n=0;const F=FLOORS[key];
+ for(const c of S.chain){const t=c.effect;if(t.state==='done'||t.t>S.time||t.room.key!==key)continue;const wide=/整層|全院|所有/.test(t.title);const col=/中毒|加密|勒索|惡意|外洩|登入/.test(t.title)?0xb07cff:0xef6b6b;
+  (wide?F.rooms:[t.room]).forEach(r=>{if(fxRooms.has(r.id))return;fxRooms.add(r.id);const m=fxPlane(n++);m.material.color.setHex(col);m.material.opacity=0.26+0.14*Math.sin(now/260);m.position.set(r.x+r.w/2,0.03,r.y+r.h/2);m.scale.set(r.w,r.h,1);m.visible=true;});
+  label('fx_'+t.id,t.room.x+t.room.w/2,0.9,t.room.y+t.room.h/2,'fxlab','⚠ '+t.title.slice(0,14),()=>hitTask(t));}
+ for(let i=n;i<fxPl.length;i++)fxPl[i].visible=false;
+ if(now<fxShake){camera.position.x+=(Math.random()-0.5)*0.25;camera.position.y+=(Math.random()-0.5)*0.18;}
+ if(now-_goalT>500){_goalT=now;const g=goals();const h=g.map(x=>'<span class="'+(x.ok?'ok':'no')+'" title="'+x.n+'：'+x.d+'">'+(x.ok?'★':'☆')+' '+x.n.replace('沒有','').replace('沒踩資安和資料紅線','紅線').replace('急件逾時','急件').replace('電話漏接','漏接')+'</span>').join('');const el=document.getElementById('goals');if(el._h!==h){el.innerHTML=h;el._h=h;}}}
 // ---------- 導引點：往哪裡走，地上看得到 ----------
 const TOUCH=window.matchMedia&&matchMedia('(pointer:coarse)').matches;
 const GN=72;const guideMesh=new THREE.InstancedMesh(new THREE.CircleGeometry(0.09,10),new THREE.MeshBasicMaterial({color:0x5fd3a6,transparent:true,opacity:0.85,depthWrite:false}),GN);guideMesh.frustumCulled=false;guideMesh.count=0;scene.add(guideMesh);
