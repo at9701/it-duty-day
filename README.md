@@ -17,9 +17,20 @@
 - 工單會標在實際設備上（讀卡機、印表機、AP、電腦推車、工作站…）
 - 結算可以列印檢討單、下載檢討單（網頁檔）、下載 CSV，給帶新人的學長對照討論
 
+## 原始檔與打包
+- `src/game.html`：2D 版原始檔，事件、做法選單、評分都在這裡（兩版共用）
+- `src/head3d.html`、`src/r3d.js`、`src/patch_logic.py`：3D 版的畫面、場景與地圖調整
+- `python3 src/build.py`：重新產生 `index.html`（3D）和 `2d/index.html`（2D）。改完 `src/` 一定要跑一次
+- `tests/`：檢查腳本（需要 Node 與 Playwright）
+  - `check-menus.js`：每套做法選單的步驟接得起來、都有最佳答案
+  - `check-answer-length.js`：最佳答案是不是又變成最長的那個
+  - `check-floors-3d.js`：3D 每層樓都走得到
+  - `autoplay-3d.js duty:day:1`：自動玩完一班，確認沒有錯誤
+  - `export-review.js 輸出檔.html`：匯出全部做法選單的對照表，給熟流程的人核對
+
 ## 改內容（兩版共用的資料）
 - 事件腳本：`EV`（白班）、`EV_EVE`、`EV_NIGHT`、`EV_HOL`、`SPEC_EV`（各專責）
-- 做法選單：`PROC`（每類問題的決策樹）、`DEEPEN` / `DEEPEN2`（補充選項）
+- 做法選單：`PROC`（每類問題的決策樹）、`DEEPEN` / `DEEPEN2`（補充選項）。選項在遊戲裡會打亂順序
 - 電話教：`GUIDE`；釐清題：`TRIAGE`；後果：`CONSEQ`；壞結局：`ENDINGS`
 - 樓層與單位：`BLUEPRINT`（四個難度）、`UNIT`、`TPL`（額外單位的工單模板）
 - 小七／美食街菜單：`MENU`；專長與特質：`SKILLS`、`TRAITS`

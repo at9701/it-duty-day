@@ -1,0 +1,68 @@
+<title>值班遊戲做法對照表</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* 版面：單欄長表，上方固定篩選列；每套選單一個區塊，題目在左、選項在右 */
+:root{--bg:#f6f8f7;--panel:#ffffff;--fg:#17211e;--muted:#5d6b66;--line:#d5dedb;--accent:#0b6b5c;--good:#1d7a46;--ok:#96690a;--bad:#b3362b;--goodbg:#e4f3ea;--okbg:#fbf1d9;--badbg:#fbe6e3;
+ --sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;--mono:ui-monospace,"SF Mono",Consolas,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101615;--panel:#18211f;--fg:#e6eeeb;--muted:#9bada7;--line:#2c3a36;--accent:#5fd0bb;--good:#6fd69a;--ok:#e5bd5c;--bad:#f08d82;--goodbg:#173326;--okbg:#3a2f12;--badbg:#3d1d19;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#101615;--panel:#18211f;--fg:#e6eeeb;--muted:#9bada7;--line:#2c3a36;--accent:#5fd0bb;--good:#6fd69a;--ok:#e5bd5c;--bad:#f08d82;--goodbg:#173326;--okbg:#3a2f12;--badbg:#3d1d19;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px;line-height:1.6;padding-block:20px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1{font-size:24px;margin:0;text-wrap:balance}
+.lead{color:var(--muted);margin:0;max-width:65ch}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;border-bottom:1px solid var(--line)}
+.bar button,.bar input{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:6px;padding:5px 10px}
+.bar button{cursor:pointer}.bar button[aria-pressed="true"]{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.bar input{flex:1 1 160px;min-width:0}
+.bar button:focus-visible,.bar input:focus-visible,.done input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.count{color:var(--muted);font-variant-numeric:tabular-nums;margin-left:auto}
+section{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+section.checked{opacity:.62}
+.head{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:baseline}
+.head h2{font-size:17px;margin:0;flex:1 1 240px;min-width:0}
+.tag{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:1px 9px;color:var(--muted);white-space:nowrap}
+.tag.conf{color:var(--good);border-color:var(--good)}
+.key{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.done{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--muted);white-space:nowrap}
+.tix{font-size:13px;color:var(--muted);margin:0}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:8px 16px;border-top:1px solid var(--line);padding-top:10px}
+@media (max-width:640px){.step{grid-template-columns:minmax(0,1fr)}}
+.q{font-weight:600}.q small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+li{border-radius:6px;padding:6px 10px;border-left:4px solid var(--line)}
+li.g1{background:var(--goodbg);border-color:var(--good)}li.g2{background:var(--okbg);border-color:var(--ok)}li.g0{background:var(--badbg);border-color:var(--bad)}
+li b{font-size:12px;margin-right:6px}li.g1 b{color:var(--good)}li.g2 b{color:var(--ok)}li.g0 b{color:var(--bad)}
+li span{display:block;font-size:13px;color:var(--muted)}
+</style>
+<div class="wrap">
+ <h1>值班遊戲做法對照表</h1>
+ <p class="lead">遊戲裡每一套做法選單都列在這裡：題目、每個選項算對、普通還是錯，以及選了之後遊戲給的說明。請對照院內實際做法，哪一題不對，把選單代號和正確的步驟告訴 Claude 就會改。打勾只記在你這台瀏覽器，方便你記得看到哪裡。</p>
+ <div class="bar" id="bar"><input id="q" type="search" placeholder="搜尋題目、選項或工單" aria-label="搜尋"><span class="count" id="count"></span></div>
+ <div id="list" style="display:flex;flex-direction:column;gap:16px"></div>
+</div>
+<script>
+const DATA=/*DATA*/;
+const DOM={hw:'硬體周邊',net:'網路',sys:'系統',sec:'資安',app:'應用程式',med:'醫療設備',db:'資料庫'};
+const CONF=['nhivpn','card','econsent_net','econsent_app','charge','update'];
+const G={1:'最佳',2:'普通',0:'錯誤'};
+let seen={};try{seen=JSON.parse(localStorage.getItem('review_seen')||'{}')}catch(e){}
+let dom='all',only=false;
+const bar=document.getElementById('bar'),q=document.getElementById('q');
+const mk=(label,fn,pressed)=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.setAttribute('aria-pressed',pressed?'true':'false');b.onclick=fn;bar.insertBefore(b,q);return b;};
+const btns={};btns.all=mk('全部',()=>{dom='all';render()},true);
+Object.keys(DOM).forEach(d=>btns[d]=mk(DOM[d],()=>{dom=d;render()}));
+const todo=mk('只看還沒核對的',()=>{only=!only;render()});
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function render(){for(const k in btns)btns[k].setAttribute('aria-pressed',k===dom?'true':'false');todo.setAttribute('aria-pressed',only?'true':'false');
+ const kw=q.value.trim();const list=document.getElementById('list');list.innerHTML='';let shown=0;
+ DATA.forEach(m=>{if(dom!=='all'&&m.dom!==dom)return;if(only&&seen[m.k])return;
+  if(kw&&!JSON.stringify(m).includes(kw))return;shown++;
+  const s=document.createElement('section');if(seen[m.k])s.className='checked';
+  s.innerHTML='<div class="head"><h2>'+esc((m.steps[0].q||'').replace(/\{room\}/g,'（單位）'))+'</h2><span class="tag">'+DOM[m.dom]+'</span>'+(CONF.includes(m.k)?'<span class="tag conf">已照院內流程改過</span>':'')+'<span class="key">'+m.k+'</span><label class="done"><input type="checkbox" id="c_'+m.k+'"'+(seen[m.k]?' checked':'')+'>已核對</label></div>'+
+   (m.tickets.length?'<p class="tix">會進這套選單的工單：'+m.tickets.map(esc).join('、')+'</p>':'<p class="tix">這套選單由其他事件的後果觸發，沒有固定工單。</p>')+
+   m.steps.map((st,i)=>'<div class="step"><div class="q">'+esc(st.q.replace(/\{room\}/g,'（單位）'))+'<small>第 '+(i+1)+' 步</small></div><ul>'+st.opts.slice().sort((a,b)=>(a.g===1?0:a.g===2?1:2)-(b.g===1?0:b.g===2?1:2)).map(o=>'<li class="g'+o.g+'"><b>'+G[o.g]+'</b>'+esc(o.t)+(o.n?'<span>'+esc(o.n)+'</span>':'')+'</li>').join('')+'</ul></div>').join('');
+  s.querySelector('input').onchange=e=>{seen[m.k]=e.target.checked;try{localStorage.setItem('review_seen',JSON.stringify(seen))}catch(x){}render();};
+  list.appendChild(s);});
+ const n=DATA.filter(m=>seen[m.k]).length;document.getElementById('count').textContent='顯示 '+shown+' 套｜已核對 '+n+'／'+DATA.length;}
+q.oninput=render;render();
+</script>

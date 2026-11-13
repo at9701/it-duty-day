@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>當醫院資訊人員的一天 3D</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+/* 3D 版：全螢幕 WebGL，HUD 疊在上面。左上時間／位置，左下身體狀態，右下功能鍵（工單、包包、院區、倍速），右側抽屜放工單。 */
+:root{
+  --bg:#0f1218; --panel:#171c26; --panel2:#1f2634; --line:#2c3545;
+  --fg:#e6e9ef; --muted:#8b95a7; --accent:#5fd3a6;
+  --warn:#f2b84b; --crit:#ef6b6b; --ok:#5fd3a6; --info:#6aa7ff;
+  --mono:'Press Start 2P',monospace; --sans:"PingFang TC","Microsoft JhengHei","Noto Sans TC",system-ui,sans-serif;
+  color-scheme:dark;
+}
+html,body{height:100%;margin:0;overflow:hidden}
+[hidden]{display:none!important}
+body{background:#0b0e14;color:var(--fg);font-family:var(--sans);font-size:14px;line-height:1.45}
+button{font-family:var(--sans);font-size:13px;border:1px solid var(--line);background:var(--panel2);color:var(--fg);border-radius:4px;padding:6px 10px;cursor:pointer}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+button.primary{background:var(--accent);color:#0b1a14;border-color:var(--accent);font-weight:600}
+button:disabled{opacity:.45;cursor:default}
+#gl{position:fixed;inset:0;display:block;touch-action:none}
+#c{display:none}
+#labels{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:2}
+#labels .lb{position:absolute;transform:translate(-50%,-100%);white-space:nowrap;pointer-events:auto}
+#labels .room{background:rgba(11,14,20,.82);border-top:2px solid var(--accent);color:var(--fg);font-weight:700;font-size:12px;padding:2px 8px;border-radius:3px;text-align:center}
+#labels .room .tl{display:flex;flex-direction:column;gap:2px;margin-top:3px;font-weight:500;text-align:left}
+#labels .room .tk{display:flex;gap:6px;align-items:center;justify-content:space-between;background:rgba(11,14,20,.9);border-left:3px solid var(--info);padding:1px 6px;border-radius:0 3px 3px 0;cursor:pointer;max-width:260px}
+#labels .room .tk:hover{background:#283244}
+#labels .room .tk.prio{border-color:var(--crit)}#labels .room .tk.late{border-color:var(--warn)}#labels .room .tk.sched{border-color:var(--accent)}
+#labels .room .tk span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#labels .room .tk small{color:var(--muted);flex:none}#labels .room .tk.late small{color:var(--warn)}
+#labels .room .ring{color:var(--warn);font-size:11px;animation:ring .6s steps(2) infinite}
+#labels .name{font-size:11px;font-weight:700;background:rgba(11,14,20,.7);padding:1px 6px;border-radius:3px}
+#labels .name .pg{display:block;height:4px;background:#0b0e14;border-radius:2px;margin-top:2px;overflow:hidden}#labels .name .pg i{display:block;height:100%}
+#labels .bubble{background:#fff;color:#1b1b1b;font-size:11px;font-weight:700;padding:2px 7px;border-radius:8px;cursor:pointer}
+#labels .bubble.late{color:#c0392b}#labels .bubble:after{content:'';position:absolute;left:50%;bottom:-5px;margin-left:-4px;border:4px solid transparent;border-top-color:#fff;border-bottom:0}
+#labels .hintkey{background:rgba(95,211,166,.95);color:#0b1a14;font-size:11px;font-weight:700;padding:1px 7px;border-radius:3px;transform:translate(-50%,0)}
+#labels .core{background:rgba(11,14,20,.6);color:#bfc8d6;font-size:11px;padding:1px 6px;border-radius:3px}
+#labels .core.bridge{color:#bff0d6}
+@keyframes ring{to{opacity:.3}}
+.toast{position:fixed;left:50%;top:14px;z-index:30;transform:translateX(-50%);background:rgba(15,18,24,.94);border:1px solid var(--line);padding:8px 16px;border-radius:4px;font-size:14px;line-height:1.4;pointer-events:none;opacity:0;transition:opacity .2s;max-width:80%;text-align:center}
+.toast.show{opacity:1}
+.transit{position:fixed;inset:0;z-index:15;display:flex;align-items:center;justify-content:center;background:rgba(11,14,20,.78);font-family:var(--mono);font-size:14px;color:var(--warn);text-align:center;line-height:2.2;white-space:pre-line}
+/* HUD 左上 */
+.hud{position:fixed;left:14px;top:14px;z-index:5;background:rgba(23,28,38,.92);border:1px solid var(--line);border-radius:6px;padding:8px 12px;display:flex;flex-direction:column;gap:4px;min-width:210px;box-shadow:0 2px 0 #0a0d12}
+.hud .top{display:flex;gap:12px;align-items:baseline}
+.clock{font-family:var(--mono);font-size:18px;color:var(--accent);letter-spacing:1px;text-shadow:0 0 8px rgba(95,211,166,.6)}
+.loc{font-size:13px;color:var(--muted)}.loc b{color:var(--fg)}
+.hud .stats{display:flex;gap:10px;flex-wrap:wrap}
+.stat{display:flex;flex-direction:column;font-variant-numeric:tabular-nums}
+.stat b{font-size:14px}.stat span{font-size:9px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+/* 左下身體 */
+.status{position:fixed;left:14px;bottom:14px;z-index:5;background:rgba(23,28,38,.92);border:1px solid var(--line);border-radius:6px;padding:8px 12px;display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;max-width:min(520px,60vw);box-shadow:0 2px 0 #0a0d12}
+.meter{display:block;height:8px;width:64px;background:var(--panel2);border:1px solid var(--line);border-radius:3px;margin-top:4px;overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:var(--info)}
+/* 右下功能鍵 */
+.dock{position:fixed;right:14px;bottom:14px;z-index:6;display:flex;gap:8px;align-items:flex-end}
+.dock .big{position:relative;width:60px;height:60px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;background:rgba(23,28,38,.94);border:1px solid var(--line);box-shadow:0 2px 0 #0a0d12;padding:0}
+.dock .big i{font-style:normal;font-size:22px;line-height:1}
+.dock .big.on{border-color:var(--accent);background:#1e3a30}
+.dock .big.warn{border-color:var(--warn)}.dock .big.crit{border-color:var(--crit);background:#3a2222;animation:ring .8s steps(2) infinite}
+.dock .big .badge{position:absolute;right:-6px;top:-6px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--info);color:#0b0e14;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;box-sizing:border-box}
+.dock .big .badge.p{background:var(--crit);color:#fff}.dock .big .badge.ring{background:var(--warn);animation:ring .6s steps(2) infinite}
+.dock .big.alert{animation:flash .8s ease-out 2}
+.dock .col{display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.seg{display:flex;gap:6px;flex-wrap:wrap}.seg button.on{background:var(--accent);color:#0b1a14;border-color:var(--accent);font-weight:600}
+#spd{gap:3px;background:rgba(23,28,38,.94);border:1px solid var(--line);border-radius:6px;padding:3px}#spd button{padding:4px 7px;font-size:12px;border:none;background:transparent}#spd button.on{background:var(--accent)}
+#pause{background:rgba(23,28,38,.94)}
+@keyframes flash{0%{box-shadow:0 0 0 3px var(--accent)}100%{box-shadow:0 2px 0 #0a0d12}}
+/* 抽屜／彈窗 */
+.drawer{position:fixed;right:14px;bottom:84px;z-index:6;width:min(420px,calc(100vw - 28px));max-height:calc(100vh - 110px);overflow:auto;background:rgba(23,28,38,.96);border:1px solid var(--line);border-radius:8px;padding:10px 12px;box-shadow:0 4px 0 #0a0d12,0 0 40px rgba(0,0,0,.4);display:flex;flex-direction:column;gap:10px}
+.drawer h3{margin:0;font-size:12px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.panel{display:flex;flex-direction:column;gap:8px}
+.list{display:flex;flex-direction:column;gap:6px}
+.card{display:grid;grid-template-columns:4px 1fr auto;gap:10px;align-items:center;background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:6px 8px 6px 0;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+.card .bar{height:100%;border-radius:4px 0 0 4px;background:var(--info)}
+.card.prio .bar{background:var(--crit)}.card.late .bar{background:var(--warn)}.card.sched .bar{background:var(--accent)}
+.card.ring .bar{background:var(--warn);animation:ring .6s steps(2) infinite}
+.card.prio{background:#2a2230}.card.sched{background:#1c2a28}
+.card .t{font-size:13px;min-width:0}.card .t small{display:block;color:var(--muted);font-size:11px}
+.card .r{display:flex;flex-direction:column;align-items:flex-end;gap:4px;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.card .r b{color:var(--fg)}
+.card.here{border-color:var(--accent)}
+.pill{font-size:10px;padding:1px 6px;border-radius:10px;border:1px solid var(--line);color:var(--muted)}
+.hint{font-size:11px;color:var(--muted)}
+.spacer{flex:1}
+.bodyBtns{display:flex;gap:8px;flex-wrap:wrap}
+.actbar{display:flex;flex-direction:column;gap:8px}
+.actbar .lab{font-size:12px;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+.actbar button{font-size:14px;padding:8px 14px;border-color:var(--accent);background:#213832;color:var(--fg)}
+.actbar button:disabled{opacity:.5}
+.bagRow{display:flex;gap:8px;flex-wrap:wrap}
+.bagRow .it{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:6px 10px;font-size:13px;display:flex;flex-direction:column;align-items:center;min-width:58px}
+.bagRow .it i{font-style:normal;font-size:20px}
+.bagRow .it small{color:var(--muted);font-size:10px}
+/* 樓層總覽（院區抽屜內） */
+.ov{display:grid;grid-template-columns:auto repeat(3,1fr);gap:4px;font-size:12px;align-content:start}
+.ov .h{color:var(--muted);text-align:center;padding:2px}
+.ov .f{color:var(--muted);text-align:right;padding-right:4px;align-self:center}
+.ov .cell{background:var(--panel2);border:1px solid var(--line);border-radius:3px;min-height:30px;position:relative;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:3px 4px}
+.ov .cell .nm{font-size:10.5px;color:var(--fg);line-height:1.15;text-align:center;white-space:normal;max-width:100%}
+.ov .dots{display:flex;gap:3px;height:7px}
+.ov .cell.me{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);background:#1e3a30}
+.ov .cell.view{background:#283244}
+.ov .dot{width:7px;height:7px;border-radius:50%}
+.ov .n{position:absolute;right:3px;top:1px;font-size:12px;font-weight:700;color:var(--info)}.ov .n.p{color:var(--crit)}
+.ov .ring{position:absolute;left:4px;top:0;font-size:13px;color:var(--warn);animation:ring .6s steps(2) infinite}
+/* 開場／對話框 */
+.overlay{position:fixed;inset:0;background:rgba(5,7,10,.6);display:flex;align-items:center;justify-content:center;padding:16px;z-index:20}
+#end.overlay{z-index:40}
+#printSheet{display:none}
+@media print{:root{color-scheme:light!important}html,body{background:#fff!important;overflow:visible!important;height:auto!important}body>*:not(#printSheet){display:none!important}#printSheet{display:block;color:#000;background:#fff;font-family:"PingFang TC","Microsoft JhengHei","Noto Sans TC",sans-serif;font-size:11pt;padding:0}
+ #printSheet h1{font-size:16pt;margin:0 0 4pt}#printSheet .meta{display:flex;flex-wrap:wrap;gap:4pt 16pt;margin:4pt 0 8pt;font-size:10pt}
+ #printSheet table{width:100%;border-collapse:collapse;font-size:9pt;margin-top:6pt}#printSheet th,#printSheet td{border:1px solid #999;padding:3pt 4pt;text-align:left;vertical-align:top;color:#000}#printSheet th{background:#eee}
+ #printSheet .ok{color:#1a7f4b;font-weight:700}#printSheet .meh{color:#b07a00;font-weight:700}#printSheet .bad{color:#c0392b;font-weight:700}
+ #printSheet .sum{display:grid;grid-template-columns:repeat(4,1fr);gap:4pt;margin:6pt 0}#printSheet .sum div{border:1px solid #999;padding:4pt;text-align:center}#printSheet .sum b{display:block;font-size:14pt}
+ #printSheet .sign{display:grid;grid-template-columns:repeat(3,1fr);gap:16pt;margin-top:18pt}#printSheet .sign div{border-top:1px solid #000;padding-top:3pt;font-size:10pt}
+ #printSheet tr{page-break-inside:avoid}@page{size:A4;margin:12mm}}
+@media (max-width:640px){.box{padding:16px 14px}.drawer{bottom:76px;max-height:45vh}}
+#start.overlay{background:linear-gradient(90deg,rgba(5,7,10,.55),rgba(5,7,10,.2));justify-content:flex-start;padding-left:max(24px,4vw)}
+.box{background:rgba(23,28,38,.96);border:1px solid var(--line);border-radius:8px;padding:20px 22px;max-width:640px;font-size:15px;width:100%;max-height:92vh;overflow:auto;box-sizing:border-box;backdrop-filter:blur(6px)}
+.box h2{margin:0 0 6px;font-size:18px;text-wrap:balance}
+.box p{margin:8px 0;color:var(--muted);line-height:1.55}
+#start .hint{font-size:12.5px;line-height:1.5}
+#start .seg button{font-size:14px;padding:8px 12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.clue{background:var(--panel2);border-left:3px solid var(--info);padding:6px 10px;border-radius:0 4px 4px 0;margin:6px 0;font-size:13px}
+.rep{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.rep div{background:var(--panel2);border-radius:4px;padding:8px;text-align:center}
+.rep b{display:block;font-family:var(--mono);font-size:18px}.rep span{font-size:11px;color:var(--muted)}
+.rep .ok b{color:var(--ok)}.rep .late b{color:var(--warn)}.rep .miss b{color:var(--crit)}
+table{width:100%;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums;margin-top:8px}
+th,td{padding:4px 6px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top}th:first-child,td:first-child{text-align:left}
+th{color:var(--muted);font-weight:500}
+td.c{text-align:left;color:var(--fg)}td.c.bad{color:var(--crit)}td.c.meh{color:var(--warn)}td.c.good{color:var(--ok)}
+.quote{border-left:3px solid var(--accent);padding:6px 10px;margin-top:10px;font-style:italic}
+.fpsNote{position:fixed;right:14px;top:14px;z-index:5;font-size:11px;color:var(--muted);background:rgba(23,28,38,.8);padding:3px 8px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}.ring,.card.ring .bar,.dock .big .badge.ring{animation:none}}
+@media (max-width:640px){.hud{min-width:0}.hud .stats{display:none}.status{max-width:calc(100vw - 28px);bottom:84px}.dock .big{width:50px;height:50px}.dock .big i{font-size:18px}}
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<canvas id="c" width="768" height="352"></canvas>
+<div id="labels"></div>
+
+<div class="hud" id="hud" hidden>
+  <div class="top"><div class="clock" id="clock">08:00</div><div class="loc" id="loc"><b>A棟 2F</b> 資訊部</div></div>
+  <div class="stats">
+    <div class="stat"><b id="unitsN">20</b><span>負責單位</span></div>
+    <div class="stat"><b id="endpN">1,850</b><span>端點</span></div>
+    <div class="stat"><b id="staff">1</b><span>在線</span></div>
+    <div class="stat"><b id="done">0</b><span>完成</span></div>
+    <div class="stat"><b id="open">0</b><span>待處理</span></div>
+    <div class="stat"><b id="missed">0</b><span>漏接</span></div>
+  </div>
+</div>
+<div class="fpsNote" id="fpsNote" hidden></div>
+
+<div class="status" id="status" hidden>
+  <div class="stat"><b id="money">$300</b><span>錢包</span></div>
+  <div class="stat" id="lunchStat"><b id="lunch">未吃</b><span id="lunchLabel">午餐</span></div>
+  <div class="stat"><b id="buff">—</b><span>提神</span></div>
+  <div class="stat"><b><span class="meter"><i id="bladderBar"></i></span></b><span>膀胱</span></div>
+  <div class="stat" id="sleepStat" hidden><b><span class="meter"><i id="sleepBar"></i></span></b><span>睏</span></div>
+  <div class="stat" id="bagStat" hidden><b id="bag" style="font-size:12px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></b><span>背包</span></div>
+</div>
+
+<div class="dock" id="dock" hidden>
+  <div class="col">
+    <span class="seg" id="spd" title="×1 = 1 秒半分鐘，一班 16 分鐘"><button class="on" data-s="1">×1</button><button data-s="2">×2</button><button data-s="4">×4</button><button data-s="8">×8</button></span>
+    <button id="pause">暫停</button>
+  </div>
+  <button class="big" id="dkWC" title="廁所"><i>🚻</i>廁所<span class="badge" id="wcBadge" hidden></span></button>
+  <button class="big" id="dkMap" title="院區"><i>🗺️</i>院區</button>
+  <button class="big" id="dkBag" title="包包／動作"><i>🎒</i>包包<span class="badge" id="bagBadge" hidden></span></button>
+  <button class="big" id="dkTasks" title="來電與工單"><i>📱</i>工單<span class="badge" id="openBadge" hidden></span></button>
+</div>
+
+<div class="drawer" id="drTasks" hidden>
+  <div class="panel" id="callPanel" hidden>
+    <h3>來電 <span class="hint">人在資訊部分機就接了；在外面用手機接要停 2 分鐘。響 10 分鐘沒人接算漏接。</span></h3>
+    <div class="list" id="calls"></div>
+  </div>
+  <div class="panel">
+    <h3>工單 <span class="hint" id="where">點工單人會自己走過去（會搭電梯、走樓梯、過空橋）；點地板也能走；到了按「處理」或空白鍵</span></h3>
+    <div class="list" id="list"></div>
+  </div>
+  <div class="panel" id="teamPanel" hidden>
+    <h3>人力板 <span class="hint">體力歸零會請假回家；心情太差會跟你說他在忙。</span><span class="spacer"></span><button id="autoBtn">自動派單：關</button></h3>
+    <div class="list" id="team"></div>
+  </div>
+</div>
+
+<div class="drawer" id="drBag" hidden>
+  <h3>包包</h3>
+  <div class="bagRow" id="bagRow"><span class="hint">空的。上班路上沒買東西，中午再去 B1 看看。</span></div>
+  <div class="actbar" id="actbar"><span class="lab">現在可以</span><span class="bodyBtns" id="bodyBtns"></span><span class="hint" id="actHint">走到小七、機房、廁所，或身上有帶東西，這裡才會有東西可以按</span></div>
+</div>
+
+<div class="drawer" id="drMap" hidden>
+  <h3>樓層總覽 <span class="hint">點一格可以先看那層；再點一次回到自己。</span><span class="spacer"></span><button id="mapBtn">院區導覽</button></h3>
+  <div class="ov" id="ov"></div>
+</div>
+
+<div class="transit" id="transit" hidden></div>
+<div class="toast" id="toast"></div>
+
+<div class="overlay" id="start">
+  <div class="box">
+    <h2>請來體驗看看——當醫院資訊人員的一天</h2>
+    <p>今天醫院裡大大小小的電腦問題都是你的。電話會一直進來，要先去哪邊、要怎麼回人家、要不要自己跑一趟，都你決定。弄錯了，等一下就會有人打來。</p>
+    <p class="hint">一班大概 15 到 30 分鐘。下面選一選，按「下一步」。</p>
+    <div id="page1">
+    <div style="margin-top:12px"><b>你叫什麼？</b></div>
+    <div class="row" style="margin-top:6px"><input id="nick" type="text" maxlength="8" placeholder="暱稱或姓名（最多 8 字）" style="font-family:var(--sans);font-size:14px;padding:8px 10px;border:1px solid var(--line);border-radius:4px;background:var(--panel2);color:var(--fg);width:220px"></div>
+    <div style="margin-top:12px"><b>你是誰？</b></div>
+    <div class="seg" id="roleSeg" style="margin-top:6px"><button data-r="newbie">剛到醫院的新人</button><button class="on" data-r="duty">值班人員</button><button data-r="spec">專責工程師</button><button data-r="mgr">主任（主管）</button></div>
+    <div class="hint" id="roleHint" style="margin-top:6px;display:grid;grid-template-columns:auto 1fr;gap:3px 10px">
+      <b>新人</b><span>第一天報到。動作比較慢，不會的可以打給學長，各單位也會對你客氣一點。</span>
+      <b>值班人員</b><span>電話進來你接，哪裡壞了你去，什麼都要會一點。</span>
+      <b>專責工程師</b><span>你負責一個領域（網路、資安、資料庫、系統、程式或 PACS）。值班同事遇到你領域的問題會轉給你，你自己也有該做的事。</span>
+      <b>主任</b><span>不太需要自己修，但要派人、簽核、接投訴，還要幫底下的人擋院長。同事會累、會不爽，操過頭會請假。</span>
+    </div>
+    <div id="secSpec" hidden><div style="margin-top:12px"><b>哪一種工程師？</b><span class="hint">　可以兼兩個</span></div>
+    <div class="seg" id="specSeg" style="margin-top:6px"></div>
+    <p class="hint" id="specHint" style="margin-top:4px"></p></div>
+    <div style="margin-top:12px"><b>醫院多大？</b><span class="hint">　後面的院區會跟著變</span></div>
+    <div class="seg" id="diffSeg" style="margin-top:6px"></div>
+    <p class="hint" id="diffHint" style="margin-top:4px"></p>
+    <div style="margin-top:12px"><b>今天排哪一班？</b></div>
+    <div class="seg" id="shiftSeg" style="margin-top:6px">
+      <button class="on" data-k="day">白班 07–15</button><button data-k="eve">小夜 15–23</button><button data-k="night">大夜 23–07</button><button data-k="hol">假日白班 07–15</button>
+    </div>
+    <p class="hint" id="shiftDesc" style="margin-top:4px">早上七點到下午三點。門診全開、行政都在、主任坐在隔壁，電話最多的一班。</p>
+    <div class="row"><button class="primary" id="next1">下一步 →</button><button id="mapBtn2">先看院區導覽</button></div>
+    </div>
+    <div id="page2" hidden>
+    <div id="secEnv"><div style="margin-top:12px"><b>這間醫院有哪些工具可以用？</b></div>
+    <div class="seg" id="envSeg" style="margin-top:6px">
+      <button class="on" data-e="remote">有遠端工具</button><button class="on" data-e="guide">可以電話教對方弄</button><button class="on" data-e="fwd">分機轉手機</button><button data-e="ticket">有工單系統</button><button class="on" data-e="spare">有備機庫存</button><button class="on" data-e="vendor">廠商維護合約</button><button data-e="nac">全院 802.1X 強制</button>
+    </div>
+    <div class="hint" style="margin-top:6px;display:grid;grid-template-columns:auto 1fr;gap:3px 10px">
+      <b>遠端工具</b><span>有標「可遠端」的事，坐在位子上就能處理。</span>
+      <b>電話教</b><span>打電話教對方自己弄。要講什麼你選（一定會有「你先重開機看看」），教不教得會要看是什麼問題、對方是誰。教不會還是得跑一趟。檢查室跟機房的事教不來。</span>
+      <b>分機轉手機</b><span>關掉的話，人不在資訊部就接不到電話。</span>
+      <b>工單系統</b><span>大約三成的人會自己上系統填單，不會漏接。</span>
+      <b>備機庫存</b><span>沒有備機的話，「先換備機」要多跑倉庫 20 分鐘。</span>
+      <b>廠商合約</b><span>沒簽約的話，「叫廠商」要多等半小時。</span>
+      <b>802.1X</b><span>有人亂接設備會直接被擋，不會整層斷線，但廠商跟訪客會更常來盧你。</span>
+    </div>
+    <p class="hint" style="margin-top:4px">跑現場不管有沒有勾都可以。</p></div>
+    <div style="margin-top:12px"><b>你是</b></div>
+    <div class="seg" id="genderSeg" style="margin-top:6px;align-items:center"><button class="on" data-g="m">男生</button><button data-g="f">女生</button><canvas id="pv" width="48" height="48" style="width:72px;height:72px;image-rendering:pixelated;background:#0b0e14;border:1px solid var(--line);border-radius:4px"></canvas><button id="reroll">換個造型</button></div>
+    <div id="secSkills"><div style="margin-top:12px"><b>你比較熟哪一塊？</b>（最多選兩個，不選就是每樣都普通）</div>
+    <div class="seg" id="skillSeg" style="margin-top:6px"></div>
+    <p class="hint" id="skillHint" style="margin-top:4px">熟的那塊做起來快三成，選做法的時候對的那個會標 ★，電話教人也比較教得會。同事熟什麼是隨機的。</p></div>
+    <div style="margin-top:12px"><b>你是哪一種人？</b>（選一個）</div>
+    <div class="seg" id="traitSeg" style="margin-top:6px"></div>
+    <p class="hint" id="traitHint" style="margin-top:4px"></p>
+    <div style="margin-top:12px"><b id="teamLabel">今天幾個人上班？</b></div>
+    <div class="seg" id="teamSeg" style="margin-top:6px">
+      <button class="on" data-n="1">1 人</button><button data-n="2">2 人</button><button data-n="3">3 人</button><button data-n="4">4 人</button>
+    </div>
+    <div style="margin-top:12px"><b>上班路上要不要先去小七？</b><span class="hint">　身上有 $<span id="budget">300</span></span></div>
+    <div class="seg" id="preShop" style="margin-top:6px"></div>
+    <div class="hint" style="margin-top:6px;display:grid;grid-template-columns:auto 1fr;gap:2px 10px">
+      <b>咖啡</b><span>帶著走，想喝再喝。喝完一個半小時內動作快一些，但會比較常想上廁所。</span>
+      <b>蠻牛</b><span>一小時內動作快很多，廁所跑得更勤，退了之後會累一陣子。</span>
+      <b>無糖綠茶</b><span>比較溫和，快一點點，撐一小時。</span>
+      <b>綠色乖乖</b><span>拿去機房放在機櫃上，機房的告警會少一半。老規矩。</span>
+      <b>黃色乖乖</b><span>……顏色買錯了，機房會多跳一張不明告警，除非旁邊有綠色的鎮著。</span>
+      <b>靠得住</b><span>放機櫃上。你選「先這樣，之後可能再壞」的做法，有一半不會再壞。</span>
+    </div>
+    <p class="hint" style="margin-top:6px">身上就這些錢，中午吃飯跟之後想買飲料都是用這筆。現在買的會放在包包裡，要用的時候按右下角的 🎒；乖乖要拿到機房放。</p>
+    <div id="lunchOpt"><div style="margin-top:12px"><b>中午打算怎麼吃？</b></div>
+    <div class="seg" id="lunchSeg" style="margin-top:6px">
+      <button class="on" data-l="0">中午再下去 B1 買</button><button data-l="1">路上先買個便當放辦公室</button>
+    </div>
+    <p class="hint" style="margin-top:4px">先買好放著的話，中午不用下樓，但便當會冷掉、吃起來也沒那麼開心。中午再下去的話，B1 有小七、便當店、自助餐、麵店、手搖飲可以選，前提是那時候你走得開。</p></div>
+    <p class="hint" style="margin-top:8px">同事會自己看哪裡有事就去，你也可以點名叫誰去。只是他們也會被主任叫去開會、被借去別的院區，人數多不代表隨時都有人。</p>
+    <div class="row"><button id="back1">← 上一步</button><button class="primary" id="go">打卡上班</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="dlg" hidden><div class="box" id="dlgBox"></div></div>
+<div id="printSheet"></div>
+<div class="overlay" id="end" hidden><div class="box" id="endBox"></div></div>
+
+<script>

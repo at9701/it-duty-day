@@ -1,0 +1,4 @@
+const {chromium}=require('playwright');(async()=>{const b=await chromium.launch();const p=await b.newPage();
+await p.goto('file://'+require('path').resolve(__dirname,'../src/game.html'));await p.waitForTimeout(800);
+console.log(await p.evaluate(()=>{let n=0,longest=0,r=0;const worst=[];for(const k in PROC)for(const st in PROC[k]){if(st==='dom'||st==='start')continue;const o=PROC[k][st].opts;const bl=Math.max(...o.filter(x=>x[1]===1).map(x=>x[0].length));const w=o.filter(x=>x[1]!==1).map(x=>x[0].length);if(!w.length)continue;n++;if(bl>Math.max(...w))longest++;const ra=bl/(w.reduce((a,c)=>a+c,0)/w.length);r+=ra;worst.push([ra.toFixed(1),k+'.'+st]);}
+return JSON.stringify({n,longestPct:Math.round(longest/n*100),avgRatio:(r/n).toFixed(2),worst:worst.sort((a,b)=>b[0]-a[0]).slice(0,12)});}));await b.close();})();

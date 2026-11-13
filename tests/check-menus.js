@@ -1,0 +1,5 @@
+const {chromium}=require('playwright');(async()=>{const b=await chromium.launch();const p=await b.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.goto('file://'+require('path').resolve(__dirname,'../src/game.html'));await p.waitForTimeout(800);
+console.log(await p.evaluate(()=>{const bad=[];for(const k in PROC){const pr=PROC[k];if(!pr[pr.start])bad.push(k+':nostart');for(const st in pr){if(st==='dom'||st==='start')continue;const S_=pr[st];if(!S_.opts){bad.push(k+'.'+st+':noopts');continue;}S_.opts.forEach(o=>{if(o[5]&&!pr[o[5]])bad.push(k+'.'+st+'→'+o[5]);if(o.length<5)bad.push(k+'.'+st+':short');(o[3]||'').split('+').forEach(f=>{if(f&&!['sec','data','rep'].includes(f)&&!CONSEQ[f])bad.push(k+':flag '+f)});});if(!S_.opts.some(o=>o[1]===1))bad.push(k+'.'+st+':nobest');}}
+const t={id:99,title:'門診整層 HIS 開藥很慢',src:'call'};const seen={};for(let i=0;i<40;i++){delete t.procKey;procOf(t);seen[t.procKey]=1;}
+return JSON.stringify({bad,slowVariants:Object.keys(seen)});}),errs);await b.close();})();
