@@ -479,8 +479,20 @@ function furnish(r,kind){CURK=kind;const x0=r.x,z0=r.y,w=r.w,h=r.h,zb=z0+0.02,la
    const rr=roomRow(x0,last,z0,6,2,0xe6e9ef);rr.forEach((cx,i)=>{orTable(cx+1.3,z0+1.1);box(cx+0.1,0,z0+0.15,0.9,1.4,0.6,0xe3ebef);emit(cx+0.2,0.9,z0+0.76,0.7,0.35,0.01,i%2?0x5fd3a6:0x6aa7ff);blk(cx+4.1,z0+0.15,0.8,0.5);box(cx+4.1,0,z0+0.15,0.8,1.6,0.5,0xdfe6ea);glassPane(cx+4.15,0.3,z0+0.65,0.7,1.1,0.02);blk(cx+4.2,z0+1.6,0.6,0.5);box(cx+4.2,0.75,z0+1.6,0.6,0.05,0.5,0xcfd6dc);box(cx+4.45,0,z0+1.8,0.1,0.75,0.1,0x8a94a8);box(cx+4.25,0.8,z0+1.7,0.5,0.03,0.3,0x9ad0e8);box(cx+0.15,1.0,z0+4.0,0.7,0.22,0.03,0xf4f6f8);emit(cx+0.2,1.04,z0+4.03,0.14,0.14,0.01,0xef6b6b);});
    for(let x=door+3;x+1.9<=last;x+=2.2){bed(x,zi2+0.1,0xf7f9fb);curtain(x,zi2+1.0,2);}counter(Math.max(x0+0.5,door-4),zi2+1.1,Math.min(3,door-0.8-x0),0xe8eef0,0x3f8f74);monitor(Math.max(x0+0.8,door-3.7),1.01,zi2+1.2);
    {const dw=r.wide?2:1;locker(door-1,zf+0.3,0.9);scrubSink(door+dw,zf+0.3);box(door-1,0,zf,0.08,1.2,1,0xcfd6dc);box(door+dw+0.92,0,zf,0.08,1.2,1,0xcfd6dc);for(let i=0;i<dw;i++)slideDoor(door+i,zf-0.08,0x9fb6c2);textPlate(door+dw/2-0.6,1.3,zf-0.06,1.2,0.16,'限制區・換裝後進入','#2f7d5a');}}
-  else if(b==='lab'){for(let i=0;i<w;i++)analyzer(x0+i,z0+0.1);blk(x0+1,zi+0.3,w-2,0.9);box(x0+1,0,zi+0.3,w-2,0.85,0.9,0xe3ebef);box(x0+0.95,0.85,zi+0.25,w-1.9,0.06,1.0,0x3b4454);for(let x=x0+1.3;x<last-0.5;x+=1.5){box(x,0.91,zi+0.5,0.25,0.35,0.3,0xdfe6ea);box(x+0.6,0.91,zi+0.6,0.2,0.2,0.2,0x6aa7ff);}
-   bioCabinet(x0+1,zi2+0.2);if(w>=8)bioCabinet(x0+2.5,zi2+0.2);for(let x=x0+4.5;x+1.5<=last-1;x+=1.8){blk(x,zi2+0.3,1.2,0.8);box(x,0,zi2+0.3,1.2,0.85,0.8,0xe3ebef);box(x+0.3,0.85,zi2+0.5,0.5,0.4,0.5,0xdfe6ea);emit(x+0.35,1.0,zi2+1.01,0.4,0.15,0.01,0x5fd3a6);}
+  else if(b==='lab'){// 檢驗科：依檢驗流程分區，每區後牆是儀器、中間是工作檯，不是一整排一樣的機器
+   const bench=(bx,n,fn)=>{blk(bx,zi+0.3,n,0.9);box(bx,0,zi+0.3,n,0.85,0.9,0xe3ebef);PW(bx-0.03,0.85,zi+0.26,n+0.06,0.04,0.98);for(let k=0;k+0.9<=n;k++)fn(bx+k,k);};
+   const tubes=(tx)=>{for(let j=0;j<6;j++)box(tx+0.15+j*0.05,0.91,zi+0.95,0.03,0.09,0.03,[0xef6b6b,0x8a2a2a,0x6aa7ff,0xf2b84b,0x9ad07a,0xd08cff][j],false);};
+   const secs=[['生化・免疫自動化線',8],['血液・鏡檢',5],['血庫',5],['微生物',6],['報告審核',6],['尿液・糞便',5]];let cx=x0+1,si=0;
+   while(si<secs.length&&cx+secs[si][1]<=last){const [nm,n]=secs[si];textPlate(cx+0.3,1.9,zb+0.05,Math.min(2.4,n-1),0.18,nm,'#c07a1a');
+    if(si===0){for(let k=0;k<n;k++)analyzer(cx+k,z0+0.1);box(cx+0.05,0.5,z0+0.84,0.9,0.08,0.22,0x6b7585,false);PW(cx,0.86,z0+0.84,n,0.05,0.22);for(let k=0;k<n;k+=2)box(cx+k+0.4,0.91,z0+0.9,0.14,0.07,0.1,0xf2b84b,false);
+     bench(cx+1,n-2,(x,k)=>{if(k%2===0){box(x+0.2,0.89,zi+0.5,0.5,0.32,0.5,0xdfe6ea);box(x+0.25,1.21,zi+0.55,0.4,0.03,0.4,0x9aa3ad,false);emit(x+0.3,0.98,zi+1.001,0.2,0.08,0.004,0x5fd3a6);}else tubes(x);});}
+    else if(si===1){for(let k=0;k<3;k++)analyzer(cx+k,z0+0.1);fileCabinet(cx+3.6,z0);for(let k=0;k<2;k++){desk(cx+0.5+k*2,zi+0.3);chair(cx+0.55+k*2,zi+0.05,false);microscope(cx+0.9+k*2,0.6,zi+0.6);box(cx+0.62+k*2,0.6,zi+0.62,0.2,0.02,0.12,0xf4f6f8,false);}}
+    else if(si===2){medFridge(cx,z0);medFridge(cx+1,z0);freezer80(cx+2.2,z0);bench(cx+0.5,n-2,(x,k)=>{if(k===0){box(x+0.2,0.89,zi+0.5,0.5,0.3,0.45,0xdfe6ea);}else if(k===1)tubes(x);else{box(x+0.2,0.89,zi+0.55,0.5,0.2,0.3,0xef6b6b,false);box(x+0.25,1.09,zi+0.6,0.4,0.02,0.2,0xf4f6f8,false);}});}
+    else if(si===3){bioCabinet(cx,z0);bioCabinet(cx+1.5,z0);blk(cx+3.2,z0+0.1,0.8,0.7);box(cx+3.2,0,z0+0.1,0.8,1.5,0.7,0xe3e7ec);glassPane(cx+3.26,0.3,z0+0.81,0.68,1.0,0.02);emit(cx+3.4,1.36,z0+0.81,0.3,0.08,0.01,0xf2b84b);
+     bench(cx+0.5,n-2,(x,k)=>{if(k%2===0){for(let q=0;q<3;q++){box(x+0.15+q*0.25,0.89,zi+0.6,0.2,0.02,0.2,[0xf2d27a,0xef9a9a,0xbfe0ff][q],false);}}else microscope(x+0.4,0.89,zi+0.6);});}
+    else if(si===4){fileCabinet(cx,z0);fileCabinet(cx+1,z0);board(cx+2.4,zb);officePods(cx+0.5,cx+n-2,zi+0.2,0x3b4454);}
+    else{for(let k=0;k<2;k++)analyzer(cx+k,z0+0.1);blk(cx+2.6,z0+0.1,0.9,0.6);box(cx+2.6,0,z0+0.1,0.9,0.85,0.6,0xe3ebef);box(cx+2.75,0.85,z0+0.2,0.5,0.12,0.4,0xcfd6dc,false);bench(cx+0.5,n-2,(x,k)=>{if(k%2===0)tubes(x);else box(x+0.2,0.89,zi+0.5,0.5,0.3,0.4,0xdfe6ea);});}
+    cx+=n+2;si++;}
    specimenWin(door+1.3,zf+0.1);fridge(last,zf+0.1);plant(x0,zf);}
   else if(b==='report'){deskRow(x0+1,last-1,zi,0x3b4454);deskRow(x0+1,last-1,zi2,0x3b4454);for(let x=x0+1;x<=last-1;x++){if((x-x0)%4===0)continue;box(x+0.95,0,zi+0.1,0.04,1.1,2.5,0x9fb6c2);box(x+0.95,0,zi2+0.1,0.04,1.1,2.5,0x9fb6c2);}for(let i=0;i<w;i+=3){box(x0+i+0.1,0.9,zb,1.2,0.9,0.04,0x3b4454);emit(x0+i+0.15,0.95,zb+0.04,1.1,0.8,0.01,0xeef6ff);}}
   else{machine(x0+Math.max(1,Math.floor(w/2)-1),zi,b);for(let i=0;i<w;i+=2){desk(x0+i,z0+0.25,0x3b4454);chair(x0+i+0.05,z0+0.3);}}
@@ -495,9 +507,21 @@ function furnish(r,kind){CURK=kind;const x0=r.x,z0=r.y,w=r.w,h=r.h,zb=z0+0.02,la
  case 'exec':{const dx=x0+Math.max(1,Math.floor(w/2)-1);blk(dx,zi+0.5,2,0.9);box(dx,0,zi+0.5,2,0.75,0.9,0x3a2820);box(dx-0.05,0.75,zi+0.45,2.1,0.06,1.0,0x4e352c);monitor(dx+0.8,0.81,zi+0.7);box(dx+0.3,0.81,zi+1.1,0.3,0.05,0.2,0xdfe3e8);chair(dx+0.8,zi+1.3,false,0x2b2b2b);chair(dx+0.1,zi-0.15,true,0x5a3a3a);chair(dx+1.1,zi-0.15,true,0x5a3a3a);
   bookshelf(x0+0.1,zb,Math.max(1,Math.min(3,w/2-0.5)));if(w>4)bookshelf(last-Math.min(2,w/2-1.2)+0.9,zb,Math.min(2,w/2-1.2));box(x0+0.15,0,zf+0.1,0.08,1.6,0.08,0x8a94a8);box(x0+0.19,0.9,zf+0.1,0.35,0.6,0.03,0xef6b6b);
   if(w>=4){sofa(x0+0.5,zi2+0.3,Math.min(1.7,w-2),0x5a3a3a);blk(x0+0.8,zi2+1.15,0.9,0.5);box(x0+0.8,0,zi2+1.15,0.9,0.4,0.5,0x4e352c);}plant(last,z0+0.2);clock(dx+2.4,zb);break;}
- case 'server':{for(let i=0;i<w;i++){if(i===w-1){blk(x0+i+0.2,z0+0.2,0.7,0.7);reg('ups',x0+i+0.55,1.25,z0+0.55);box(x0+i+0.2,0,z0+0.2,0.7,1.2,0.7,0x4b5566);emit(x0+i+0.4,0.9,z0+0.9,0.3,0.1,0.02,0xf2b84b);continue;}rack(x0+i,z0+0.1,i);}
-  for(let x=x0+1;x<=last-1;x++){if((x-x0)%5===0)continue;rack(x,zi,x+7);rack(x,zi2,x+13);}
-  box(x0+0.3,1.05,zb,1.2,0.38,0.26,0xe8ecf0);emit(x0+1.3,1.1,zb+0.27,0.1,0.04,0.01,0x5fd3a6);box(x0+0.1,1.25,zb,w-0.2,0.1,0.14,0x3b4454);extinguisher(last+0.7,zf+0.6);
+ case 'server':{// 機房：機櫃成排、排間是冷熱通道，上方線架；後牆空調箱；東側配電盤、電池櫃、UPS；門口監控台
+  const xs=x0+3,xe=last-3,mid=Math.floor((xs+xe)/2);
+  [2,4].forEach((dz,ri)=>{for(let x=xs;x<=xe;x++){if(xe-xs>=13&&x===mid)continue;rack(x,z0+dz,x*3+ri*5);}
+   PW(xs,2.2,z0+dz+0.36,xe-xs+1,0.03,0.28);for(let x=xs;x<=xe;x+=2)box(x+0.47,2.02,z0+dz+0.47,0.05,0.18,0.05,0x6b7585,false);});
+  for(let x=xs;x<=xe;x++){box(x+0.06,0.003,z0+3.06,0.88,0.012,0.88,0x7d95c2,false);for(let k=0;k<3;k++)box(x+0.16,0.016,z0+3.22+k*0.26,0.68,0.004,0.08,0x4f6690,false);}// 冷通道：有孔高架地板
+  const crac=(x,t)=>{blk(x,z0,1,0.85);box(x+0.04,0,z0+0.06,0.92,1.9,0.74,0xdfe6ea);box(x+0.1,1.25,z0+0.8,0.8,0.5,0.01,0x4b5566,false);for(let k=0;k<5;k++)box(x+0.12,1.3+k*0.09,z0+0.81,0.76,0.02,0.01,0x8a94a8,false);emit(x+0.3,0.98,z0+0.81,0.34,0.14,0.01,0x5fd3a6);box(x+0.1,0.1,z0+0.8,0.8,0.5,0.01,0xc9d2da,false);textPlate(x+0.2,1.02,z0+0.82,0.2,0.08,t,'#1b2230','#5fd3a6');};
+  crac(x0,'22°C');crac(mid,'21°C');if(w>=20)crac(xs+2,'22°C');
+  // 東側：配電盤、電池櫃、UPS
+  {const px=last-3;blk(px+0.1,z0,0.8,0.5);box(px+0.1,0,z0+0.08,0.8,1.8,0.34,0x9aa3ad);for(let r=0;r<3;r++)for(let c=0;c<4;c++)emit(px+0.2+c*0.16,1.05+r*0.2,z0+0.43,0.1,0.12,0.01,(r+c)%5===0?0xf2b84b:0x2b3242);emit(px+0.3,1.7,z0+0.43,0.4,0.06,0.01,0xef6b6b);
+   [last-2,last-1].forEach(bx=>{blk(bx+0.1,z0,0.8,0.8);box(bx+0.1,0,z0+0.08,0.8,1.6,0.7,0x3d4452);for(let k=0;k<4;k++)box(bx+0.16,0.25+k*0.34,z0+0.79,0.68,0.24,0.01,0x4b5566,false);emit(bx+0.2,1.45,z0+0.79,0.2,0.05,0.01,0x5fd3a6);});
+   blk(last+0.1,z0,0.8,0.8);reg('ups',last+0.5,1.3,z0+0.5);box(last+0.12,0,z0+0.08,0.78,1.25,0.72,0x4b5566);emit(last+0.3,0.9,z0+0.81,0.34,0.14,0.01,0xf2b84b);emit(last+0.3,1.08,z0+0.81,0.1,0.04,0.01,0x5fd3a6);
+   textPlate(px+0.15,1.95,zb+0.04,0.7,0.14,'配電盤','#c0392b');textPlate(last-1.6,1.95,zb+0.04,1.0,0.14,'電池櫃','#5a4a3a');textPlate(last+0.1,1.95,zb+0.04,0.8,0.14,'UPS','#5a4a3a');}
+  // 門口監控台：巡檢、看告警
+  {const dx=door-3>=x0+1?door-3:door+2;desk(dx,z0+5.6,0x3b4454);desk(dx+1,z0+5.6,0x3b4454);chair(dx+0.55,z0+5.35,false);monitor(dx+0.15,0.6,z0+5.85);monitor(dx+0.7,0.6,z0+5.85);monitor(dx+1.25,0.6,z0+5.85);textPlate(dx+0.3,1.5,z0+6.1,1.2,0.16,'監控台','#ffffff','#2a7fd4',true);}
+  box(x0-0.02,1.3,z0+3.2,0.04,0.3,0.4,0xf4f6f8,false);emit(x0+0.021,1.36,z0+3.26,0.004,0.18,0.28,0x1b2230);extinguisher(last+0.7,zf+0.6);
   for(let i=0;i<w;i++)for(let j=0;j<h;j++)box(x0+i+0.02,-0.1,z0+j+0.02,0.96,0.02,0.96,0x4b5566,false);break;}
  }
  // 保險：走道 row 7、兩側邊欄（row 3-6 的頭尾格）、門口那兩格一定要能走；row 2 只在沒有小房間的單位清空
@@ -581,7 +605,7 @@ function detailUnit(r,kind){const x0=r.x,z0=r.y,w=r.w,h=r.h,last=x0+w-1,zb=z0+0.
  case 'endo':{let wcx=pick([last-1,last-2]);if(wcx!==null)wheelchair(wcx,zf);break;}
  case 'or':{const k=Math.floor((last-x0+2)/6);for(let i=0;i<k;i++){const cx=x0+i*6;if(cx+4>last)break;textPlate(cx+2,1.32,z0+4.0,1.0,0.16,'手術中','#c0392b');emit(cx+2.35,1.5,z0+4.0,0.3,0.06,0.02,0xef6b6b);instTray(cx+0.2,z0+2.5);o2tank(cx+0.3,z0+2.0);}
   textPlate(Math.max(x0+0.5,door-4),1.45,z0+5.15,2.0,0.2,'手術排程・狀態','#2f7d5a');break;}
- case 'lab':{let t=pick([x0+1,x0+2]);if(t!==null)tubeStation(t+0.3,0.8,zf+0.83);for(let x=x0+1.4;x<last-0.6;x+=1.5)for(let j=0;j<6;j++)box(x+0.3+j*0.05,0.91,z0+2.5,0.03,0.09,0.03,[0xef6b6b,0x8a2a2a,0x6aa7ff,0xf2b84b,0x9ad07a,0xd08cff][j],false);textPlate(x0+0.4,1.3,zb+0.04,1.2,0.16,'生化・血液・尿液','#c07a1a');break;}
+ case 'lab':{let t=pick([x0+1,x0+2]);if(t!==null)tubeStation(t+0.3,0.8,zf+0.83);break;}
  case 'pharmacy':{textPlate(door-1.6,1.33,z0+4.0,1.2,0.16,'調劑區 非請勿入','#2f7d5a');tubeStation(x0+0.3,0.8,z0+0.02+3.85-0.16);textPlate(x0+w/2-1,1.62,zb+0.08,2.0,0.28,'領藥 Pharmacy','#2f7d5a');break;}
  case 'dialysis':{for(let i=0;i<3;i++)box(x0+0.2,0.95+i*0.1,zb,last-x0-1.8,0.05,0.05,[0x6aa7ff,0xef6b6b,0xdfe3e8][i],false);textPlate(last-1.5,1.32,z0+4.05,0.9,0.14,'RO 水處理','#2a6fa8');break;}
  case 'rehab':{wallBars(sideL+0.02,z0+4.2,2.0);if(w>=12){let ts=pick([last-3,last-4]);if(ts!==null)trainStairs(ts-1,zf);}textPlate(x0+0.3,1.15,zb+0.05,1.2,0.16,'物理治療・職能治療','#5a8a4a');break;}
