@@ -22,20 +22,23 @@ a.back{color:var(--muted);text-decoration:none;font-size:14px}a.back:hover{color
 h2.sec{font-size:16px;margin:6px 0 0}
 .stars{color:var(--warn);letter-spacing:2px;font-size:14px}.stars i{color:var(--line);font-style:normal}
 button:focus-visible,.opt:focus-visible,.btn:focus-visible{outline:3px solid var(--info);outline-offset:2px}
-/* 2D 訓練村地圖 */
-.map{position:relative;width:100%;aspect-ratio:100/62;border-radius:18px;overflow:hidden;border:1px solid var(--line);box-shadow:0 8px 24px rgba(28,42,54,.1);background:#8fc77e}
+/* 2D 職訓中心地圖：深色底、發光線路 */
+.map{position:relative;width:100%;aspect-ratio:100/62;border-radius:18px;overflow:hidden;border:1px solid #24405c;box-shadow:0 8px 24px rgba(28,42,54,.18);background:#0e1626}
 .map svg{position:absolute;inset:0;width:100%;height:100%}
-.npc{position:absolute;transform:translate(-50%,-50%);border:0;background:none;padding:0;font:inherit;color:var(--fg);cursor:pointer;display:flex;flex-direction:column;align-items:center;width:112px}
-.npc .roof{width:74px;height:16px;border-radius:10px 10px 3px 3px;box-shadow:0 2px 0 rgba(0,0,0,.15)}
-.npc .hut{width:62px;height:40px;background:#fff8ea;border:2px solid #b89c6a;border-top:0;border-radius:0 0 8px 8px;display:flex;align-items:center;justify-content:center;font-size:24px;transition:transform .15s}
-.npc:hover .hut{transform:translateY(-3px)}
-.npc .tag{margin-top:3px;background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:10px;padding:1px 8px;font-size:12px;font-weight:700;line-height:1.35;text-align:center;white-space:nowrap}
-.npc .tag small{display:block;font-weight:400;color:var(--muted);font-size:11px}
-.npc .mk{position:absolute;top:-14px;right:10px;background:var(--warn);color:#fff;border-radius:999px;font-size:11px;font-weight:800;padding:0 7px;line-height:18px}
+.npc{position:absolute;transform:translate(-50%,-50%);border:0;background:none;padding:0;font:inherit;color:#eaf8ff;cursor:pointer;display:flex;flex-direction:column;align-items:center;width:112px}
+.npc .roof{width:74px;height:5px;border-radius:3px;box-shadow:0 0 10px 1px var(--rc);background:var(--rc)}
+.npc .hut{width:66px;height:46px;margin-top:3px;background:#1b2a40;border:1.5px solid var(--rc);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;transition:transform .15s,box-shadow .15s}
+.npc:hover .hut{transform:translateY(-3px);box-shadow:0 0 14px var(--rc)}
+.npc .tag{margin-top:4px;background:rgba(10,22,40,.88);border:1px solid #39d6ff88;border-radius:8px;padding:1px 8px;font-size:12px;font-weight:700;line-height:1.35;text-align:center;white-space:nowrap}
+.npc .tag small{display:block;font-weight:400;color:#7fdcff;font-size:11px}
+.npc .mk{position:absolute;top:-10px;right:8px;background:var(--warn);color:#fff;border-radius:999px;font-size:11px;font-weight:800;padding:0 7px;line-height:18px}
 .npc .mk.done{background:var(--accent)}
-.hall{position:absolute;left:50%;top:54.8%;transform:translate(-50%,-50%);background:#fff;border:2px solid #b89c6a;border-radius:14px;padding:6px 14px;text-align:center;font-weight:800;line-height:1.3;box-shadow:0 3px 0 rgba(0,0,0,.12)}
-.hall small{display:block;font-weight:400;color:var(--muted);font-size:12px}
-.gate{position:absolute;background:rgba(28,42,54,.72);color:#fff;border-radius:10px;padding:3px 10px;font-size:12px;line-height:1.4;text-align:center}
+.hall{position:absolute;left:50%;top:54.8%;transform:translate(-50%,-50%);background:rgba(10,22,40,.9);color:#eaf8ff;border:1.5px solid #39d6ff;border-radius:12px;padding:6px 14px;text-align:center;font-weight:800;line-height:1.3;box-shadow:0 0 16px #39d6ff66}
+.hall small{display:block;font-weight:400;color:#7fdcff;font-size:12px}
+.gate{position:absolute;background:rgba(10,22,40,.9);color:#f2c14e;border:1px solid #f2c14e;border-radius:8px;padding:3px 12px;font-size:12px;line-height:1.5;text-align:center}
+@keyframes flow{to{stroke-dashoffset:-41.2}}
+.map .flow{stroke-dasharray:1.2 40;animation:flow 9s linear infinite}
+@media (prefers-reduced-motion:reduce){.map .flow{animation:none}}
 @media (max-width:700px){.map{display:none}}
 /* 3D 訓練村 */
 .v3d{position:relative;width:100%;aspect-ratio:16/9;max-height:72vh;min-height:300px;border-radius:18px;overflow:hidden;border:1px solid var(--line);box-shadow:0 8px 24px rgba(28,42,54,.1);background:#0e1626;touch-action:none}
@@ -347,11 +350,16 @@ const $=id=>document.getElementById(id);const hub=$('hub'),play=$('play'),talk=$
 const starsHTML=n=>'<span class="stars">'+'★'.repeat(n)+'<i>'+'★'.repeat(3-n)+'</i></span>';
 function build2D(){const st=$('stage');st.className='map';
  const P=COURSES.map((c,i)=>{const a=(i*40-90)*Math.PI/180;return [50+37*Math.cos(a),34+22*Math.sin(a)];});
- let trees='';[[6,8],[14,30],[5,50],[22,56],[40,58.5],[62,58.5],[80,56],[95,48],[88,30],[94,10],[30,5],[70,5],[33,32],[67,32],[41,17],[59,17],[40,46],[60,46]].forEach(t=>{trees+='<ellipse cx="'+t[0]+'" cy="'+(t[1]+1.6)+'" rx="2" ry=".7" fill="rgba(0,0,0,.14)"/><circle cx="'+t[0]+'" cy="'+t[1]+'" r="2" fill="#4f9a57"/><circle cx="'+(t[0]-.6)+'" cy="'+(t[1]-.7)+'" r="1.1" fill="#6bb56f"/>';});
- st.innerHTML='<svg viewBox="0 0 100 62" preserveAspectRatio="none" aria-hidden="true"><rect width="100" height="62" fill="#8fc77e"/><ellipse cx="50" cy="34" rx="37" ry="22" fill="none" stroke="#e6d3a3" stroke-width="3.4"/>'+P.map(p=>'<line x1="50" y1="34" x2="'+p[0]+'" y2="'+p[1]+'" stroke="#e6d3a3" stroke-width="2.2"/>').join('')+'<ellipse cx="50" cy="34" rx="12" ry="7.4" fill="#d9d5cb" stroke="#bdb8ab" stroke-width=".5"/>'+trees+'</svg>'+
+ let grid='';for(let x=5;x<100;x+=5)grid+='<line x1="'+x+'" y1="0" x2="'+x+'" y2="62"/>';for(let y=5;y<62;y+=5)grid+='<line x1="0" y1="'+y+'" x2="100" y2="'+y+'"/>';
+ let nodes='';[[6,8],[14,30],[5,50],[22,57],[80,57],[95,48],[88,30],[94,10],[30,6],[70,6]].forEach(t=>{nodes+='<rect x="'+(t[0]-1.2)+'" y="'+(t[1]-1.2)+'" width="2.4" height="2.4" rx=".4" fill="#1a2a40" stroke="#2f86b8" stroke-width=".25"/><circle cx="'+t[0]+'" cy="'+t[1]+'" r=".45" fill="#39d6ff"/>';});
+ st.innerHTML='<svg viewBox="0 0 100 62" preserveAspectRatio="none" aria-hidden="true"><rect width="100" height="62" fill="#0e1626"/><g stroke="#1b2d44" stroke-width=".15">'+grid+'</g>'+
+  '<rect x="30" y="-1" width="40" height="5" fill="#1c2b40" stroke="#39d6ff" stroke-width=".25"/>'+
+  '<ellipse cx="50" cy="34" rx="37" ry="22" fill="none" stroke="#24344a" stroke-width="3.4"/><ellipse cx="50" cy="34" rx="38.7" ry="23.7" fill="none" stroke="#39d6ff" stroke-width=".25"/><ellipse cx="50" cy="34" rx="35.3" ry="20.3" fill="none" stroke="#39d6ff" stroke-width=".25"/>'+
+  P.map((p,i)=>'<line x1="50" y1="34" x2="'+p[0]+'" y2="'+p[1]+'" stroke="#24344a" stroke-width="2.2"/><line x1="50" y1="34" x2="'+p[0]+'" y2="'+p[1]+'" stroke="'+COURSES[i].rc+'" stroke-width=".3" opacity=".7"/><line class="flow" x1="50" y1="34" x2="'+p[0]+'" y2="'+p[1]+'" stroke="'+COURSES[i].rc+'" stroke-width=".9" stroke-linecap="round" style="animation-delay:-'+(i*.45)+'s"/>').join('')+
+  '<ellipse cx="50" cy="34" rx="12" ry="7.4" fill="#16263a" stroke="#39d6ff" stroke-width=".4"/><ellipse cx="50" cy="34" rx="10" ry="6" fill="none" stroke="#39d6ff" stroke-width=".15" stroke-dasharray=".8 .8"/>'+nodes+'</svg>'+
   '<div class="hall">基礎課程<small id="hallN"></small></div>'+
   '<div class="gate" style="left:50%;top:1.5%;transform:translateX(-50%)">🔒 進階專科大樓　籌備中</div>';
- COURSES.forEach((c,i)=>{const b=document.createElement('button');b.className='npc';b.style.left=P[i][0]+'%';b.style.top=(P[i][1]/62*100)+'%';b.dataset.c=c.id;b.onclick=()=>openTalk(c);st.appendChild(b);});}
+ COURSES.forEach((c,i)=>{const b=document.createElement('button');b.className='npc';b.style.left=P[i][0]+'%';b.style.top=(P[i][1]/62*100)+'%';b.dataset.c=c.id;b.style.setProperty('--rc',c.rc);b.onclick=()=>openTalk(c);st.appendChild(b);});}
 function renderHub(){let ts=0,sc=0;const n=doneN();
  COURSES.forEach(c=>{for(let l=0;l<4;l++){const r=rec(c.id,l);ts+=r.stars;sc+=r.best;}});
  $('sDone').textContent=n+'／'+COURSES.length;$('sStar').textContent=ts;$('sScore').textContent=sc.toLocaleString();
@@ -359,7 +367,7 @@ function renderHub(){let ts=0,sc=0;const n=doneN();
  COURSES.forEach(c=>{const t=titleOf(c),b=document.createElement('button');b.className='chip';b.innerHTML='<span class="ic" style="background:'+c.col+'">'+c.ic+'</span><span style="min-width:0"><b>'+c.name+'</b><small>'+c.npc+'・'+(t||'還沒有稱號')+'</small></span>';b.onclick=()=>openTalk(c);ch.appendChild(b);});
  $('adv').innerHTML=ADV.map(a=>'<div class="chip lock"><span class="ic" style="background:var(--panel2)">🔒</span><span style="min-width:0"><b>'+a+'</b><small>籌備中</small></span></div>').join('');
  document.querySelectorAll('.npc').forEach(b=>{const c=COURSES.find(x=>x.id===b.dataset.c),t=tierOf(c);b.setAttribute('aria-label','找'+c.npc+'學'+c.name);
-  b.innerHTML=(t>=0?'<span class="mk done">'+TIER[t]+'</span>':'<span class="mk">！</span>')+'<span class="roof" style="background:'+c.rc+'"></span><span class="hut">'+c.ic+'</span><span class="tag">'+c.npc+'<small>'+c.name+'</small></span>';});
+  b.innerHTML=(t>=0?'<span class="mk done">'+TIER[t]+'</span>':'<span class="mk">！</span>')+'<span class="roof"></span><span class="hut">'+c.ic+'</span><span class="tag">'+c.npc+'<small>'+c.name+'</small></span>';});
  const hn=$('hallN');if(hn)hn.textContent='已通過 '+n+'／'+COURSES.length+' 門';
  if(window.v3dRefresh)v3dRefresh();}
 function closeTalk(){talk.hidden=true;talk.innerHTML='';}

@@ -35,7 +35,7 @@ window.initVillage3D=function(api){
  // 線路：從中庭連到每間教室和大門，上面有光點在跑
  const trace=(a,r0,r1,col,k)=>{const len=r1-r0,p=new THREE.Mesh(new THREE.PlaneGeometry(1.8,len),M(0x24344a));p.rotation.x=-Math.PI/2;p.rotation.z=-a;p.position.set(Math.sin(a)*(r0+len/2),.02,Math.cos(a)*(r0+len/2));p.receiveShadow=true;sc.add(p);
   [-.82,.82].forEach(o=>{const e=new THREE.Mesh(new THREE.PlaneGeometry(.07,len),B(col));e.rotation.x=-Math.PI/2;e.rotation.z=-a;e.position.set(Math.sin(a)*(r0+len/2)+Math.cos(a)*o,.03,Math.cos(a)*(r0+len/2)-Math.sin(a)*o);sc.add(e);});
-  for(let j=0;j<2;j++){const d=new THREE.Mesh(new THREE.BoxGeometry(.22,.06,.5),B(col));d.rotation.y=a;sc.add(d);anim.push(t=>{const u=(t*.35+j*.5+k*.13)%1,r=r1-u*len;d.position.set(Math.sin(a)*r,.07,Math.cos(a)*r);});}};
+  for(let j=0;j<1;j++){const d=new THREE.Mesh(new THREE.BoxGeometry(.22,.06,.5),B(col));d.rotation.y=a;sc.add(d);anim.push(t=>{const u=(t*.22+j*.5+k*.13)%1,r=r1-u*len;d.position.set(Math.sin(a)*r,.07,Math.cos(a)*r);});}};
  api.courses.forEach((c,i)=>trace(AN(i),6.3,14,new THREE.Color(c.rc).getHex(),i));trace(0,12.6,23,CY,3);
  // 中庭：會轉的全像核心
  cyl(2.6,2.8,.4,0x33465f,0,.2,0,null,24);cyl(2.2,2.2,.06,B(0x10283c),0,.42,0,null,24);cyl(.5,.7,.5,0x33465f,0,.65,0,null,12);
@@ -122,7 +122,7 @@ window.initVillage3D=function(api){
   if(r<23){cyl(.1,.14,h,0x4b5d75,x,h/2,z,null,8);const b=sph(.24,B(0xbfefff),x,h+.2,z);b.castShadow=false;blocks.push([x,z,.5]);}
   else{const w=1.6+rnd()*2.4;box(w,h,w,0x1a2a40,x,h/2,z);const c=[CY,0x4fe08a,0xf2c14e,0xd0568a][i%4];for(let k=0;k<3;k++){const e=box(w+.04,.08,w+.04,B(c),x,h*(.3+k*.25),z);e.castShadow=false;const ph=rnd()*6;anim.push(t=>{e.visible=Math.sin(t*1.3+ph+k)>-.7;});}}}
  // 飄在空中的資料光點
- for(let i=0;i<40;i++){const a=rnd()*Math.PI*2,r=4+rnd()*20,d=new THREE.Mesh(new THREE.BoxGeometry(.1,.1,.1),B(i%3?CY:0x4fe08a));const y0=1+rnd()*6,sp=.3+rnd()*.5;sc.add(d);anim.push(t=>{d.position.set(Math.sin(a+t*.03)*r,((y0+t*sp)%7)+.6,Math.cos(a+t*.03)*r);});}
+ for(let i=0;i<12;i++){const a=rnd()*Math.PI*2,r=4+rnd()*20,d=new THREE.Mesh(new THREE.BoxGeometry(.1,.1,.1),B(i%3?CY:0x4fe08a));const y0=1+rnd()*6,sp=.3+rnd()*.5;sc.add(d);anim.push(t=>{d.position.set(Math.sin(a+t*.03)*r,((y0+t*sp)%7)+.6,Math.cos(a+t*.03)*r);});}
  // 玩家
  const me=person(0x17a07a,0x33271f);me.position.set(0,0,10);
  const ring=new THREE.Mesh(new THREE.RingGeometry(.3,.42,24),new THREE.MeshBasicMaterial({color:0x39d6ff,transparent:true,opacity:.8}));ring.rotation.x=-Math.PI/2;ring.position.y=.05;ring.visible=false;sc.add(ring);
