@@ -37,7 +37,7 @@ const TEXC={};function checker(c1,c2){const k=c1+c2;if(TEXC[k])return TEXC[k];co
 let STATIC=new Map();const _m4=new THREE.Matrix4(),_q=new THREE.Quaternion(),_p=new THREE.Vector3(),_s=new THREE.Vector3();
 let FG=null;// 目前樓層的 group
 function addInst(key,material,x,y,z,w,h,d,shadow,rg){if(rg)key='R'+key;let g=STATIC.get(key);if(!g){g={material,shadow,list:[],geo:rg?RGEO:geo};STATIC.set(key,g);}_p.set(x+w/2,y+h/2,z+d/2);_s.set(w,h,d);_m4.compose(_p,_q,_s);g.list.push(_m4.clone());}
-let DEV=[];const DEV3={};function reg(kind,x,y,z){DEV.push({kind,x,y,z});}
+let DEV=[];const DEV3={};function reg(kind,x,y,z,a){DEV.push({kind,x,y,z,a});}
 function box(x,y,z,w,h,d,c,shadow=true,dyn=false){if(dyn){const m=new THREE.Mesh(geo,mat(c));m.scale.set(w,h,d);m.position.set(x+w/2,y+h/2,z+d/2);m.castShadow=shadow;m.receiveShadow=true;FG.add(m);return m;}addInst('L'+c+(shadow?'s':''),mat(c),x,y,z,w,h,d,shadow,HQ&&Math.max(w,h,d)<=1.6&&Math.min(w,h,d)>=0.04&&h<=1.1&&!(w>=1&&w%1===0)&&!(d>=1&&d%1===0));}
 function emit(x,y,z,w,h,d,c,dyn=false){if(dyn){const m=new THREE.Mesh(geo,bmat(c));m.scale.set(w,h,d);m.position.set(x+w/2,y+h/2,z+d/2);FG.add(m);return m;}addInst('B'+c,bmat(c),x,y,z,w,h,d,false);}
 function flushStatic(){STATIC.forEach(g=>{const im=new THREE.InstancedMesh(g.geo||geo,g.material,g.list.length);g.list.forEach((m,i)=>im.setMatrixAt(i,m));im.instanceMatrix.needsUpdate=true;im.castShadow=g.shadow;im.receiveShadow=true;FG.add(im);});STATIC=new Map();}
@@ -53,7 +53,7 @@ const desk=(x,z,c=0x6b4b32)=>{blk(x+0.1,z+0.2,0.8,0.5);
  box(x+0.72,0,z+0.26,0.16,0.42,0.38,0x2b3242);emit(x+0.77,0.36,z+0.645,0.04,0.02,0.005,0x5fd3a6);box(x+0.74,0.3,z+0.645,0.12,0.02,0.005,0x1b2230,false);// 主機
  box(x+0.12,0.6,z+0.48,0.12,0.04,0.14,0x3b4454);box(x+0.13,0.64,z+0.49,0.1,0.02,0.05,0x2b3242,false);// 電話
  box(x+0.5,0.005,z+0.22,0.08,0.03,0.05,0xf4f6f8,false);};
-const chair=(x,z,flip=false,c=0x3c4656)=>{blk(x+0.3,z+0.3,0.4,0.4);const bz=flip?z+0.3:z+0.64;
+const chair=(x,z,flip=false,c=0x3c4656)=>{blk(x+0.3,z+0.3,0.4,0.4);reg('seat',x+0.5,0.3,z+0.5,flip?0:Math.PI);const bz=flip?z+0.3:z+0.64;
  box(x+0.3,0.02,z+0.48,0.4,0.03,0.04,0x222222,false);box(x+0.48,0.02,z+0.3,0.04,0.03,0.4,0x222222,false);[[0.3,0.48],[0.66,0.48],[0.48,0.3],[0.48,0.66]].forEach(([a,b])=>box(x+a,0,z+b,0.04,0.03,0.04,0x111111,false));// 五爪腳
  box(x+0.48,0.05,z+0.48,0.04,0.2,0.04,0x6b7585);box(x+0.3,0.25,z+0.3,0.4,0.06,0.4,c);box(x+0.32,0.31,z+0.32,0.36,0.02,0.36,0x4a5566,false);// 椅墊
  box(x+0.32,0.33,bz,0.36,0.36,0.05,c);box(x+0.34,0.35,bz+(flip?-0.01:0.01),0.32,0.3,0.04,0x4a5566,false);box(x+0.47,0.28,bz+(flip?0.01:0.02),0.06,0.06,0.03,0x6b7585,false);// 椅背
@@ -85,7 +85,7 @@ const shelf=(x,z,cols)=>{blk(x+0.1,z+0.1,0.8,0.5);box(x+0.1,0,z+0.1,0.8,1.6,0.5,
 const fridge=(x,z)=>{blk(x+0.1,z+0.1,0.8,0.6);box(x+0.1,0,z+0.1,0.8,1.8,0.6,0xe3ebef);emit(x+0.16,0.2,z+0.7,0.68,1.5,0.01,0xbfe0ff);box(x+0.16,0.2,z+0.72,0.68,1.5,0.01,0x9ad0e8);for(let i=0;i<4;i++)box(x+0.2,0.35+i*0.4,z+0.6,0.6,0.03,0.1,0xd0d8de);};
 const sofa=(x,z,w,c=0x4a5566)=>{blk(x,z+0.1,w,0.7);box(x,0,z+0.1,w,0.4,0.7,c);box(x,0.4,z+0.1,w,0.4,0.18,c);box(x,0.4,z+0.1,0.14,0.3,0.7,c);box(x+w-0.14,0.4,z+0.1,0.14,0.3,0.7,c);};
 const bench=(x,z,w)=>{blk(x,z+0.25,w,0.5);box(x+0.05,0.18,z+0.45,w-0.1,0.05,0.06,0x6b7585);box(x+0.12,0,z+0.45,0.06,0.2,0.06,0x6b7585,false);box(x+w-0.18,0,z+0.45,0.06,0.2,0.06,0x6b7585,false);box(x+0.08,0,z+0.36,0.14,0.02,0.24,0x6b7585,false);box(x+w-0.22,0,z+0.36,0.14,0.02,0.24,0x6b7585,false);
- const n=Math.max(2,Math.floor(w/0.55));const sw=w/n;for(let i=0;i<n;i++){const sx=x+i*sw+0.04;box(sx,0.24,z+0.27,sw-0.08,0.06,0.42,0x4f8fd6);box(sx,0.3,z+0.66,sw-0.08,0.32,0.05,0x4f8fd6);box(sx+0.02,0.3,z+0.27,sw-0.12,0.01,0.38,0x6aa7ff,false);}};
+ const n=Math.max(2,Math.floor(w/0.55));const sw=w/n;for(let i=0;i<n;i++){const sx=x+i*sw+0.04;reg('wseat',sx+sw/2-0.04,0.27,z+0.46,Math.PI);box(sx,0.24,z+0.27,sw-0.08,0.06,0.42,0x4f8fd6);box(sx,0.3,z+0.66,sw-0.08,0.32,0.05,0x4f8fd6);box(sx+0.02,0.3,z+0.27,sw-0.12,0.01,0.38,0x6aa7ff,false);}};
 const cart=(x,z,c=0x6aa7ff)=>{blk(x+0.2,z+0.2,0.6,0.6);[[0.22,0.22],[0.72,0.22],[0.22,0.72],[0.72,0.72]].forEach(([a,b])=>box(x+a,0,z+b,0.06,0.08,0.06,0x222222,false));
  box(x+0.2,0.08,z+0.2,0.6,0.82,0.6,c);for(let i=0;i<4;i++){box(x+0.24,0.14+i*0.19,z+0.8,0.52,0.15,0.015,0xf4f6f8,false);box(x+0.44,0.2+i*0.19,z+0.815,0.12,0.025,0.015,0x5a6270,false);}
  box(x+0.18,0.9,z+0.18,0.64,0.04,0.64,0xdfe3e8);box(x+0.15,0.92,z+0.3,0.03,0.12,0.4,0x8a94a8,false);box(x+0.3,0.94,z+0.3,0.14,0.1,0.14,0xffffff,false);box(x+0.5,0.94,z+0.35,0.2,0.04,0.25,0x9ad0e8,false);box(x+0.78,0.4,z+0.3,0.08,0.3,0.3,0xf2d27a,false);};
@@ -507,6 +507,8 @@ const testBench=(x,z)=>{blk(x+0.05,z+0.15,0.9,0.6);box(x+0.05,0.56,z+0.15,0.9,0.
 const fileCabinet=(x,z)=>{blk(x+0.1,z+0.2,0.8,0.55);box(x+0.1,0,z+0.2,0.8,1.2,0.55,0x9aa3ad);for(let i=0;i<4;i++){box(x+0.13,0.05+i*0.29,z+0.75,0.74,0.26,0.01,0xaab4bf,false);box(x+0.42,0.15+i*0.29,z+0.76,0.16,0.03,0.02,0x5a6270,false);box(x+0.45,0.22+i*0.29,z+0.76,0.1,0.04,0.01,0xf4f6f8,false);}
  for(let i=0;i<6;i++)box(x+0.14+i*0.12,1.2,z+0.25,0.1,0.28,0.4,[0x2a4f8a,0x8a2a2a,0x2f7d4a,0xf2b84b,0x2a4f8a,0x9aa3ad][i],false);};
 const waterDispenser=(x,z)=>{blk(x+0.25,z+0.25,0.5,0.5);box(x+0.27,0,z+0.27,0.46,0.95,0.46,0xe3e7ec);box(x+0.32,0.55,z+0.73,0.36,0.25,0.02,0xcfd6dc,false);box(x+0.36,0.65,z+0.74,0.06,0.06,0.03,0x6aa7ff,false);box(x+0.58,0.65,z+0.74,0.06,0.06,0.03,0xef6b6b,false);const m=new THREE.Mesh(new THREE.CylinderGeometry(0.16,0.16,0.4,12),new THREE.MeshLambertMaterial({color:0x9ad0e8,transparent:true,opacity:0.6}));m.position.set(x+0.5,1.15,z+0.5);FG.add(m);};
+const deco=(x,z)=>{blk(x,z,0.5,0.5);box(x+0.1,0,z+0.1,0.3,0.26,0.3,0xc98a5a);box(x+0.12,0.26,z+0.12,0.26,0.03,0.26,0x6b4a2f,false);box(x+0.06,0.3,z+0.08,0.38,0.3,0.36,0x2f8a4a);box(x+0.14,0.55,z+0.02,0.3,0.26,0.3,0x3fa35c);box(x+0.0,0.5,z+0.2,0.26,0.24,0.26,0x277a40);box(x+0.2,0.76,z+0.14,0.2,0.2,0.2,0x4fb86c);};
+const wallArt=(x,z,c1,c2)=>{box(x,0.62,z,0.62,0.5,0.02,0xf7f4ec,false);emit(x+0.04,0.9,z+0.021,0.54,0.18,0.004,c1);emit(x+0.04,0.8,z+0.021,0.4,0.04,0.004,0x9aa6b8);emit(x+0.04,0.73,z+0.021,0.48,0.04,0.004,0x9aa6b8);emit(x+0.04,0.66,z+0.021,0.2,0.04,0.004,c2);};
 const copier=(x,z)=>{reg('printer',x+0.5,0.9,z+0.5);blk(x+0.05,z+0.15,0.9,0.65);box(x+0.05,0,z+0.15,0.9,0.75,0.65,0xe3e7ec);for(let i=0;i<3;i++)box(x+0.08,0.06+i*0.22,z+0.8,0.84,0.18,0.01,0xcfd6dc,false);box(x+0.08,0.75,z+0.18,0.84,0.12,0.6,0xd8dde3);box(x+0.12,0.87,z+0.22,0.76,0.05,0.5,0x9aa3ad,false);box(x+0.62,0.8,z+0.79,0.25,0.1,0.02,0x2b3242,false);emit(x+0.64,0.82,z+0.811,0.15,0.06,0.003,0x5fd3a6);box(x+0.95,0.5,z+0.3,0.2,0.04,0.35,0xcfd6dc,false);};
 const wallTV=(x,y,z,w=0.6)=>{box(x,y,z,w,w*0.58,0.04,0x111111,false);emit(x+0.02,y+0.02,z+0.041,w-0.04,w*0.58-0.04,0.003,0x2a6fa8);};
 const headwall=(x,z,w)=>{box(x,0.75,z,w,0.16,0.05,0xe3e7ec,false);for(let i=0;i+0.9<=w+0.01;i+=1.0){box(x+i+0.15,0.8,z+0.05,0.05,0.05,0.01,0x2f9a5a,false);box(x+i+0.25,0.8,z+0.05,0.05,0.05,0.01,0xf4f6f8,false);box(x+i+0.35,0.8,z+0.05,0.05,0.05,0.01,0xf2b84b,false);box(x+i+0.5,0.8,z+0.05,0.1,0.05,0.01,0xef6b6b,false);emit(x+i+0.15,0.88,z+0.05,0.4,0.02,0.003,0xfff6d6);}};
@@ -644,6 +646,10 @@ function buildFloor(key){if(!DRY&&FG){scene.remove(FG);disposeGroup(FG);}
   for(let x=6;x<W-4;x+=11){let xx=x;while(xx<W-3&&!wallRun(xx,1))xx++;if(xx<W-3)wallAP(xx+0.3,NZ);}
   {let xx=W-4;while(xx>4&&!wallRun(xx,1))xx--;if(xx>4){idfBox(xx,NZ);textPlate(xx+0.05,1.28,NZ+0.27,0.7,0.12,'弱電箱 '+F.b+F.f,'#3b4454');}}
   {let xx=Math.floor(W/2)-4;while(xx>4&&!wallRun(xx,1))xx--;if(xx>4){box(xx,0.2,NZ,0.8,0.95,0.18,0xc0392b);box(xx+0.04,0.24,NZ+0.18,0.72,0.87,0.01,0xd9534f,false);textPlate(xx+0.15,0.95,NZ+0.19,0.5,0.14,'消防栓','#c0392b');}}
+   // 裝飾：靠北牆的盆栽和衛教海報、各單位門口的地墊
+   for(let x=7;x<W-6;x+=10){let xx=x;while(xx<W-3&&!wallRun(xx,0))xx++;if(xx<W-3&&g[NZ][xx]===0&&g[NZ+1][xx]===0)deco(xx+0.25,NZ+0.02);}
+   {const PC=[[0x5fb5e6,0xef6b6b],[0xf2b84b,0x5fd3a6],[0xe58fb0,0x5fb5e6]];let k=0;for(let x=12;x<W-8;x+=13){let xx=x;while(xx<W-3&&!wallRun(xx,1))xx++;if(xx<W-3){wallArt(xx+0.2,NZ,PC[k%3][0],PC[k%3][1]);k++;}}}
+   F.rooms.forEach(r=>{if(r.door&&r.door[1]===WALLROW&&!r.noWall)box(r.door[0]+0.08,0.004,NZ+0.04,0.84,0.012,0.5,0x7a8aa6,false);});
  }
  F.rooms.forEach(r=>{furnish(r,KIND(r.id));detailUnit(r,KIND(r.id));});
  if(DRY){STATIC=new Map();}else{flushStatic();flushLEDs();}BLK3[key]=BLK;DEV3[key]=DEV;BUILDING.delete(key);
@@ -767,6 +773,7 @@ function person2(a){const lk=a.look||{shirt:a.color,hair:'#2b2b2b',skin:'#f1d3b3
  g.userData.limbs=[L1,L2,A1,A2];g.position.y=0.3;g.userData.actor=a;return g;}
 function legs(g,sw){const L=g.userData.limbs;if(!L)return;L[0].rotation.x=sw;L[1].rotation.x=-sw;L[2].rotation.x=-sw*0.8;L[3].rotation.x=sw*0.8;}
 
+const SITTERS={doctor:1,clerk:1,tech:1,pharm:1,researcher:1,exec:1,nurse:1};
 const AG=new Map();// actor -> {g,ang,phase}
 function actorG(a){let e=AG.get(a);if(!e){e={g:person(a),ang:0,phase:0};scene.add(e.g);AG.set(a,e);}return e;}
 
@@ -813,7 +820,14 @@ function tickActors(key,now){const F=FLOORS[key];const list=[...(F.npcs||[]),...
   if(walking&&a.path[0]){const dx=a.path[0][0]-a.x,dy=a.path[0][1]-a.y;const tgt=Math.atan2(dx,dy);let d=tgt-e.ang;while(d>Math.PI)d-=Math.PI*2;while(d<-Math.PI)d+=Math.PI*2;e.ang+=d*0.25;}
   else{const dm={d:0,u:Math.PI,l:-Math.PI/2,r:Math.PI/2}[a.dir||'d']||0;let d=dm-e.ang;while(d>Math.PI)d-=Math.PI*2;while(d<-Math.PI)d+=Math.PI*2;e.ang+=d*0.15;}
   if(walking)e.phase+=0.34*Math.min(2,S.speed);legs(e.g,walking?Math.sin(e.phase)*0.7:0);if(HQ&&!walking){const L=e.g.userData.limbs,ph=now/900+(e.seed||(e.seed=Math.random()*6.28));e.g.scale.y=1+0.012*Math.sin(ph*1.7);if(L){L[2].rotation.z=-0.06-0.03*Math.sin(ph);L[3].rotation.z=0.06+0.03*Math.sin(ph);}}else if(e.g.scale.y!==1){e.g.scale.y=1;const L=e.g.userData.limbs;if(L){L[2].rotation.z=0;L[3].rotation.z=0;}}
-  e.g.position.set(wx,0.3+(walking?Math.abs(Math.sin(e.phase))*0.03:0),wz);e.g.rotation.y=e.ang;});
+  let px=wx,py=0.3+(walking?Math.abs(Math.sin(e.phase))*0.03:0),pz=wz;
+  if(a.npc&&HQ){const L=e.g.userData.limbs;if(walking){if(e.seat){e.seat.used=null;e.seat=null;}}
+   else{if(!e.seat&&now>(e.seatT||0)){e.seatT=now+3000+Math.random()*5000;const want=a.role==='patient'?'wseat':SITTERS[a.role]?'seat':null;
+     if(want&&(a.role!=='nurse'||(e.seed||0)<3.1)){let best=null,bd=7.3;const h=a.home;for(const sd of DEV3[key]||[]){if(sd.kind!==want||sd.used)continue;if(h&&(sd.x<h.x-0.6||sd.x>h.x+h.w+0.6||sd.z<h.y-1.6||sd.z>h.y+h.h+1.6))continue;const d=(sd.x-wx)*(sd.x-wx)+(sd.z-wz)*(sd.z-wz);if(d<bd){bd=d;best=sd;}}
+      if(best){best.used=a;e.seat=best;a.next=now+20000+Math.random()*25000;}}}
+    if(e.seat&&L){const sd=e.seat,ty=sd.kind==='seat';px=sd.x;pz=sd.z;py=sd.y+0.05;e.ang=sd.a;L[0].rotation.x=L[1].rotation.x=-1.45;L[2].rotation.x=ty?-1.0+0.12*Math.sin(now/110+e.seed):-0.45;L[3].rotation.x=ty?-1.0+0.12*Math.cos(now/130+e.seed):-0.45;}
+    else if(L&&a.role==='nurse'){L[3].rotation.x=-0.95;}}}
+  e.g.position.set(px,py,pz);e.g.rotation.y=e.ang;});
  for(const [a,e] of AG){if(!seen.has(a))e.g.visible=false;}}
 function draw3d(){const now=performance.now();if(!S){renderExterior(now);return;}
  if(S!==curS){curS=S;for(const [a,e] of AG)scene.remove(e.g);AG.clear();curKey=null;document.getElementById('hud').hidden=false;document.getElementById('status').hidden=false;document.getElementById('dock').hidden=false;maybeCoach();}
@@ -888,11 +902,19 @@ const fxRooms=new Set();const fxPl=[];let fxShake=0,_goalT=0;
 const fxPlane=i=>{if(!fxPl[i]){const m=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({color:0xef6b6b,transparent:true,opacity:0.2,depthWrite:false}));m.rotation.x=-Math.PI/2;m.visible=false;scene.add(m);fxPl[i]=m;}return fxPl[i];};
 window.fxBanner=(e,why)=>{const el=document.getElementById('fxBan');el.innerHTML='<b>⚠ 出事了：'+locName(e.room)+'</b><span></span><small></small>';el.children[1].textContent=e.title;el.children[2].textContent='原因：'+why;el.hidden=false;clearTimeout(el._t);el._t=setTimeout(()=>{el.hidden=true;},9000);
  const v=document.getElementById('vig');v.classList.remove('on');void v.offsetWidth;v.classList.add('on');fxShake=performance.now()+600;sfx('bad');setTimeout(()=>sfx('alert'),450);};
-function tickFx(key,now){fxRooms.clear();let n=0;const F=FLOORS[key];
+const fltB=[],fltP=[];const SCR=bmat(0xe8eef6),SCR0=SCR.color.clone();
+function tickFault(key,now){let n=0;for(const t of S.tasks){if(t.state==='done'||t.t>S.time||t.room.key!==key||!t.devPos||n>=10)continue;const d=t.devPos;
+  if(!fltB[n]){fltB[n]=new THREE.Mesh(SPL,new THREE.MeshBasicMaterial({color:0xff4d4d}));fltB[n].scale.setScalar(0.09);scene.add(fltB[n]);fltP[n]=[0,1].map(()=>{const m=new THREE.Mesh(SPL,new THREE.MeshBasicMaterial({color:0x8a8f99,transparent:true,opacity:0.5,depthWrite:false}));scene.add(m);return m;});}
+  const b=fltB[n];b.visible=Math.sin(now/170+n)>-0.2;b.position.set(d.x,d.y+0.14,d.z);fltP[n].forEach((m,k)=>{const p=((now/1500)+n*0.37+k*0.5)%1;m.visible=true;m.position.set(d.x+0.05*Math.sin(p*6+k),d.y+0.12+p*0.55,d.z);m.scale.setScalar(0.07+p*0.16);m.material.opacity=0.55*(1-p);});n++;}
+ for(let i=n;i<fltB.length;i++){fltB[i].visible=false;fltP[i].forEach(m=>m.visible=false);}
+ SCR.color.copy(SCR0).multiplyScalar(0.93+0.07*Math.sin(now/650));}
+function tickFx(key,now){tickFault(key,now);fxRooms.clear();let n=0;const F=FLOORS[key];
  for(const c of S.chain){const t=c.effect;if(t.state==='done'||t.t>S.time||t.room.key!==key)continue;const wide=/整層|全院|所有/.test(t.title);const col=/中毒|加密|勒索|惡意|外洩|登入/.test(t.title)?0xb07cff:0xef6b6b;
   (wide?F.rooms:[t.room]).forEach(r=>{if(fxRooms.has(r.id))return;fxRooms.add(r.id);const m=fxPlane(n++);m.material.color.setHex(col);m.material.opacity=0.26+0.14*Math.sin(now/260);m.position.set(r.x+r.w/2,0.03,r.y+r.h/2);m.scale.set(r.w,r.h,1);m.visible=true;});
   label('fx_'+t.id,t.room.x+t.room.w/2,0.9,t.room.y+t.room.h/2,'fxlab','⚠ '+t.title.slice(0,14),()=>hitTask(t));}
  for(let i=n;i<fxPl.length;i++)fxPl[i].visible=false;
+ // 表情：每個單位一個人，把對你的印象掛在頭上
+ {const done=new Set();(F.npcs||[]).forEach((a,i)=>{const r=a.room;if(done.has(r.id)||a.role==='patient'||a.path.length)return;const v=S.fav[r.id];const face=fxRooms.has(r.id)?'😱':v===undefined?null:v>=75?'😊':v<30?'😠':v<50?'😒':null;if(!face)return;if(S.tasks.some(t=>t.room===r&&t.state!=='done'&&t.t<=S.time&&!t.assignee))return;done.add(r.id);label('emo_'+i,a.x+a.px+0.5,1.5,a.y+a.py+0.5,'emote',face,null);});}
  if(now<fxShake){camera.position.x+=(Math.random()-0.5)*0.25;camera.position.y+=(Math.random()-0.5)*0.18;}
  if(now-_goalT>500){_goalT=now;const g=goals();const h=g.map(x=>'<span class="'+(x.ok?'ok':'no')+'" title="'+x.n+'：'+x.d+'">'+(x.ok?'★':'☆')+' '+x.n.replace('沒有','').replace('沒踩資安和資料紅線','紅線').replace('急件逾時','急件').replace('電話漏接','漏接')+'</span>').join('');const el=document.getElementById('goals');if(el._h!==h){el.innerHTML=h;el._h=h;}}}
 // ---------- 導引點：往哪裡走，地上看得到 ----------
