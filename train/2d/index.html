@@ -45,6 +45,23 @@ button:focus-visible,.opt:focus-visible,.btn:focus-visible{outline:3px solid var
 .v3d canvas{display:block;width:100%;height:100%}
 .v3d .tip{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:2}
 .v3d .how{position:absolute;left:12px;top:10px;background:rgba(10,22,40,.7);border:1px solid #39d6ff55;border-radius:10px;padding:3px 10px;font-size:12px;color:#bfefff;pointer-events:none}
+/* 3D 版：場景鋪滿整個視窗，標題和進度浮在上面，說明和課程清單收進右側抽屜 */
+.btn.hb{padding:4px 14px;border-radius:999px;font-weight:400;font-size:14px;align-self:center}
+@media (max-width:640px){body.full:not(.inplay) header{gap:6px 8px}body.full:not(.inplay) header h1{flex:1 1 auto;font-size:17px}body.full:not(.inplay) .pill{font-size:12px;padding:2px 10px}body.full:not(.inplay) .btn.hb{font-size:12px;padding:3px 10px}}
+body.full:not(.inplay){padding:0;overflow:hidden}
+body.full:not(.inplay) .wrap{max-width:none;gap:0}
+body.full:not(.inplay) header{position:fixed;z-index:5;top:max(10px,env(safe-area-inset-top,0px));left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));pointer-events:none}
+body.full:not(.inplay) header>*{pointer-events:auto}
+body.full:not(.inplay) header h1{color:#eaf8ff;font-size:20px;text-shadow:0 2px 8px #000}
+body.full:not(.inplay) a.back{color:#bfefff;background:rgba(10,22,40,.7);border-radius:999px;padding:3px 12px}
+body.full:not(.inplay) #stage.v3d{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;max-height:none;min-height:0;aspect-ratio:auto;border:0;border-radius:0;box-shadow:none}
+body.full:not(.inplay) .v3d .how{top:auto;bottom:max(14px,env(safe-area-inset-bottom,0px));left:max(12px,env(safe-area-inset-left,0px))}
+body.full:not(.inplay) .v3d .tip{bottom:max(64px,env(safe-area-inset-bottom,0px));font-size:17px;padding:13px 24px}
+body.full:not(.inplay) #lists{position:fixed;z-index:6;top:0;right:0;bottom:0;width:min(440px,94vw);background:var(--bg);overflow:auto;padding:16px max(16px,env(safe-area-inset-right,0px)) 24px 16px;box-shadow:-12px 0 30px rgba(0,0,0,.35);transform:translateX(105%);transition:transform .2s}
+body.full:not(.inplay) #lists.open{transform:none}
+body.full:not(.inplay) #lists .chips{grid-template-columns:1fr}
+body.full:not(.inplay) #lsClose{align-self:flex-end}
+@media (prefers-reduced-motion:reduce){body.full #lists{transition:none}}
 /* 課程一覽 */
 .chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
 .chip{display:flex;gap:10px;align-items:center;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px 12px;font:inherit;color:var(--fg);cursor:pointer;min-width:0}
@@ -100,14 +117,17 @@ pre{margin:0;background:#16212b;color:#d7e3ee;border-radius:10px;padding:12px 14
 </head>
 <body>
 <div class="wrap">
- <header><a class="back" href="../../">← 回首頁</a><h1>資訊職訓中心</h1><div class="sum"><span class="pill">基礎課程 <b id="sDone">0</b></span><span class="pill">星星 <b id="sStar">0</b></span><span class="pill">總分 <b id="sScore">0</b></span><button class="btn ghost" id="snd" style="padding:4px 12px;border-radius:999px" aria-label="音效開關">🔊</button></div></header>
+ <header><a class="back" href="../../">← 回首頁</a><h1>資訊職訓中心</h1><div class="sum"><span class="pill">基礎課程 <b id="sDone">0</b></span><span class="pill">星星 <b id="sStar">0</b></span><span class="pill">總分 <b id="sScore">0</b></span><button class="btn ghost hb" id="lsBtn" hidden>課程與說明</button><button class="btn ghost hb" id="fsBtn" hidden aria-label="全螢幕">⛶ 全螢幕</button><button class="btn ghost" id="snd" style="padding:4px 12px;border-radius:999px" aria-label="音效開關">🔊</button></div></header>
  <div id="hub" style="display:flex;flex-direction:column;gap:16px">
   <p class="lead">中庭周圍是九間實習教室，九位師傅各教一門每個資訊人員都該會的基礎課；基礎考過，就能去進階專科大樓，照六條專業路線找各科大師。技能等級代表通過知識測驗，不等於實作能力的認證。找師傅說話就能考試：一次 8 題、三條命，錯一題以內就算通過，每一項技能從初級一路考到專家。想在中心裡走動可以用 <a href="../">3D 版</a>，進度是共用的。</p>
   <div id="stage"></div>
-  <h2 class="sec">基礎課程</h2>
-  <div class="chips" id="chips"></div>
-  <h2 class="sec">進階課程（六條專業路線）</h2>
-  <div class="chips" id="adv"></div>
+  <div id="lists" style="display:flex;flex-direction:column;gap:16px">
+   <button class="btn ghost" id="lsClose" hidden>關閉</button>
+   <h2 class="sec">基礎課程</h2>
+   <div class="chips" id="chips"></div>
+   <h2 class="sec">進階課程（六條專業路線）</h2>
+   <div class="chips" id="adv"></div>
+  </div>
  </div>
  <div id="play" hidden></div>
 </div>
@@ -1032,7 +1052,7 @@ function renderHub(){let ts=0,sc=0;const n=doneN();
  const hn=$('hallN');if(hn)hn.textContent='已通過 '+n+'／'+COURSES.length+' 門';
  if(window.v3dRefresh)v3dRefresh();}
 function closeTalk(){talk.hidden=true;talk.innerHTML='';}
-function openTalk(c){sfx.talk();const t=tierOf(c),ttl=titleOf(c),lk=lockedBy(c);
+function openTalk(c){$('lists').classList.remove('open');sfx.talk();const t=tierOf(c),ttl=titleOf(c),lk=lockedBy(c);
  const say=lk.length?'想走這一科，基礎要先夠。先去把「'+lk.map(x=>x.name).join('」「')+'」考過，再回來找我。':t<0?c.hi:t<3&&pool(c,t+1).length<NQ?TIER[t]+'過了，不錯。'+TIER[t+1]+'的題目我還在準備，好了再來找我。':t===3?'你已經是專家了，我沒什麼好教的，想複習隨時來。':TIER[t]+'過了，要不要挑戰'+TIER[t+1]+'？';
  const btn=[0,1,2,3].map(l=>{const has=pool(c,l).length>=NQ,open=!lk.length&&(l===0||rec(c.id,l-1).stars>=2),r=rec(c.id,l);
   return '<button data-l="'+l+'" '+(has&&open?'':'disabled')+'>'+TIER[l]+(has?(open?starsHTML(r.stars):'<span class="n">'+(lk.length?'🔒 未開放':'🔒 前一級先過')+'</span>'):'<span class="n">製作中</span>')+'</button>';}).join('');
@@ -1043,7 +1063,7 @@ addEventListener('keydown',e=>{if(e.key==='Escape'&&!talk.hidden)closeTalk();});
 // ===== 作答 =====
 const shuf=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
 let G=null;
-function start(d,l,practice){G={d,l,practice:!!practice,qs:shuf(pool(d,l)).slice(0,NQ),i:0,lives:3,combo:0,score:0,right:0,miss:[]};hub.hidden=true;hub.style.display='none';play.hidden=false;ask();scrollTo(0,0);}
+function start(d,l,practice){G={d,l,practice:!!practice,qs:shuf(pool(d,l)).slice(0,NQ),i:0,lives:3,combo:0,score:0,right:0,miss:[]};hub.hidden=true;hub.style.display='none';document.body.classList.add('inplay');play.hidden=false;ask();scrollTo(0,0);}
 function ask(){const g=G,q=g.qs[g.i];const opts=shuf(q.a.map((t,k)=>({t,ok:k===0})));
  play.innerHTML='<div class="bar"><span class="name">'+g.d.ic+' '+g.d.name+'・'+TIER[g.l]+(g.practice?'・練習':'')+'</span>'+(g.practice?'':'<span class="hearts" aria-label="剩 '+g.lives+' 條命">'+'❤️'.repeat(g.lives)+'<i>'+'❤️'.repeat(3-g.lives)+'</i></span>')+'<span class="combo">'+(g.combo>=2?'連對 ×'+g.combo:'')+'</span></div><div class="prog"><i style="width:'+(g.i/g.qs.length*100)+'%"></i></div>'+
   '<div class="qcard" id="qc"><span class="qno">第 '+(g.i+1)+'／'+g.qs.length+' 題　分數 '+g.score.toLocaleString()+'</span><p class="q">'+q.q+'</p>'+(q.code?'<pre>'+q.code+'</pre>':'')+'<div class="opts" id="opts"></div><div id="fb"></div></div>';
@@ -1062,8 +1082,12 @@ function finish(){const g=G,n=g.qs.length,dead=g.lives<=0;const stars=dead?0:g.r
  play.innerHTML='<div class="qcard"><span class="qno">'+g.d.ic+' '+g.d.name+'・'+TIER[g.l]+'　'+g.d.npc+'</span><p class="q">'+head+'</p>'+(g.practice?'':'<div class="big">'+'★'.repeat(stars)+'<i>'+'★'.repeat(3-stars)+'</i></div>')+'<div>答對 '+g.right+'／'+n+' 題'+(g.practice?'　<span class="note">練習不計成績</span>':'　分數 '+g.score.toLocaleString())+'</div>'+(up&&!g.practice?'<div class="note">技能等級代表通過這一級的知識測驗，不等於實作能力的認證。</div>':'')+(weak.length?'<div><b>這次比較弱的主題</b>：'+weak.join('、')+'</div>':'')+
   (g.miss.length?'<div><b>答錯的題目</b>'+g.miss.map(q=>'<div class="miss">'+q.q+'<small>正確答案：'+q.a[0]+'</small><small>'+q.why+'</small></div>').join('')+'</div>':'')+
   '<div class="row"><button class="btn" id="again">'+(g.practice?'再練一次':'再考一次')+'</button><button class="btn ghost" id="home">回職訓中心</button></div></div>';
- $('again').onclick=()=>start(g.d,g.l,g.practice);$('home').onclick=()=>{play.hidden=true;hub.hidden=false;hub.style.display='flex';renderHub();scrollTo(0,0);};}
-if(window.initVillage3D)initVillage3D({courses:COURSES,adv:ADV,locked:c=>lockedBy(c).length>0,talk:openTalk,tier:tierOf,TIER,busy:()=>!talk.hidden||hub.hidden});else build2D();
+ $('again').onclick=()=>start(g.d,g.l,g.practice);$('home').onclick=()=>{play.hidden=true;document.body.classList.remove('inplay');hub.hidden=false;hub.style.display='flex';renderHub();scrollTo(0,0);};}
+if(window.initVillage3D){document.body.classList.add('full');const ls=$('lists'),lead=document.querySelector('#hub .lead');ls.insertBefore(lead,ls.children[1]);
+ ['lsBtn','fsBtn','lsClose'].forEach(i=>$(i).hidden=false);$('lsBtn').onclick=()=>ls.classList.toggle('open');$('lsClose').onclick=()=>ls.classList.remove('open');
+ $('fsBtn').onclick=()=>{const d=document;if(d.fullscreenElement)d.exitFullscreen();else if(d.documentElement.requestFullscreen)d.documentElement.requestFullscreen().catch(()=>{});};
+ if(!document.documentElement.requestFullscreen)$('fsBtn').hidden=true;}
+if(window.initVillage3D)initVillage3D({courses:COURSES,adv:ADV,locked:c=>lockedBy(c).length>0,talk:openTalk,tier:tierOf,TIER,busy:()=>!talk.hidden||hub.hidden||$('lists').classList.contains('open')});else build2D();
 renderHub();
 </script>
 </body>
