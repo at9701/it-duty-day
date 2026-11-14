@@ -22,7 +22,8 @@ window.initVillage3D=function(api){
   const r=22,rr=()=>{x.beginPath();x.moveTo(r+6,6);x.arcTo(506,6,506,cv.height-6,r);x.arcTo(506,cv.height-6,6,cv.height-6,r);x.arcTo(6,cv.height-6,6,6,r);x.arcTo(6,6,506,6,r);x.closePath();};
   rr();x.fillStyle=holo?'rgba(10,22,40,.86)':bg;x.fill();if(holo){x.lineWidth=5;x.strokeStyle='#39d6ff';x.stroke();}
   x.fillStyle=holo?'#eaf8ff':fg;x.textAlign='center';x.textBaseline='middle';
-  if(lines.length>1){x.font='700 64px "PingFang TC","Microsoft JhengHei","Noto Sans TC",sans-serif';x.fillText(lines[0],256,62);x.fillStyle=holo?'#7fdcff':fg;x.font='400 42px "PingFang TC","Microsoft JhengHei","Noto Sans TC",sans-serif';x.fillText(lines[1],256,130);}
+  const fit=(t,wt,px)=>{do{x.font=wt+' '+px+'px "PingFang TC","Microsoft JhengHei","Noto Sans TC",sans-serif';px-=2;}while(x.measureText(t).width>476&&px>18);};
+  if(lines.length>1){fit(lines[0],700,64);x.fillText(lines[0],256,62);x.fillStyle=holo?'#7fdcff':fg;fit(lines[1],400,42);x.fillText(lines[1],256,130);}
   else{x.font='700 60px "PingFang TC","Microsoft JhengHei","Noto Sans TC",sans-serif';x.fillText(lines[0],256,58);}
   const t=new THREE.CanvasTexture(cv);const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t,depthWrite:false}));sp.scale.set(w,w*cv.height/512,1);return sp;}
  // 地面：深色機房地板、發光的線路
