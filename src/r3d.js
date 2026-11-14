@@ -321,6 +321,22 @@ function researchLab(r,x0,last,z0,zf,door,w){const nm=r.name;
  for(let x=x0;x<=last;x++){if(x%5===0)bioCabinet(x,z0);else if(x%5===2)fridge(x,z0+0.1);else if(x%5===3)freezer80(x,z0);}
  [z0+2.2,z0+4.1].forEach(z=>{for(let x=x0+1;x+2.6<=last;x+=3.4){blk(x,z+0.1,2.6,0.9);box(x,0,z+0.1,2.6,0.85,0.9,0xe3e7ec);box(x-0.05,0.85,z+0.05,2.7,0.05,1.0,0x3b4454);box(x+1.25,0.9,z+0.1,0.1,0.55,0.9,0xcfd6dc);microscope(x+0.3,0.9,z+0.25);microscope(x+1.7,0.9,z+0.6);for(let j=0;j<6;j++)box(x+0.6+j*0.06,0.9,z+0.65,0.03,0.1,0.03,[0xef6b6b,0x6aa7ff,0xf2b84b,0x5fd3a6,0xd08cff,0xffffff][j],false);box(x+2.0,0.9,z+0.2,0.3,0.25,0.3,0xdfe6ea,false);}});
  textPlate(x0+0.3,1.62,z0+0.03,1.4,0.18,nm,'#2a4f8a');}
+// 資訊部這類大辦公室：主任座位、四人一組的工位、討論桌、茶水、門口值班台，不是一整片排排坐
+function itOffice(r,x0,last,z0,zf,door,w){const zb=z0+0.02;
+ // 後牆：檔案櫃、白板（排班）、影印機
+ fileCabinet(x0+4,z0);fileCabinet(x0+5,z0);board(x0+6.4,zb);clock(x0+8.6,zb);copier(x0+10,z0);fileCabinet(x0+12,z0);if(w>=22){fileCabinet(x0+13,z0);poster(x0+14.4,zb,0x6aa7ff);}
+ // 西側：主任座位，矮隔板圍起來，前面兩張訪客椅
+ desk(x0+1,z0+1.3,0x4e352c);desk(x0+2,z0+1.3,0x4e352c);chair(x0+1.55,z0+1.05,false,0x2b2b2b);chair(x0+0.9,z0+2.6);chair(x0+2.1,z0+2.6);fileCabinet(x0,z0);plant(x0,z0+3.2);
+ lowPanel(x0+3.5,z0+0.3,0.06,3.4);textPlate(x0+1.0,1.5,zb+0.04,1.3,0.16,'主任','#ffffff','#1b2230');
+ // 東側：討論桌＋電視，矮隔板隔開；再過去是茶水區
+ const tx=last-4.4;lowPanel(tx-0.8,z0+0.3,0.06,3.4);blk(tx,z0+2.0,3.2,0.9);box(tx,0.65,z0+2.0,3.2,0.06,0.9,0x8a6545);[[0.1,0.1],[3.0,0.1],[0.1,0.7],[3.0,0.7]].forEach(([a,c])=>box(tx+a,0,z0+2.0+c,0.1,0.65,0.1,0x4e352c));
+ for(let c=tx+0.1;c+0.7<=tx+3.2;c+=1.0){chair(c,z0+1.2,true);chair(c,z0+2.75);}tv(tx+0.9,zb,1.4);textPlate(tx+0.2,1.95,zb+0.04,1.2,0.14,'討論區','#5a4a3a');
+ counter(last-2.2,z0+4.5,2.2,0xe8e2d6,0x8a6545);coffeeMachine(last-2.0,0.95,z0+4.65);cupSet(last-1.4,0.95,z0+4.85,3);waterDispenser(last,z0+5.6);textPlate(last-2.0,1.5,z0+4.62,1.2,0.14,'茶水區','#5a4a3a',undefined,true);
+ // 中間：四人一組的工位，兩排，組跟組之間留走道
+ const px0=x0+5,px1=tx-2;officePods(px0,px1,z0+2.2);officePods(px0,Math.min(px1,door-2),z0+4.4);if(door+4<=px1)officePods(door+4,px1,z0+4.4);
+ // 門口：值班台（兩個位子、電話），來報修的人第一個看到
+ {const dx=door+1<=px1-1?door+1:door-2;desk(dx,z0+6.0);desk(dx+1,z0+6.0);chair(dx+0.05,z0+6.15);chair(dx+1.05,z0+6.15);box(dx+0.1,0.61,z0+6.25,0.18,0.06,0.2,0x2b3242,false);box(dx+1.1,0.61,z0+6.25,0.18,0.06,0.2,0x2b3242,false);textPlate(dx+0.3,1.6,z0+6.3,1.3,0.18,'值班台','#ffffff','#2a7fd4',true);}
+ plant(last,zf);}
 function adminOffice(r,x0,last,z0,zf,door,w){const b=r.base;
  // 後牆：檔案櫃一排、主管座位在角落
  for(let x=x0;x<=last-3;x++){if((x-x0)%4===3)continue;fileCabinet(x,z0);}desk(last-1,z0+0.1,0x4e352c);chair(last-0.95,z0+0.9,true,0x2b2b2b);plant(last,z0+0.1);
@@ -371,6 +387,7 @@ function furnish(r,kind){CURK=kind;const x0=r.x,z0=r.y,w=r.w,h=r.h,zb=z0+0.02,la
    for(let x=x0+1;x+2.4<=last-1;x+=3)bench(x,z0+5.05,2.4);break;}
   if(b==='edu'){classroom(x0,last,z0,zf,door,w);break;}
   if(['hr','acct','ga','pr','qa','sw','ic','nutrition'].includes(b)){adminOffice(r,x0,last,z0,zf,door,w);break;}
+  if(w>=16){itOffice(r,x0,last,z0,zf,door,w);break;}
   for(let i=0;i<w;i++){const tx=x0+i;if(i===w-1&&w>3){printer(tx,z0+0.1);continue;}if(i%3===1){blk(tx+0.1,z0+0.05,0.8,0.5);box(tx+0.1,0,z0+0.05,0.8,1.2,0.5,0x8a94a8);box(tx+0.15,0.3,z0+0.55,0.7,0.03,0.02,0x222222);box(tx+0.15,0.75,z0+0.55,0.7,0.03,0.02,0x222222);}}
   deskRow(x0+1,last-1,zi);deskRow(x0+1,last-1,zi2);board(x0+0.4,zb);if(w>5)poster(last-2.2,zb,0x6aa7ff);clock(x0+w/2,zb);corners();break;}
  case 'meet':{if(/國際會議廳/.test(r.name)){auditorium(x0,last,z0,zf,door,w);break;}if(/值班宿舍/.test(r.name)){dorm(x0,last,z0,zf,door);break;}
@@ -773,7 +790,7 @@ function person2(a){const lk=a.look||{shirt:a.color,hair:'#2b2b2b',skin:'#f1d3b3
  g.userData.limbs=[L1,L2,A1,A2];g.position.y=0.3;g.userData.actor=a;return g;}
 function legs(g,sw){const L=g.userData.limbs;if(!L)return;L[0].rotation.x=sw;L[1].rotation.x=-sw;L[2].rotation.x=-sw*0.8;L[3].rotation.x=sw*0.8;}
 
-const SITTERS={doctor:1,clerk:1,tech:1,pharm:1,researcher:1,exec:1,nurse:1};
+const SITTERS={doctor:1,clerk:1,tech:1,pharm:1,researcher:1,exec:1,nurse:1,it:1,admin:1,staff:1};
 const AG=new Map();// actor -> {g,ang,phase}
 function actorG(a){let e=AG.get(a);if(!e){e={g:person(a),ang:0,phase:0};scene.add(e.g);AG.set(a,e);}return e;}
 

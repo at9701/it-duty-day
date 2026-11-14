@@ -55,4 +55,5 @@ def patch(body):
 
     # 檢討單用：每一個做法選擇都記下來（不只選錯的）
     body=rep("bt.onclick=()=>{S.procN++;let extra=0;","bt.onclick=()=>{S.procN++;{const bo=st.opts.find(x=>x[1]===1)||['','','','',''];(S.decisions=S.decisions||[]).push({tm:S.time,room:locName(t.room),title:t.title,q:st.q.replace(/\\{room\\}/g,t.room.name),txt,o,note,best:bo[0],bestNote:bo[4]});}let extra=0;")
+    body=body.replace('background:#3a1520','background:#fff1ef')  # 3D 版是亮色介面
     return body
