@@ -130,13 +130,15 @@ window.initVillage3D=function(api){
  for(let k=0;k<9;k++){scr(H,-20+k*5,5.5,-17.72,3.4,4.5,k%2?0x16324a:0x1d4466);}{const e=box(46,.12,.1,B(CY),0,8.6,-17.7,H);e.castShadow=false;const e2=box(46,.12,.1,B(CY),0,1.2,-17.7,H);e2.castShadow=false;}
  {const o=new THREE.Mesh(new THREE.RingGeometry(4.2,4.35,48),B(CY));o.rotation.x=-Math.PI/2;o.position.y=.03;H.add(o);const l=label(['進階專科大樓'],'#ffffff','#fff',5);l.position.set(OX,10.2,-17);sc.add(l);}
  const SHAPES=[()=>new THREE.BoxGeometry(.9,.9,.9),()=>new THREE.TorusKnotGeometry(.45,.12,48,8),()=>new THREE.OctahedronGeometry(.7,0),()=>new THREE.ConeGeometry(.6,1.1,4),()=>new THREE.CylinderGeometry(.55,.55,.8,20),()=>new THREE.DodecahedronGeometry(.65,0),()=>new THREE.TorusGeometry(.5,.14,8,24),()=>new THREE.TetrahedronGeometry(.8,0),()=>new THREE.IcosahedronGeometry(.65,0)];
- const RA=11.5,AA=i=>Math.PI-(i-(api.adv.length-1)/2)*.36;
+ const RA=15,AA=i=>Math.PI-(i-(api.adv.length-1)/2)*.245;
+ // 路線名稱牌：掛在每一組諮詢台的後上方
+ {const G={};api.adv.forEach((c,i)=>{(G[c.track]=G[c.track]||[]).push(AA(i));});for(const t in G){const a=G[t].reduce((x,y)=>x+y,0)/G[t].length,l=label([t],'#f2c14e','#1c2a36',Math.max(3.2,t.length*.62));l.position.set(OX+Math.sin(a)*(RA+1.2),6.3,Math.cos(a)*(RA+1.2));sc.add(l);}}
  api.adv.forEach((c,i)=>{const a=AA(i),lx=Math.sin(a)*RA,lz=Math.cos(a)*RA,g=new THREE.Group(),rcH=new THREE.Color(c.rc).getHex();g.position.set(lx,0,lz);g.rotation.y=a+Math.PI;H.add(g);
   cyl(1.9,2,.16,0x2a3a50,0,.08,0,g,24);{const o=new THREE.Mesh(new THREE.TorusGeometry(1.92,.04,6,40),B(rcH));o.rotation.x=Math.PI/2;o.position.y=.17;g.add(o);}
   box(2.2,.9,.5,0x33455c,0,.6,.7,g);{const e=box(2.2,.05,.52,B(rcH),0,1.07,.7,g);e.castShadow=false;}mon(g,.55,1.1,.7,0x16324a,Math.PI);
   cyl(.07,.07,2.6,0x4b5d75,-1.1,1.4,-.9,g,8);const sh=new THREE.Mesh(SHAPES[i%SHAPES.length](),new THREE.MeshBasicMaterial({color:rcH,wireframe:true}));sh.position.set(-1.1,3.3,-.9);g.add(sh);anim.push(t=>{sh.rotation.set(t*.5,t*.8+i,0);});
   const m=person(rcH,HAIR[(i+3)%HAIR.length]);sc.remove(m);m.position.set(0,.16,-.1);g.add(m);
-  const x=OX+lx,z=lz,sign=label([c.npc,c.name],'#ffffff','#1c2a36',3.6);sign.position.set(x,4.4,z);sc.add(sign);
+  const x=OX+lx,z=lz,sign=label([c.npc,c.name],'#ffffff','#1c2a36',3.3);sign.position.set(x,4.4,z);sc.add(sign);
   blocks2.push([x,z,2.1]);stalls.push({c,x,z,a,m,mk:null,adv:true,my:5.6,fx:OX+Math.sin(a)*(RA-3),fz:Math.cos(a)*(RA-3)});});
  // 電梯：中庭和大樓之間來回
  const lifts=[[9.5,9.5,'搭電梯到進階專科大樓'],[OX,10,'搭電梯回中庭']].map((q,k)=>{cyl(1.3,1.4,.14,0x33455c,q[0],.07,q[1],null,24);const o=new THREE.Mesh(new THREE.RingGeometry(1.05,1.22,32),B(0xf2c14e));o.rotation.x=-Math.PI/2;o.position.set(q[0],.16,q[1]);sc.add(o);
@@ -173,7 +175,7 @@ window.initVillage3D=function(api){
   anim.forEach(f=>f(t));near=null;let bd=3.4;stalls.forEach((s,i)=>{const d=Math.hypot(me.position.x-s.fx,me.position.z-s.fz);if(d<bd){bd=d;near=s;}s.m.position.y=(s.adv?.16:.12)+Math.sin(t*2+i)*.03;if(s.mk)s.mk.position.y=s.my+Math.sin(t*3+i)*.08;});
   nearL=null;if(!near)lifts.forEach(L=>{if(Math.hypot(me.position.x-L.x,me.position.z-L.z)<1.5)nearL=L;});
   if(near){tip.textContent='跟'+near.c.npc+'說話（E）';tip.hidden=false;}else if(nearL){tip.textContent=nearL.txt+'（E）';tip.hidden=false;}else tip.hidden=true;
-  if(zone){const fx=OX+(me.position.x-OX)*.6,fz=me.position.z*.5-3;cam.position.set(fx,22,fz+23);cam.lookAt(fx,1,fz);}else{const fx=me.position.x*.6,fz=me.position.z*.55-5.5;cam.position.set(fx,29,fz+29);cam.lookAt(fx,1,fz);}}
+  if(zone){const fx=OX+(me.position.x-OX)*.6,fz=me.position.z*.5-5;cam.position.set(fx,27,fz+27);cam.lookAt(fx,1,fz);}else{const fx=me.position.x*.6,fz=me.position.z*.55-5.5;cam.position.set(fx,29,fz+29);cam.lookAt(fx,1,fz);}}
  function size(){const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;R.setSize(w,h,false);cam.aspect=w/h;cam.fov=w/h<1.1?52:38;cam.updateProjectionMatrix();}
  if(window.ResizeObserver)new ResizeObserver(size).observe(host);addEventListener('resize',size);size();
  let last=performance.now();(function loop(now){requestAnimationFrame(loop);const dt=Math.min(.05,(now-last)/1000);last=now;if(!host.clientWidth)return;if(!api.busy())step(dt);R.render(sc,cam);})(last);
