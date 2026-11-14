@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>資訊訓練村</title>
+<title>資訊職訓中心</title>
 <style>
 /* 版面：上方進度，中間訓練村（2D 地圖或 3D 場景），下方課程一覽；作答時換成單一題目卡 */
 :root{--bg:#eaf0f4;--panel:#ffffff;--panel2:#f0f5f8;--line:#d2dde6;--fg:#1c2a36;--muted:#617384;--accent:#17a07a;--warn:#c9860c;--crit:#d6453d;--info:#2a7fd4;
@@ -33,7 +33,7 @@ button:focus-visible,.opt:focus-visible,.btn:focus-visible{outline:3px solid var
 .npc .tag small{display:block;font-weight:400;color:var(--muted);font-size:11px}
 .npc .mk{position:absolute;top:-14px;right:10px;background:var(--warn);color:#fff;border-radius:999px;font-size:11px;font-weight:800;padding:0 7px;line-height:18px}
 .npc .mk.done{background:var(--accent)}
-.hall{position:absolute;left:50%;top:51.6%;transform:translate(-50%,-50%);background:#fff;border:2px solid #b89c6a;border-radius:14px;padding:6px 14px;text-align:center;font-weight:800;line-height:1.3;box-shadow:0 3px 0 rgba(0,0,0,.12)}
+.hall{position:absolute;left:50%;top:54.8%;transform:translate(-50%,-50%);background:#fff;border:2px solid #b89c6a;border-radius:14px;padding:6px 14px;text-align:center;font-weight:800;line-height:1.3;box-shadow:0 3px 0 rgba(0,0,0,.12)}
 .hall small{display:block;font-weight:400;color:var(--muted);font-size:12px}
 .gate{position:absolute;background:rgba(28,42,54,.72);color:#fff;border-radius:10px;padding:3px 10px;font-size:12px;line-height:1.4;text-align:center}
 @media (max-width:700px){.map{display:none}}
@@ -93,9 +93,9 @@ pre{margin:0;background:#16212b;color:#d7e3ee;border-radius:10px;padding:12px 14
 </head>
 <body>
 <div class="wrap">
- <header><a class="back" href="{{HOME}}">← 回首頁</a><h1>資訊訓練村</h1><div class="sum"><span class="pill">基礎課程 <b id="sDone">0</b></span><span class="pill">星星 <b id="sStar">0</b></span><span class="pill">總分 <b id="sScore">0</b></span><button class="btn ghost" id="snd" style="padding:4px 12px;border-radius:999px" aria-label="音效開關">🔊</button></div></header>
+ <header><a class="back" href="{{HOME}}">← 回首頁</a><h1>資訊職訓中心</h1><div class="sum"><span class="pill">基礎課程 <b id="sDone">0</b></span><span class="pill">星星 <b id="sStar">0</b></span><span class="pill">總分 <b id="sScore">0</b></span><button class="btn ghost" id="snd" style="padding:4px 12px;border-radius:999px" aria-label="音效開關">🔊</button></div></header>
  <div id="hub" style="display:flex;flex-direction:column;gap:16px">
-  <p class="lead">村子中央是基礎學堂，九位師傅各教一門每個資訊人員都該會的課。找師傅說話就能考試：一次 8 題、三條命，錯一題以內就拿到稱號，從初級一路考到專家。{{ALT}}</p>
+  <p class="lead">中庭周圍是九間實習教室，九位師傅各教一門每個資訊人員都該會的基礎課。找師傅說話就能考試：一次 8 題、三條命，錯一題以內就拿到稱號，從初級一路考到專家。{{ALT}}</p>
   <div id="stage"></div>
   <h2 class="sec">基礎課程</h2>
   <div class="chips" id="chips"></div>
@@ -346,11 +346,11 @@ const sfx={good:()=>{tone(660,0,.1);tone(990,.09,.16);},bad:()=>{tone(300,0,.18,
 const $=id=>document.getElementById(id);const hub=$('hub'),play=$('play'),talk=$('talk');
 const starsHTML=n=>'<span class="stars">'+'★'.repeat(n)+'<i>'+'★'.repeat(3-n)+'</i></span>';
 function build2D(){const st=$('stage');st.className='map';
- const P=COURSES.map((c,i)=>{const a=(i*40-90)*Math.PI/180;return [50+37*Math.cos(a),32+23*Math.sin(a)];});
+ const P=COURSES.map((c,i)=>{const a=(i*40-90)*Math.PI/180;return [50+37*Math.cos(a),34+22*Math.sin(a)];});
  let trees='';[[6,8],[14,30],[5,50],[22,56],[40,58.5],[62,58.5],[80,56],[95,48],[88,30],[94,10],[30,5],[70,5],[33,32],[67,32],[41,17],[59,17],[40,46],[60,46]].forEach(t=>{trees+='<ellipse cx="'+t[0]+'" cy="'+(t[1]+1.6)+'" rx="2" ry=".7" fill="rgba(0,0,0,.14)"/><circle cx="'+t[0]+'" cy="'+t[1]+'" r="2" fill="#4f9a57"/><circle cx="'+(t[0]-.6)+'" cy="'+(t[1]-.7)+'" r="1.1" fill="#6bb56f"/>';});
- st.innerHTML='<svg viewBox="0 0 100 62" preserveAspectRatio="none" aria-hidden="true"><rect width="100" height="62" fill="#8fc77e"/><ellipse cx="50" cy="32" rx="37" ry="23" fill="none" stroke="#e6d3a3" stroke-width="3.4"/>'+P.map(p=>'<line x1="50" y1="32" x2="'+p[0]+'" y2="'+p[1]+'" stroke="#e6d3a3" stroke-width="2.2"/>').join('')+'<ellipse cx="50" cy="32" rx="12" ry="7.4" fill="#d9d5cb" stroke="#bdb8ab" stroke-width=".5"/>'+trees+'</svg>'+
-  '<div class="hall">基礎學堂<small id="hallN"></small></div>'+
-  '<div class="gate" style="left:1.5%;top:3%">🔒 進階專科區<br>籌備中</div><div class="gate" style="right:1.5%;top:3%">🔒 進階專科區<br>籌備中</div>';
+ st.innerHTML='<svg viewBox="0 0 100 62" preserveAspectRatio="none" aria-hidden="true"><rect width="100" height="62" fill="#8fc77e"/><ellipse cx="50" cy="34" rx="37" ry="22" fill="none" stroke="#e6d3a3" stroke-width="3.4"/>'+P.map(p=>'<line x1="50" y1="34" x2="'+p[0]+'" y2="'+p[1]+'" stroke="#e6d3a3" stroke-width="2.2"/>').join('')+'<ellipse cx="50" cy="34" rx="12" ry="7.4" fill="#d9d5cb" stroke="#bdb8ab" stroke-width=".5"/>'+trees+'</svg>'+
+  '<div class="hall">基礎課程<small id="hallN"></small></div>'+
+  '<div class="gate" style="left:50%;top:1.5%;transform:translateX(-50%)">🔒 進階專科大樓　籌備中</div>';
  COURSES.forEach((c,i)=>{const b=document.createElement('button');b.className='npc';b.style.left=P[i][0]+'%';b.style.top=(P[i][1]/62*100)+'%';b.dataset.c=c.id;b.onclick=()=>openTalk(c);st.appendChild(b);});}
 function renderHub(){let ts=0,sc=0;const n=doneN();
  COURSES.forEach(c=>{for(let l=0;l<4;l++){const r=rec(c.id,l);ts+=r.stars;sc+=r.best;}});
@@ -391,7 +391,7 @@ function finish(){const g=G,n=g.qs.length,dead=g.lives<=0;const stars=dead?0:g.r
  const head=dead?'三條命用完了，這次沒過':pass?(up?'通過！你現在是「'+titleOf(g.d)+'」':'通過！'):'考完了，但錯超過一題，還拿不到稱號';
  play.innerHTML='<div class="qcard"><span class="qno">'+g.d.ic+' '+g.d.name+'・'+TIER[g.l]+'　'+g.d.npc+'</span><p class="q">'+head+'</p><div class="big">'+'★'.repeat(stars)+'<i>'+'★'.repeat(3-stars)+'</i></div><div>答對 '+g.right+'／'+n+' 題　分數 '+g.score.toLocaleString()+'</div>'+
   (g.miss.length?'<div><b>答錯的題目</b>'+g.miss.map(q=>'<div class="miss">'+q.q+'<small>正確答案：'+q.a[0]+'</small><small>'+q.why+'</small></div>').join('')+'</div>':'')+
-  '<div class="row"><button class="btn" id="again">再考一次</button><button class="btn ghost" id="home">回訓練村</button></div></div>';
+  '<div class="row"><button class="btn" id="again">再考一次</button><button class="btn ghost" id="home">回職訓中心</button></div></div>';
  $('again').onclick=()=>start(g.d,g.l);$('home').onclick=()=>{play.hidden=true;hub.hidden=false;hub.style.display='flex';renderHub();scrollTo(0,0);};}
 if(window.initVillage3D)initVillage3D({courses:COURSES,talk:openTalk,tier:tierOf,TIER,busy:()=>!talk.hidden||hub.hidden});else build2D();
 renderHub();
