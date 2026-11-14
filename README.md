@@ -2,14 +2,16 @@
 
 模擬遊戲：醫院資訊單位人員的一天。角色有剛到醫院的新人、值班人員、專責工程師（網路／資安／資料庫／系統／程式／PACS）、主任。給新人練判斷與底線，給主管看人力配置的差異。單一 HTML，無後端。
 
-- **3D 版（首頁）**：`index.html`。Three.js 與字型已內嵌，院內電腦不用連外網也能玩。
-- **2D 像素版**：`2d/index.html`。電腦比較舊、3D 跑不動時用這個。
+- **首頁**：`index.html`。左邊進入遊戲，右邊專業訓練。
+- **3D 版遊戲**：`game/index.html`。Three.js 與字型已內嵌，院內電腦不用連外網也能玩。
+- **2D 像素版遊戲**：`2d/index.html`。電腦比較舊、3D 跑不動時用這個。
+- **專業訓練**：`train/index.html`。資訊各領域的闖關題庫（異常排除、硬體、軟體、網路、資安、Windows、Linux、資料庫、醫療資訊、法規治理），不限醫院情境。題庫在 `src/train.html` 的 `DOMAINS`，每個領域 `lv` 陣列放三關，每關一個題目陣列；每題第一個選項是正確答案，出題時會打亂。
 
 兩個版本用同一套事件、做法選單、因果與評分；3D 版的地圖較大，走路速度已校準成跟 2D 花一樣的遊戲時間。
 
 ## 部署到 GitHub Pages
 1. Settings → Pages → Source 選 `Deploy from a branch`，Branch 選 `main` / `(root)`
-2. 3D：`https://<帳號>.github.io/it-duty-day/`；2D：`https://<帳號>.github.io/it-duty-day/2d/`
+2. 首頁：`https://<帳號>.github.io/it-duty-day/`；遊戲在 `game/`、`2d/`，訓練在 `train/`
 
 ## 3D 版功能
 - 開場是院區外觀，選醫院大小後大樓數會跟著變（1／2／3／5 棟）
@@ -20,7 +22,7 @@
 ## 原始檔與打包
 - `src/game.html`：2D 版原始檔，事件、做法選單、評分都在這裡（兩版共用）
 - `src/head3d.html`、`src/r3d.js`、`src/patch_logic.py`：3D 版的畫面、場景與地圖調整
-- `python3 src/build.py`：重新產生 `index.html`（3D）和 `2d/index.html`（2D）。改完 `src/` 一定要跑一次
+- `python3 src/build.py`：重新產生 `index.html`（首頁）、`game/index.html`（3D）、`2d/index.html`（2D）、`train/index.html`（訓練）。首頁原始檔是 `src/landing.html`。改完 `src/` 一定要跑一次
 - `tests/`：檢查腳本（需要 Node 與 Playwright）
   - `check-menus.js`：每套做法選單的步驟接得起來、都有最佳答案
   - `check-answer-length.js`：最佳答案是不是又變成最長的那個

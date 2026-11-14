@@ -1,7 +1,7 @@
 const {chromium}=require('playwright');(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-webgl','--ignore-gpu-blocklist']});const p=await b.newPage({viewport:{width:1280,height:760}});const errs=[];p.on('pageerror',e=>errs.push(e.message));
 await p.route('https://cdnjs.cloudflare.com/**',r=>r.fulfill({path:'/tmp/claude-0/-home-claude/87ab8a7b-6576-53a8-a11f-be9c0a9807a7/scratchpad/three.min.js',contentType:'application/javascript'}));
 await p.route('https://fonts.googleapis.com/**',r=>r.fulfill({body:'',contentType:'text/css'}));
-await p.goto('file://'+require('path').resolve(__dirname,'../index.html'));await p.waitForTimeout(1000);
+await p.goto('file://'+require('path').resolve(__dirname,'../game/index.html'));await p.waitForTimeout(1000);
 await p.click('#diffSeg button:nth-child(4)');await p.click('#next1');await p.waitForTimeout(200);await p.click('#go');await p.waitForTimeout(800);
 const keys=await p.evaluate(()=>Object.keys(FLOORS));const shots=process.argv.slice(2);
 for(const k of keys){await p.evaluate(k=>{S.view=k;},k);await p.waitForTimeout(350);

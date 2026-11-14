@@ -44,11 +44,14 @@ a='<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.j
 assert out.count(a)==1
 out=out.replace(a,'<script>/* three.js r128 (MIT) 內嵌 */\n'+three+'\n</script>')
 assert 'cdnjs' not in out and 'googleapis' not in out
-# 7. 輸出：repo 首頁（3D，附 2D 連結）、2d/index.html（2D，附 3D 連結）
+# 7. 輸出：index.html（首頁）、game/index.html（3D）、2d/index.html（2D）、train/index.html（專業訓練）
 H='<p class="hint">一班大概 15 到 30 分鐘。下面選一選，按「下一步」。</p>'
 assert out.count(H)==1 and src.count(H)==1
-open(os.path.join(ROOT,'index.html'),'w',encoding='utf-8').write(out.replace(H,H[:-4]+'電腦比較舊、跑不動的話，可以改玩 <a href="2d/" style="color:var(--accent)">2D 版</a>。</p>'))
-open(os.path.join(ROOT,'2d','index.html'),'w',encoding='utf-8').write(open('head2d.html',encoding='utf-8').read()+src.replace(H,H[:-4]+'想看立體的醫院可以玩 <a href="../" style="color:var(--accent)">3D 版</a>。</p>'))
+for d in ('game','2d','train'): os.makedirs(os.path.join(ROOT,d),exist_ok=True)
+open(os.path.join(ROOT,'game','index.html'),'w',encoding='utf-8').write(out.replace(H,H[:-4]+'電腦比較舊、跑不動的話，可以改玩 <a href="../2d/" style="color:var(--accent)">2D 版</a>。<a href="../" style="color:var(--accent)">回首頁</a></p>'))
+open(os.path.join(ROOT,'index.html'),'w',encoding='utf-8').write(open('landing.html',encoding='utf-8').read())
+open(os.path.join(ROOT,'train','index.html'),'w',encoding='utf-8').write(open('train.html',encoding='utf-8').read())
+open(os.path.join(ROOT,'2d','index.html'),'w',encoding='utf-8').write(open('head2d.html',encoding='utf-8').read()+src.replace(H,H[:-4]+'想看立體的醫院可以玩 <a href="../game/" style="color:var(--accent)">3D 版</a>。<a href="../" style="color:var(--accent)">回首頁</a></p>'))
 # 選用：--plain 路徑，輸出不含 2D 連結的單檔 3D 版
 if '--plain' in sys.argv: open(sys.argv[sys.argv.index('--plain')+1],'w',encoding='utf-8').write(out)
 print('built',len(out))

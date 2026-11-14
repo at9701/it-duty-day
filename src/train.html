@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>資訊專業訓練</title>
+<style>
+/* 版面：上方總進度，下方領域卡片；作答時換成單一題目卡 */
+:root{--bg:#eaf0f4;--panel:#ffffff;--panel2:#f0f5f8;--line:#d2dde6;--fg:#1c2a36;--muted:#617384;--accent:#17a07a;--warn:#c9860c;--crit:#d6453d;--info:#2a7fd4;
+ --sans:"PingFang TC","Microsoft JhengHei","Noto Sans TC",system-ui,sans-serif;--mono:ui-monospace,"SF Mono",Consolas,"Courier New",monospace}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px;line-height:1.6;padding:20px max(16px,env(safe-area-inset-right,0px)) 60px max(16px,env(safe-area-inset-left,0px))}
+.wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+header{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+header h1{font-size:24px;margin:0;flex:1 1 200px}
+a.back{color:var(--muted);text-decoration:none;font-size:14px}a.back:hover{color:var(--fg)}
+.sum{display:flex;gap:10px;flex-wrap:wrap}
+.pill{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:4px 14px;font-size:14px;font-variant-numeric:tabular-nums}
+.pill b{color:var(--accent)}
+.lead{color:var(--muted);margin:0;max-width:62ch}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.dom{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:0 4px 14px rgba(28,42,54,.08)}
+.dom .top{display:flex;gap:12px;align-items:center}
+.dom .ic{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex:none}
+.dom h2{font-size:17px;margin:0}.dom p{margin:0;color:var(--muted);font-size:13px}
+.dom .rank{font-size:12px;color:var(--accent);font-weight:700}
+.lv{display:flex;gap:8px}
+.lv button{flex:1;min-width:0;border:1px solid var(--line);background:var(--panel2);color:var(--fg);border-radius:12px;padding:8px 4px;font:inherit;font-size:13px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+.lv button:hover:not(:disabled){border-color:var(--accent)}
+.lv button:disabled{opacity:.5;cursor:not-allowed}
+.lv button:focus-visible,.opt:focus-visible,.btn:focus-visible{outline:3px solid var(--info);outline-offset:2px}
+.stars{color:var(--warn);letter-spacing:2px;font-size:14px}.stars i{color:var(--line);font-style:normal}
+/* 作答 */
+#play{display:flex;flex-direction:column;gap:14px;max-width:720px;margin:0 auto;width:100%}
+.bar{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.bar .name{font-weight:700;flex:1 1 140px}
+.hearts{font-size:20px;letter-spacing:3px}.hearts i{font-style:normal;opacity:.2}
+.combo{font-weight:800;color:var(--warn);min-width:74px;text-align:right;font-variant-numeric:tabular-nums}
+.prog{height:8px;border-radius:4px;background:var(--line);overflow:hidden}.prog i{display:block;height:100%;background:var(--accent);transition:width .25s}
+.qcard{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 8px 24px rgba(28,42,54,.1);display:flex;flex-direction:column;gap:14px}
+.qno{color:var(--muted);font-size:13px}
+.q{font-size:18px;font-weight:700;margin:0;text-wrap:balance}
+pre{margin:0;background:#16212b;color:#d7e3ee;border-radius:10px;padding:12px 14px;font-family:var(--mono);font-size:13px;overflow-x:auto}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{text-align:left;border:2px solid var(--line);background:var(--panel2);color:var(--fg);border-radius:12px;padding:11px 14px;font:inherit;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--info)}
+.opt.right{border-color:var(--accent);background:#dcf3ea}.opt.wrong{border-color:var(--crit);background:#fbe6e3}.opt:disabled{cursor:default}
+.opt code,.q code,.why code{font-family:var(--mono);font-size:.92em;background:rgba(28,42,54,.08);border-radius:4px;padding:1px 5px}
+.why{border-left:5px solid var(--accent);background:var(--panel2);border-radius:8px;padding:10px 14px}
+.why.bad{border-color:var(--crit)}.why b{display:block;margin-bottom:2px}
+.btn{border:0;background:var(--accent);color:#fff;font:inherit;font-weight:700;border-radius:12px;padding:11px 20px;cursor:pointer;align-self:flex-start}
+.btn.ghost{background:var(--panel2);color:var(--fg);border:1px solid var(--line)}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.big{font-size:44px;color:var(--warn);letter-spacing:8px;line-height:1}.big i{color:var(--line);font-style:normal}
+.miss{border-top:1px solid var(--line);padding-top:10px}.miss small{color:var(--muted);display:block}
+@keyframes pop{0%{transform:scale(.96)}60%{transform:scale(1.02)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.qcard.ok{animation:pop .25s}.qcard.ng{animation:shake .25s}
+@media (prefers-reduced-motion:reduce){.qcard.ok,.qcard.ng{animation:none}.prog i{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <header><a class="back" href="../">← 回首頁</a><h1>資訊專業訓練</h1><div class="sum"><span class="pill">星星 <b id="sStar">0</b></span><span class="pill">總分 <b id="sScore">0</b></span><button class="btn ghost" id="snd" style="padding:4px 12px;border-radius:999px" aria-label="音效開關">🔊</button></div></header>
+ <div id="hub" style="display:flex;flex-direction:column;gap:18px">
+  <p class="lead">每個領域三關：新手、熟手、專家。一關 8 題，有三條命，連續答對有加分。過關拿星星，兩顆星以上解鎖下一關。進度存在這台電腦的瀏覽器裡。</p>
+  <div class="grid" id="grid"></div>
+ </div>
+ <div id="play" hidden></div>
+</div>
+<script>
+// ===== 題庫：每題 {q 題目, code 可省略, a 四個選項（第一個是正確答案，出題時會打亂）, why 解說} =====
+const DOMAINS=[
+{id:'trouble',ic:'🛠️',col:'#dcf3ea',name:'電腦異常排除',desc:'現場報修的判斷順序：先問、先分、再動手',ranks:['報修見習','現場工程員','排除高手'],lv:[[
+ {q:'使用者只說「電腦開不了機」。你第一件事該確認什麼？',a:['電源燈有沒有亮、按了有沒有任何反應，分清楚是沒電、沒畫面還是進不了系統','不用問太多，直接幫他把作業系統重灌一次，重灌完大部分的問題都會消失','先把主機板換掉，開不了機最常見就是主機板壞','進 BIOS 把韌體更新到最新版本再說'],why:'「開不了機」可能是三種完全不同的狀況，先分清楚才知道往哪查。'},
+ {q:'主機有電、風扇在轉，但螢幕完全沒畫面。最先檢查哪裡？',a:['螢幕的電源、訊號線有沒有鬆，輸入來源有沒有切對','把硬碟拆下來換一顆新的','把作業系統整個重灌一次','電源可能不夠力，換一顆瓦數更大的電源供應器'],why:'沒畫面最常見的原因是線鬆了或輸入來源切錯，先查最簡單、最便宜的。'},
+ {q:'開機後畫面顯示 <code>No bootable device</code>，最可能的方向是？',a:['開機磁碟沒有被偵測到，或 BIOS 的開機順序設錯','記憶體容量不夠，系統載入不了','顯示卡驅動程式版本太舊','網路線沒有接好，電腦抓不到開機需要的資訊'],why:'這個訊息代表找不到可以開機的磁碟：先看 BIOS 有沒有認到硬碟、開機順序對不對。'},
+ {q:'排除問題時，為什麼要「一次只改一個地方」？',a:['這樣才能確定是哪一個改動讓問題消失或出現','因為一次改太多設定，會讓電腦變得比較耗電','因為公司規定每次只能改一項設定','因為這樣做整體速度會比較快'],why:'同時改好幾樣，就算好了也不知道是哪一樣造成的，下次遇到還是不會。'},
+ {q:'使用者說電腦突然變得很慢。你先看什麼？',a:['開工作管理員，看 CPU、記憶體、磁碟哪個被佔滿，是哪個程式','直接申請加裝記憶體，電腦變慢通常都是因為記憶體不夠用','直接重灌，重灌完一定會變快','換一條新的網路線試試看'],why:'先看是什麼資源被吃光、被誰吃光，再決定怎麼處理。'},
+ {q:'使用者說「昨天還好好的」。最有用的追問是哪一句？',a:['從昨天到現在，有沒有裝過、改過、搬動過什麼東西？','這台電腦當初是哪一年買的？','你登入的密碼是多少？','你們單位總共有幾個人在用電腦，平常都用來做什麼？'],why:'昨天正常、今天不正常，中間的變動就是最大的線索。'},
+ {q:'電腦出現藍底白字的當機畫面（BSOD）。處理前應該先記下什麼？',a:['畫面上的停止代碼，以及當機前正在做什麼','螢幕的廠牌和型號','鍵盤和滑鼠是有線的還是無線的','電腦主機外殼的顏色'],why:'停止代碼可以直接查到方向（驅動、記憶體、磁碟…），當機前的動作可以重現問題。'},
+ {q:'問題處理完了。結案前最重要的一步是？',a:['請使用者實際操作一次確認正常，並把原因和處理方式記下來','趁使用者還沒發現其他問題之前趕快離開，免得被留下來','提醒使用者下次不要再打電話來','把電腦連續重開三次確保穩定'],why:'使用者確認才算修好；原因寫下來，下次自己或同事遇到就不用重查。'},
+]]},
+{id:'hw',ic:'🖥️',col:'#e3ecf8',name:'硬體',desc:'主機裡有什麼、壞掉會怎樣、怎麼安全地動它',ranks:['硬體見習','維修員','硬體達人'],lv:[[
+ {q:'關於記憶體（RAM），下列哪一個敘述正確？',a:['斷電之後，裡面的資料就會消失','斷電之後資料仍然會保留','只能讀取，不能寫入','主要用來長期保存檔案'],why:'RAM 是揮發性儲存，只在通電時暫存運作中的資料。'},
+ {q:'SSD 相對於傳統硬碟（HDD），最主要的優點是？',a:['沒有機械結構，隨機讀寫快，也比較耐震','同樣價格下容量一定比較大','每 GB 的價格一定比較便宜','使用壽命無限，不會損壞'],why:'SSD 沒有碟片和讀寫頭，所以快、安靜、耐震，但每 GB 通常比較貴，也有寫入壽命。'},
+ {q:'開機時主機連續嗶嗶叫，而且沒有畫面。通常先檢查什麼？',a:['記憶體有沒有插好，或是不是壞了','鍵盤有沒有接上','主機喇叭的音量是不是調太大','網路卡的燈有沒有亮'],why:'連續嗶聲是主機板的自我檢測警告，最常見是記憶體接觸不良。'},
+ {q:'RAID 1 的作用是什麼？',a:['兩顆磁碟互為鏡像，一顆壞掉資料還在','把資料拆開寫入加快速度，但沒有備援','自動壓縮資料節省空間','把整顆磁碟的內容加密'],why:'RAID 1 是鏡像；加快速度但沒有備援的是 RAID 0。'},
+ {q:'RAID 5 最少需要幾顆磁碟？最多可以壞幾顆而資料不遺失？',a:['最少 3 顆，可以壞 1 顆','最少 2 顆，可以壞 1 顆','最少 4 顆，可以壞 2 顆','最少 3 顆，可以壞 2 顆'],why:'RAID 5 用一顆磁碟的容量存同位元資料，所以最少 3 顆、容許壞 1 顆。可壞 2 顆的是 RAID 6。'},
+ {q:'不斷電系統（UPS）的主要用途是？',a:['停電時撐一小段時間，讓設備正常關機或等發電機接手','提升網路的傳輸速度，讓伺服器的回應變得比較快','降低機房的溫度','攔截病毒和惡意程式'],why:'UPS 靠電池供電，只能撐幾分鐘到幾十分鐘，重點是爭取時間。'},
+ {q:'要打開主機更換零件之前，應該先做什麼？',a:['關機、拔掉電源線，並先摸金屬釋放身上的靜電','讓電腦保持開機，更換時比較方便測試','只要戴上橡膠手套就可以直接動手','先把硬碟格式化避免資料外洩'],why:'帶電操作會燒零件，靜電也會打壞記憶體和主機板。'},
+ {q:'電腦用一陣子就自動關機，摸起來很燙。最常見的原因是？',a:['風扇或散熱片積滿灰塵，或散熱膏乾掉了','硬碟的容量太大','螢幕的亮度調得太高，連帶讓主機溫度上升','鍵盤有按鍵卡住'],why:'過熱保護會強制關機。清灰塵、確認風扇有轉、必要時重塗散熱膏。'},
+]]},
+{id:'sw',ic:'📦',col:'#fbf1d9',name:'軟體',desc:'安裝、驅動、更新、相容性和授權',ranks:['軟體見習','安裝員','軟體達人'],lv:[[
+ {q:'驅動程式（driver）是做什麼用的？',a:['讓作業系統能夠控制並使用硬體裝置','讓電腦上網和下載的速度變得比較快','偵測並清除電腦病毒','定期備份使用者的檔案'],why:'沒有正確的驅動，硬體接上去作業系統也不會用。'},
+ {q:'廠商定期釋出的軟體更新（修補程式），最主要的目的是？',a:['修正安全漏洞和程式錯誤','讓程式的圖示變得比較好看','增加硬碟可以使用的容量','降低電腦的耗電量'],why:'沒修補的漏洞是被入侵最常見的入口，所以更新要按時上。'},
+ {q:'程式安裝完打不開，訊息說缺少某個 DLL 或執行環境。先怎麼處理？',a:['安裝它需要的執行環境，例如 VC++ 可轉散發套件或 .NET','表示系統已經損壞，要把 Windows 整個重灌一次','換一台新的電腦再安裝','把防毒軟體關掉再開一次'],why:'很多程式依賴共用的執行環境，補裝對應版本就能執行。'},
+ {q:'在公司的電腦上安裝軟體，哪一個做法正確？',a:['只安裝經過核准、有合法授權、來源可信的軟體','網路上找得到安裝檔的就可以裝','試用版到期後，用破解的方式延長使用沒有關係','同事用隨身碟給的版本最快最方便'],why:'來路不明或盜版軟體是惡意程式的主要來源，也有法律責任。'},
+ {q:'Windows 的「相容模式」是用來做什麼的？',a:['讓舊版程式用舊版 Windows 的方式執行','加快電腦的開機速度','讓筆電的電池撐比較久','切換作業系統和程式的顯示語言'],why:'有些老程式在新版 Windows 跑不起來，可以先試相容模式。'},
+ {q:'用瀏覽器開內部系統，畫面顯示怪怪的，但別人的電腦正常。先試什麼？',a:['清除快取，或用無痕視窗開一次，看是不是快取或擴充套件造成','把作業系統重灌','換一台解析度比較高、尺寸比較大的螢幕再試','換一條新的網路線'],why:'無痕視窗不帶快取和擴充套件，能很快分出是不是瀏覽器本身的問題。'},
+ {q:'32 位元和 64 位元作業系統，最主要的差別是？',a:['64 位元可以使用超過 4GB 的記憶體','64 位元的系統耗電量比較低','32 位元的安全性比較高','兩者在功能上沒有任何差別'],why:'32 位元的定址空間只有 4GB，裝再多記憶體也用不到。'},
+ {q:'「開源軟體」（open source）指的是？',a:['原始碼公開，依照授權條款可以使用和修改','一定免費，而且使用上沒有任何限制','沒有著作權，任何人都可以佔為己有','只能個人使用，不可以用在商業用途'],why:'開源仍然有著作權和授權條款（GPL、MIT…），用之前要看清楚條款。'},
+]]},
+{id:'net',ic:'🌐',col:'#dcefff',name:'網路',desc:'IP、DNS、DHCP、交換器和基本排錯',ranks:['網路見習','網路值班','網路負責人'],lv:[[
+ {q:'IP 位址寫成 <code>192.168.1.10/24</code>，它的子網路遮罩是？',a:['255.255.255.0','255.255.0.0','255.0.0.0','255.255.255.255'],why:'/24 代表前 24 個位元是網路位址，也就是 255.255.255.0。'},
+ {q:'DNS 的功能是什麼？',a:['把網域名稱轉換成 IP 位址','自動分配 IP 位址給電腦','把傳輸的資料加密','過濾網路上的病毒'],why:'電腦靠 IP 連線，人記名稱，DNS 負責中間的翻譯。'},
+ {q:'DHCP 的功能是什麼？',a:['自動分配 IP、遮罩、閘道、DNS 給設備','把使用者輸入的網域名稱解析成 IP 位址','決定封包要往哪一條路送','阻擋外部不明的連線'],why:'沒有 DHCP 的話，每台設備都要手動設定網路參數。'},
+ {q:'電腦的 IP 變成 <code>169.254.x.x</code>，代表什麼？',a:['沒有從 DHCP 拿到位址，系統自己給了一個','一切正常，這是公司內部網路常用的私有網段','這台電腦被防火牆封鎖了','DNS 伺服器故障了'],why:'169.254.0.0/16 是 APIPA：要不到 DHCP 時自動產生的位址，通常代表線路或 DHCP 有問題。'},
+ {q:'用 IP 可以 ping 到伺服器，但用名稱就連不上。最可能是哪裡的問題？',a:['DNS 解析有問題','網路線接觸不良','交換器整台故障','預設閘道設定錯誤'],why:'IP 通代表線路和路由沒事，只有名稱不通就是名稱解析的問題。'},
+ {q:'交換器（switch）主要是依據什麼來轉送資料？',a:['MAC 位址','IP 位址','連接埠號碼','網域名稱'],why:'一般交換器工作在第二層，靠 MAC 位址表決定從哪個埠送出。'},
+ {q:'「預設閘道」（default gateway）的作用是？',a:['把要送到其他網段的封包轉送出去','把網域名稱轉換成 IP 位址','自動發放 IP 位址給電腦','把封包內容加密'],why:'同網段直接送；不同網段的封包都交給預設閘道。閘道設錯會變成只能連同網段。'},
+ {q:'HTTPS 預設使用哪一個連接埠？',a:['TCP 443','TCP 80','TCP 22','TCP 3389'],why:'80 是 HTTP、22 是 SSH、3389 是遠端桌面。'},
+]]},
+{id:'sec',ic:'🛡️',col:'#fbe6e3',name:'資訊安全',desc:'基本觀念、常見攻擊，以及遇到事情的第一步',ranks:['資安見習','資安值班','資安守門員'],lv:[[
+ {q:'資訊安全的三個基本要素（CIA）是？',a:['機密性、完整性、可用性','控制性、識別性、稽核性','加密、身分、授權','成本、效益、風險'],why:'Confidentiality、Integrity、Availability：不外洩、不被竄改、要用的時候用得到。'},
+ {q:'收到一封信說「帳號異常，請立即點連結重設密碼」。應該怎麼做？',a:['不點連結，自己從官方管道登入確認，並通報資訊單位','馬上點連結把密碼改掉比較安全','先轉寄給其他同事，問他們有沒有收到一樣的信再決定','直接回信問寄件人是不是真的'],why:'這是典型的釣魚信。不點、不回、通報；轉寄會讓更多人中招。'},
+ {q:'「多因素驗證」（MFA）指的是？',a:['用兩種以上不同類型的方式驗證身分，例如密碼加手機','設定兩組不同的密碼，登入時兩組都要輸入才能通過','使用一組非常長的密碼','規定每天都要更換一次密碼'],why:'因素分三類：你知道的、你持有的、你本身的。兩組密碼都屬於同一類，不算多因素。'},
+ {q:'懷疑電腦中了勒索軟體。第一步應該做什麼？',a:['馬上斷開網路，不要關機，然後通報資安人員','依照畫面上的指示先付贖金，把檔案救回來再說','把電腦重新開機看會不會恢復','先把手上的工作做完再處理'],why:'斷網是為了不要擴散到別台；不關機是為了保留記憶體裡的證據。'},
+ {q:'「最小權限原則」是什麼意思？',a:['只給完成工作所需要的最低權限','為了方便，每個人都給管理員權限','權限給得越多，工作效率越高','只有主管才可以擁有系統權限'],why:'權限越大，帳號被盜時的損害越大。'},
+ {q:'弱點掃描和滲透測試，差別在哪裡？',a:['掃描是工具自動找已知弱點；滲透測試是人實際嘗試入侵來驗證','兩個是同一件事的不同說法','弱點掃描一定會真的入侵系統；滲透測試只是看報告','滲透測試不需要事先取得授權'],why:'兩者都要授權。掃描廣而淺，滲透測試深而有針對性。'},
+ {q:'「社交工程」是什麼？',a:['利用人的信任、恐懼或好奇，騙取資料或讓人做出某些操作','一種把資料加密的技術','在社群網站上經營帳號、吸引人點擊的行銷方法','一種防火牆的規則設定'],why:'攻擊的對象是人，不是系統，所以技術再好也擋不住，要靠訓練和流程。'},
+ {q:'備份的「3-2-1 原則」是指？',a:['3 份資料、2 種不同的儲存媒體、1 份放在異地','每 3 天備份 2 次，保留 1 個月','3 個人保管 2 把鑰匙，開 1 個機櫃','3 台伺服器、2 條線路、1 台 UPS'],why:'避免單一故障或單一地點的災害讓所有備份一起消失。'},
+]]},
+{id:'win',ic:'🪟',col:'#e3ecf8',name:'Windows 系統',desc:'常用指令、網域、群組原則和事件紀錄',ranks:['Windows 見習','系統值班','網域管理員'],lv:[[
+ {q:'要查看這台電腦完整的 IP 設定（含 DNS、MAC），用哪個指令？',a:['ipconfig /all','ping -t','nslookup','tasklist'],why:'<code>ipconfig /all</code> 會列出每張網卡的 IP、遮罩、閘道、DNS、MAC。'},
+ {q:'電腦加入網域後，使用者登入時，帳號密碼是由誰驗證？',a:['網域控制站（Active Directory）','這台電腦本機的帳號資料庫（SAM）','DNS 伺服器','DHCP 伺服器'],why:'網域帳號集中在 AD，由網域控制站負責驗證。'},
+ {q:'群組原則（GPO）是用來做什麼的？',a:['集中對網域內的電腦和使用者套用設定和限制','定期備份網域內所有電腦和使用者的檔案','掃描並清除電腦上的病毒','遠端連線操作使用者的桌面'],why:'例如密碼規則、禁用 USB、桌布、軟體派送，都可以用 GPO 一次套用。'},
+ {q:'改了群組原則之後，想讓這台電腦立刻重新套用。用哪個指令？',a:['gpupdate /force','gpresult /r','sfc /scannow','chkdsk /f'],why:'<code>gpresult /r</code> 是查看目前套用了哪些原則，不是重新套用。'},
+ {q:'要查 Windows 的系統錯誤、服務啟動失敗的紀錄，應該看哪裡？',a:['事件檢視器（Event Viewer）','記事本','小畫家','控制台裡的「程式和功能」'],why:'系統、應用程式、安全性的紀錄都在事件檢視器。'},
+ {q:'<code>sfc /scannow</code> 這個指令的用途是？',a:['檢查並修復受損的 Windows 系統檔案','重組磁碟裡的檔案','掃描整台電腦有沒有病毒和惡意程式','釋放被佔用的記憶體'],why:'System File Checker：系統檔案被改壞或遺失時用它修。'},
+ {q:'遠端桌面（RDP）預設使用哪一個連接埠？',a:['TCP 3389','TCP 22','TCP 445','TCP 5900'],why:'22 是 SSH、445 是 SMB 檔案共用、5900 是 VNC。3389 不應該直接對網際網路開放。'},
+ {q:'一個共用資料夾同時設了「共用權限」和「NTFS 權限」。使用者從網路連進來時，實際的權限是？',a:['兩者之中比較嚴格的那一個','兩者之中比較寬鬆的那一個','只看共用權限','只看 NTFS 權限'],why:'兩層都要通過，所以取交集，也就是較嚴格的結果。'},
+]]},
+{id:'linux',ic:'🐧',col:'#dcf3ea',name:'Linux 系統',desc:'檔案、權限、服務、紀錄和常用指令',ranks:['Linux 見習','系統值班','Linux 管理員'],lv:[[
+ {q:'要列出目前目錄下所有檔案（含隱藏檔）和詳細資訊，用哪個指令？',a:['ls -la','ls -h','dir /a','cat .'],why:'<code>-l</code> 顯示詳細資訊，<code>-a</code> 連同以 . 開頭的隱藏檔一起列出。'},
+ {q:'<code>chmod 755 run.sh</code> 設定之後，權限是？',a:['擁有者可以讀、寫、執行；群組和其他人可以讀和執行','所有人都可以讀、寫、執行','只有擁有者可以讀和寫；群組和其他人完全不能存取','所有人都只能讀取'],why:'7=rwx、5=r-x、5=r-x，三個數字依序是擁有者、群組、其他人。'},
+ {q:'要持續看一個正在增加內容的 log 檔，用哪個指令？',a:['tail -f /var/log/syslog','head -n 10 /var/log/syslog','cat /var/log/syslog','touch /var/log/syslog'],why:'<code>tail -f</code> 會停在檔尾，有新內容就即時顯示。'},
+ {q:'在使用 systemd 的系統上，要重新啟動 nginx 服務，用哪個指令？',a:['systemctl restart nginx','nginx --reboot','kill nginx','service nginx open'],why:'啟動、停止、重啟、看狀態分別是 <code>systemctl start / stop / restart / status</code>。'},
+ {q:'要看各個磁碟分割區還剩多少空間，用哪個指令？',a:['df -h','free -h','lsblk','uname -a'],why:'<code>df -h</code> 看磁碟空間；<code>free -h</code> 是看記憶體。'},
+ {q:'<code>sudo</code> 的作用是什麼？',a:['用其他使用者（預設是 root）的權限執行一個指令','切換到另一個使用者的家目錄，之後都在那裡工作','把系統關機','安裝作業系統'],why:'平常用一般帳號，需要時才用 sudo 提權，而且會留下紀錄。'},
+ {q:'要在 app.log 裡找出含有 error 的行，用哪個指令？',a:['grep error app.log','find error app.log','ls error app.log','cd error app.log'],why:'<code>grep</code> 搜尋檔案內容；<code>find</code> 是依檔名、時間等條件找檔案。'},
+ {q:'要即時看哪個程序吃掉最多 CPU，用哪個指令？',a:['top','pwd','whoami','uname'],why:'<code>top</code>（或 htop）會即時列出各程序的 CPU、記憶體用量。'},
+]]},
+{id:'db',ic:'🗄️',col:'#f0e6fa',name:'資料庫',desc:'SQL 基礎、交易、索引、備份和安全',ranks:['資料庫見習','資料管理員','DBA'],lv:[[
+ {q:'關於主鍵（Primary Key），哪一個敘述正確？',a:['值必須唯一，而且不能是 NULL','值可以重複，但不能是 NULL','值必須唯一，但可以是 NULL','同一張表可以設定很多個主鍵'],why:'主鍵用來唯一識別每一筆資料。一張表只有一個主鍵（可以由多個欄位組成）。'},
+ {q:'要從 patients 資料表取出 age 大於 65 的資料，哪一句 SQL 正確？',a:['SELECT * FROM patients WHERE age > 65;','SELECT patients WHERE age > 65;','GET * FROM patients IF age > 65;','FIND patients HAVING age > 65;'],why:'基本語法是 SELECT 欄位 FROM 資料表 WHERE 條件。'},
+ {q:'執行 UPDATE 或 DELETE 之前，最重要的檢查是？',a:['確認有 WHERE 條件，並先用 SELECT 看會影響幾筆','先把資料庫主機重開機','先把其他使用者全部踢下線','不需要特別檢查，萬一執行錯了再用另一句 SQL 改回來'],why:'沒有 WHERE 的 UPDATE／DELETE 會動到整張表，這是最常見的資料事故。'},
+ {q:'交易（Transaction）的 ACID 特性中，A 代表什麼？',a:['原子性：全部成功，或全部不做','可用性：系統隨時可以使用','授權：只有授權的人可以執行','自動化：系統會自動執行'],why:'Atomicity。另外三個是一致性、隔離性、持久性。'},
+ {q:'在欄位上建立索引（Index），效果和代價是？',a:['查詢變快，但寫入變慢，也多佔空間','寫入變快，但查詢變慢，佔用空間減少','自動把資料壓縮','自動把資料加密'],why:'索引像書的目錄：找得快，但每次新增修改都要一起維護。'},
+ {q:'要把兩張資料表依照關聯欄位合起來查詢，用哪一個語法？',a:['JOIN','UNION','GROUP BY','ORDER BY'],why:'JOIN 是依欄位把兩張表的資料列對起來；UNION 是把兩個查詢結果上下接起來。'},
+ {q:'防範 SQL Injection 最有效的做法是？',a:['使用參數化查詢，不要把使用者輸入直接串成 SQL','把資料庫的錯誤訊息隱藏起來','網站改用 HTTPS 連線','把資料庫的連接埠改成別的號碼，讓外面找不到'],why:'參數化查詢讓輸入只會被當成資料，不會被當成指令執行。'},
+ {q:'平常做「完整備份＋差異備份」。要還原到最新狀態，需要哪些備份？',a:['最近一次完整備份，加上最近一次差異備份','最近一次完整備份，加上之後每一次差異備份','只需要最近一次差異備份','只需要最近一次完整備份'],why:'差異備份記錄的是「上次完整備份之後的所有變動」，所以只要最新一份。每一份都要的是增量備份。'},
+]]},
+{id:'med',ic:'🏥',col:'#fbe6e3',name:'醫療資訊系統',desc:'HIS、PACS、LIS，以及醫院特有的規則',ranks:['醫資見習','醫資工程員','醫資專家'],lv:[[
+ {q:'HIS 指的是什麼？',a:['醫療資訊系統，處理掛號、醫囑、批價等院內作業','醫療影像儲存與傳輸系統','檢驗資訊系統','人事薪資系統，處理員工的出勤、排班和薪水'],why:'Hospital Information System，是醫院運作的核心系統。'},
+ {q:'PACS 指的是什麼？',a:['醫療影像儲存與傳輸系統','藥局的調劑與給藥系統','門診的掛號系統','醫院的會計系統'],why:'Picture Archiving and Communication System，X 光、CT、MRI 的影像都存在這裡。'},
+ {q:'DICOM 是什麼？',a:['醫療影像的檔案格式和傳輸標準','檢驗數據的單位和換算標準','健保費用的申報格式','紙本病歷的歸檔規則'],why:'影像儀器和 PACS 之間靠 DICOM 溝通，設定時會用到 AE Title、IP、Port。'},
+ {q:'HL7 和 FHIR 主要是用來做什麼？',a:['讓不同的醫療系統之間交換資料的標準','壓縮醫療影像檔案的演算法','加密網路傳輸的協定','醫療儀器的電源規格'],why:'例如 HIS 把醫囑傳給 LIS、LIS 把報告傳回 HIS。'},
+ {q:'LIS 指的是什麼？',a:['檢驗資訊系統','放射資訊系統','護理資訊系統','藥品庫存系統'],why:'Laboratory Information System。放射資訊系統是 RIS。'},
+ {q:'醫療儀器旁邊附的那台電腦，資訊人員可以自己更新或安裝軟體嗎？',a:['不行，它是醫材的一部分，要先經過原廠和醫工確認','可以，它就是一般的電腦，照院內規定更新就好','只要有裝防毒軟體就可以','只要在下班時間做就可以'],why:'醫材附屬電腦自行更動可能讓儀器異常，也會影響保固和醫材許可。'},
+ {q:'電子病歷在法規上最重要的要求是？',a:['能確認是誰、在什麼時間製作，而且內容不能被竄改','畫面必須是彩色顯示','每一筆紀錄都要列印成紙本，簽名後存查','必須存放在雲端'],why:'所以需要電子簽章、時戳和完整的存取稽核紀錄。'},
+ {q:'HIS 當機時，臨床單位應該依據什麼繼續作業？',a:['事先訂好的停機應變程序（紙本作業）','先等資訊室把系統修好，再繼續作業','暫停所有看診和治療','各單位自己想辦法'],why:'醫療不能停。停機應變程序要事先訂好、定期演練，系統恢復後再補登。'},
+]]},
+{id:'gov',ic:'📜',col:'#fbf1d9',name:'法規與治理',desc:'資安法、個資法、ISO 27001 和稽核',ranks:['法遵見習','受稽人員','治理推手'],lv:[[
+ {q:'《資通安全管理法》規範的對象包含哪些？',a:['公務機關和特定非公務機關','只有中央政府機關','只有金融業者','所有在國內使用電腦的個人'],why:'特定非公務機關包含關鍵基礎設施提供者、公營事業、政府捐助的財團法人。'},
+ {q:'依資通安全事件通報及應變辦法，知道發生資安事件後，要在多久之內通報？',a:['1 小時內','24 小時內','72 小時內','一個星期內'],why:'知悉後一小時內要完成通報，所以值班人員要知道通報的流程和窗口。'},
+ {q:'在《個人資料保護法》中，病歷、醫療、基因、健康檢查這類資料屬於？',a:['特種個人資料，原則上不得蒐集、處理或利用','一般個人資料，取得當事人口頭同意就可以使用','已經公開的資料','不屬於個人資料'],why:'個資法第 6 條。除非符合法定例外（例如醫療目的、當事人書面同意），否則不能用。'},
+ {q:'ISO 27001 是什麼的標準？',a:['資訊安全管理系統（ISMS）','品質管理系統','環境管理系統','醫療器材品質管理系統'],why:'品質是 ISO 9001、環境是 ISO 14001、醫療器材是 ISO 13485。'},
+ {q:'評估出一項風險之後，處理的方式有哪四種？',a:['降低、移轉、避免、接受','忽略、隱藏、刪除、否認','記錄、通報、開會、結案','加密、備份、防毒、更新'],why:'降低（加控制措施）、移轉（保險或委外）、避免（不做那件事）、接受（主管核可後承擔）。'},
+ {q:'稽核時被問到一項還沒有做到的要求，應該怎麼回應？',a:['如實說明現況，並提出改善計畫和預計完成時間','先回答有做，稽核結束之後再想辦法補上','當場趕快補一份文件出來','說那是其他單位負責的'],why:'稽核看的是管理是否有效。隱瞞被查到會變成更嚴重的缺失。'},
+ {q:'我國的資通安全事件分成幾級？哪一級最嚴重？',a:['分成四級，第四級最嚴重','分成三級，第一級最嚴重','分成五級，第五級最嚴重','分成四級，第一級最嚴重'],why:'依機密性、完整性、可用性受影響的程度分一到四級，數字越大越嚴重。'},
+ {q:'帳號和存取權限為什麼要定期清查？',a:['人員調動或離職後，常會留下不該有的權限','清查之後系統的負載降低，跑得比較快','可以節省軟體授權費用','只是為了應付稽核'],why:'沒收回的權限是內部風險和入侵後擴散的常見來源。'},
+]]},
+];
+// ===== 存檔 =====
+const KEY='ittrain_v1';let SAVE={};try{SAVE=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(SAVE))}catch(e){}};
+const rec=(d,l)=>(SAVE[d]&&SAVE[d][l])||{stars:0,best:0};
+const LVN=['新手','熟手','專家'];
+// ===== 音效 =====
+let AC=null,mute=false;try{mute=localStorage.getItem('itduty_mute')==='1'}catch(e){}
+const sndB=document.getElementById('snd');const sndUI=()=>{sndB.textContent=mute?'🔇':'🔊'};sndUI();sndB.onclick=()=>{mute=!mute;try{localStorage.setItem('itduty_mute',mute?'1':'0')}catch(e){}sndUI();};
+addEventListener('pointerdown',()=>{if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}else if(AC.state==='suspended')AC.resume();},true);
+function tone(f,t0,d,type,v){if(mute||!AC||AC.state!=='running')return;const o=AC.createOscillator(),g=AC.createGain();o.type=type||'sine';o.frequency.value=f;const t=AC.currentTime+t0;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v||.12,t+.015);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d+.03);}
+const sfx={good:()=>{tone(660,0,.1);tone(990,.09,.16);},bad:()=>{tone(300,0,.18,'sawtooth',.07);tone(210,.15,.26,'sawtooth',.07);},win:()=>{[523,659,784,1047].forEach((f,i)=>tone(f,i*.11,.2));},lose:()=>{[392,330,262].forEach((f,i)=>tone(f,i*.16,.28,'triangle'));}};
+// ===== 首頁 =====
+const $=id=>document.getElementById(id);const hub=$('hub'),play=$('play');
+const starsHTML=n=>'<span class="stars">'+'★'.repeat(n)+'<i>'+'★'.repeat(3-n)+'</i></span>';
+function renderHub(){let ts=0,sc=0;const grid=$('grid');grid.innerHTML='';
+ DOMAINS.forEach(d=>{let got=0;const card=document.createElement('div');card.className='dom';
+  const lvB=[0,1,2].map(l=>{const r=rec(d.id,l);got+=r.stars;ts+=r.stars;sc+=r.best;const has=!!d.lv[l];const open=l===0||rec(d.id,l-1).stars>=2;
+   return '<button data-l="'+l+'" '+(has&&open?'':'disabled')+' aria-label="'+d.name+' '+LVN[l]+'">'+LVN[l]+(has?(open?starsHTML(r.stars):'<span style="font-size:12px;color:var(--muted)">🔒 前一關兩顆星</span>'):'<span style="font-size:12px;color:var(--muted)">製作中</span>')+'</button>';}).join('');
+  const rk=got>=7?d.ranks[2]:got>=4?d.ranks[1]:got>=2?d.ranks[0]:'';
+  card.innerHTML='<div class="top"><span class="ic" style="background:'+d.col+'">'+d.ic+'</span><div style="min-width:0"><h2>'+d.name+'</h2>'+(rk?'<span class="rank">稱號：'+rk+'</span>':'')+'</div></div><p>'+d.desc+'</p><div class="lv">'+lvB+'</div>';
+  card.querySelectorAll('button').forEach(b=>b.onclick=()=>start(d,+b.dataset.l));grid.appendChild(card);});
+ $('sStar').textContent=ts+'／'+DOMAINS.length*9;$('sScore').textContent=sc.toLocaleString();}
+// ===== 作答 =====
+const shuf=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
+let G=null;
+function start(d,l){G={d,l,qs:shuf(d.lv[l]),i:0,lives:3,combo:0,score:0,right:0,miss:[]};hub.hidden=true;hub.style.display='none';play.hidden=false;ask();scrollTo(0,0);}
+function ask(){const g=G,q=g.qs[g.i];const opts=shuf(q.a.map((t,k)=>({t,ok:k===0})));
+ play.innerHTML='<div class="bar"><span class="name">'+g.d.ic+' '+g.d.name+'・'+LVN[g.l]+'</span><span class="hearts" aria-label="剩 '+g.lives+' 條命">'+'❤️'.repeat(g.lives)+'<i>'+'❤️'.repeat(3-g.lives)+'</i></span><span class="combo">'+(g.combo>=2?'連對 ×'+g.combo:'')+'</span></div><div class="prog"><i style="width:'+(g.i/g.qs.length*100)+'%"></i></div>'+
+  '<div class="qcard" id="qc"><span class="qno">第 '+(g.i+1)+'／'+g.qs.length+' 題　分數 '+g.score.toLocaleString()+'</span><p class="q">'+q.q+'</p>'+(q.code?'<pre>'+q.code+'</pre>':'')+'<div class="opts" id="opts"></div><div id="fb"></div></div>';
+ const box=$('opts');opts.forEach(o=>{const b=document.createElement('button');b.className='opt';b.innerHTML=o.t.replace(/&(?!amp;|lt;|gt;)/g,'&amp;');b.onclick=()=>answer(o,b,opts,q);box.appendChild(b);});}
+function answer(o,btn,opts,q){const g=G;[...$('opts').children].forEach((b,k)=>{b.disabled=true;if(opts[k].ok)b.classList.add('right');});const qc=$('qc');
+ if(o.ok){g.combo++;g.right++;const mul=g.combo>=6?2:g.combo>=4?1.5:g.combo>=2?1.2:1;g.score+=Math.round(100*mul);qc.classList.add('ok');sfx.good();}
+ else{btn.classList.add('wrong');g.combo=0;g.lives--;g.miss.push(q);qc.classList.add('ng');sfx.bad();}
+ const last=g.i===g.qs.length-1||g.lives<=0;
+ $('fb').innerHTML='<div class="why'+(o.ok?'':' bad')+'"><b>'+(o.ok?'✔ 答對了':'✘ 答錯了，扣一條命')+'</b>'+q.why+'</div><button class="btn" id="nx" style="margin-top:12px">'+(last?'看結果':'下一題')+'</button>';
+ const nx=$('nx');nx.onclick=()=>{if(last)finish();else{g.i++;ask();scrollTo(0,0);}};nx.focus();}
+function finish(){const g=G,n=g.qs.length,dead=g.lives<=0;const stars=dead?0:g.right===n?3:g.right>=n-1?2:1;
+ SAVE[g.d.id]=SAVE[g.d.id]||{};const old=rec(g.d.id,g.l);SAVE[g.d.id][g.l]={stars:Math.max(old.stars,stars),best:Math.max(old.best,dead?0:g.score)};save();(dead?sfx.lose:sfx.win)();
+ const nextOpen=!dead&&stars>=2&&g.l<2&&g.d.lv[g.l+1];
+ play.innerHTML='<div class="qcard"><span class="qno">'+g.d.ic+' '+g.d.name+'・'+LVN[g.l]+'</span><p class="q">'+(dead?'三條命用完了，這關要重來':'過關！')+'</p><div class="big">'+'★'.repeat(stars)+'<i>'+'★'.repeat(3-stars)+'</i></div><div>答對 '+g.right+'／'+n+' 題　分數 '+g.score.toLocaleString()+(stars<2&&!dead?'　<span style="color:var(--muted)">兩顆星以上才會解鎖下一關</span>':'')+'</div>'+
+  (g.miss.length?'<div><b>答錯的題目</b>'+g.miss.map(q=>'<div class="miss">'+q.q+'<small>正確答案：'+q.a[0]+'</small><small>'+q.why+'</small></div>').join('')+'</div>':'')+
+  '<div class="row"><button class="btn" id="again">再打一次</button>'+(nextOpen?'<button class="btn" id="nextLv">挑戰'+LVN[g.l+1]+'關</button>':'')+'<button class="btn ghost" id="home">回領域列表</button></div></div>';
+ $('again').onclick=()=>start(g.d,g.l);if(nextOpen)$('nextLv').onclick=()=>start(g.d,g.l+1);$('home').onclick=()=>{play.hidden=true;hub.hidden=false;hub.style.display='flex';renderHub();scrollTo(0,0);};}
+renderHub();
+</script>
+</body>
+</html>

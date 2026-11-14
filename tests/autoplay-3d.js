@@ -4,7 +4,7 @@ const combos=process.argv.slice(2).map(s=>s.split(':'));// role:shift:diff
 for(const [role,shift,diff] of combos){const p=await b.newPage({viewport:{width:1280,height:760}});const errs=[];p.on('pageerror',e=>errs.push(e.message.slice(0,160)));p.on('console',m=>{if(m.type()==='error')errs.push('c:'+m.text().slice(0,160));});
  
  await p.route('https://fonts.googleapis.com/**',r=>r.fulfill({body:'',contentType:'text/css'}));
- const fs=require('fs');let html=fs.readFileSync(require('path').resolve(__dirname,'../index.html'),'utf8');html=html.replace("renderer.render(scene,camera);\n // fps","/*norender*/\n // fps");
+ const fs=require('fs');let html=fs.readFileSync(require('path').resolve(__dirname,'../game/index.html'),'utf8');html=html.replace("renderer.render(scene,camera);\n // fps","/*norender*/\n // fps");
  html=html.replace("function toast(s){","function toast(s){(window.__toasts=window.__toasts||[]).push(Math.round(S?S.time:0)+':'+s);");
  await p.route('file:///home/claude/ap.html',r=>r.fulfill({body:html,contentType:'text/html'}));await p.goto('file:///home/claude/ap.html');await p.waitForTimeout(800);
  await p.click(`#roleSeg button[data-r=${role}]`);await p.click(`#diffSeg button:nth-child(${diff})`);const sb=await p.$(`#shiftSeg button[data-k=${shift}]:not([hidden])`);if(sb)await sb.click();
