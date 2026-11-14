@@ -143,8 +143,8 @@ window.initVillage3D=function(api){
   box(2.2,.9,.5,0x33455c,0,.6,.7,g);{const e=box(2.2,.05,.52,B(rcH),0,1.07,.7,g);e.castShadow=false;}mon(g,.55,1.1,.7,0x16324a,Math.PI);
   cyl(.07,.07,2.6,0x4b5d75,-1.1,1.4,-.9,g,8);const sh=new THREE.Mesh(SHAPES[i%SHAPES.length](),new THREE.MeshBasicMaterial({color:rcH,wireframe:true}));sh.position.set(-1.1,3.3,-.9);g.add(sh);anim.push(t=>{sh.rotation.set(t*.5,t*.8+i,0);});
   const m=person(rcH,HAIR[(i+3)%HAIR.length]);sc.remove(m);m.position.set(0,.16,-.1);g.add(m);
-  const x=OX+lx,z=lz,sign=label([c.npc,c.name],'#ffffff','#1c2a36',3.3);sign.position.set(x,4.4,z);sc.add(sign);
-  blocks2.push([x,z,2.1]);stalls.push({c,x,z,a,m,mk:null,adv:true,my:5.6,fx:OX+Math.sin(a)*(RA-3),fz:Math.cos(a)*(RA-3)});});
+  const x=OX+lx,z=lz,sign=label([c.name,c.npc+'｜'+c.track],'#ffffff','#1c2a36',4.2);sign.position.set(x,4.5,z);sc.add(sign);
+  blocks2.push([x,z,2.1]);stalls.push({c,x,z,a,m,mk:null,adv:true,my:5.9,fx:OX+Math.sin(a)*(RA-3),fz:Math.cos(a)*(RA-3)});});
  // 電梯：中庭和大樓之間來回
  const lifts=[[9.5,9.5,'搭電梯到進階專科大樓'],[OX,10,'搭電梯回中庭']].map((q,k)=>{cyl(1.3,1.4,.14,0x33455c,q[0],.07,q[1],null,24);const o=new THREE.Mesh(new THREE.RingGeometry(1.05,1.22,32),B(0xf2c14e));o.rotation.x=-Math.PI/2;o.position.set(q[0],.16,q[1]);sc.add(o);
   const bm=new THREE.Mesh(new THREE.CylinderGeometry(1.05,1.05,3.2,24,1,true),new THREE.MeshBasicMaterial({color:0xf2c14e,transparent:true,opacity:.13,side:THREE.DoubleSide,depthWrite:false}));bm.position.set(q[0],1.7,q[1]);sc.add(bm);anim.push(t=>{bm.material.opacity=.1+Math.sin(t*2)*.05;});
