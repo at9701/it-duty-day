@@ -1,7 +1,7 @@
-// 3D 職訓中心：中庭周圍九間主題實習教室，後面是還沒開的進階專科大樓。WASD／方向鍵或點地板走路，靠近師傅按 E 說話。
+// 3D 職訓中心：中庭周圍九間主題實習教室，後面是還沒開的進階專科大樓。WASD／方向鍵或點地板走路，靠近師傅或電梯按 E 說話。
 window.initVillage3D=function(api){
  const host=document.getElementById('stage');host.className='v3d';
- host.innerHTML='<span class="how">WASD／方向鍵或點地板走路，靠近師傅按 E</span><button class="btn tip" id="v3tip" hidden></button>';
+ host.innerHTML='<span class="how">WASD／方向鍵或點地板走路，靠近師傅或電梯按 E</span><button class="btn tip" id="v3tip" hidden></button>';
  const tip=document.getElementById('v3tip');
  let R;try{R=new THREE.WebGLRenderer({antialias:true});}catch(e){host.className='';host.innerHTML='<p class="lead">這台電腦開不了 3D，請改用 2D 版。</p>';return;}
  R.setPixelRatio(Math.min(devicePixelRatio||1,2));R.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;
@@ -112,7 +112,7 @@ window.initVillage3D=function(api){
  const wins=[];for(let r=0;r<3;r++)for(let k=0;k<14;k++){if(r===0&&(k===6||k===7))continue;const on=(k*5+r*3)%7;wins.push(scr(sc,-15.6+k*2.4,2+r*2.5,-22.97,1.7,1.5,on<2?0x16283c:on<5?0x2f86b8:0x39d6ff));}
  anim.push(t=>{const k=Math.floor(t*1.5)%wins.length;wins[k].visible=Math.sin(t*9)>-.6;});
  box(3.8,3.3,.2,0x0f1a28,0,1.65,-22.95);[[0,3.35,3.9,.08],[-1.95,1.65,.08,3.4],[1.95,1.65,.08,3.4]].forEach(q=>scr(sc,q[0],q[1],-22.83,q[2],q[3],0xf2c14e));scr(sc,0,1.7,-22.83,.5,.6,0xf2c14e);
- {const l=label(['進階專科大樓','籌備中'],'#ffffff','#ffffff',6);l.position.set(0,10.9,-23);sc.add(l);}
+ {const l=label(['進階專科大樓','從中庭搭電梯'],'#ffffff','#ffffff',6);l.position.set(0,10.9,-23);sc.add(l);}
  [-2.6,2.6].forEach(x=>{box(.5,4,.5,0x33455c,x,2,21.5);const e=box(.12,4,.12,B(CY),x,2,21.78);e.castShadow=false;});box(5.9,.5,.5,0x33455c,0,4.1,21.5);{const e=box(5.9,.08,.08,B(CY),0,3.82,21.78);e.castShadow=false;}
  {const l=label(['資訊職訓中心'],'#ffffff','#ffffff',4.6);l.position.set(0,5.3,21.5);sc.add(l);}
  let sd=7;const rnd=()=>(sd=(sd*16807)%2147483647)/2147483647;
@@ -123,36 +123,59 @@ window.initVillage3D=function(api){
   else{const w=1.6+rnd()*2.4;box(w,h,w,0x1a2a40,x,h/2,z);const c=[CY,0x4fe08a,0xf2c14e,0xd0568a][i%4];for(let k=0;k<3;k++){const e=box(w+.04,.08,w+.04,B(c),x,h*(.3+k*.25),z);e.castShadow=false;const ph=rnd()*6;anim.push(t=>{e.visible=Math.sin(t*1.3+ph+k)>-.7;});}}}
  // 飄在空中的資料光點
  for(let i=0;i<12;i++){const a=rnd()*Math.PI*2,r=4+rnd()*20,d=new THREE.Mesh(new THREE.BoxGeometry(.1,.1,.1),B(i%3?CY:0x4fe08a));const y0=1+rnd()*6,sp=.3+rnd()*.5;sc.add(d);anim.push(t=>{d.position.set(Math.sin(a+t*.03)*r,((y0+t*sp)%7)+.6,Math.cos(a+t*.03)*r);});}
+ // 進階專科大樓內部：放在很遠的地方，搭電梯過去。九個諮詢台圍成弧形，每科一個會轉的標誌
+ const OX=300,blocks2=[],H=new THREE.Group();H.position.x=OX;sc.add(H);
+ box(46,.2,32,0x182538,0,-.1,-2,H);{const gr=new THREE.GridHelper(46,23,0x2a4a68,0x20344c);gr.position.set(0,.012,-2);gr.scale.z=32/46;H.add(gr);}
+ box(46,9,.5,0x1c2b40,0,4.5,-18,H);box(.5,9,32,0x1c2b40,-23,4.5,-2,H);box(.5,9,32,0x1c2b40,23,4.5,-2,H);
+ for(let k=0;k<9;k++){scr(H,-20+k*5,5.5,-17.72,3.4,4.5,k%2?0x16324a:0x1d4466);}{const e=box(46,.12,.1,B(CY),0,8.6,-17.7,H);e.castShadow=false;const e2=box(46,.12,.1,B(CY),0,1.2,-17.7,H);e2.castShadow=false;}
+ {const o=new THREE.Mesh(new THREE.RingGeometry(4.2,4.35,48),B(CY));o.rotation.x=-Math.PI/2;o.position.y=.03;H.add(o);const l=label(['進階專科大樓'],'#ffffff','#fff',5);l.position.set(OX,10.2,-17);sc.add(l);}
+ const SHAPES=[()=>new THREE.BoxGeometry(.9,.9,.9),()=>new THREE.TorusKnotGeometry(.45,.12,48,8),()=>new THREE.OctahedronGeometry(.7,0),()=>new THREE.ConeGeometry(.6,1.1,4),()=>new THREE.CylinderGeometry(.55,.55,.8,20),()=>new THREE.DodecahedronGeometry(.65,0),()=>new THREE.TorusGeometry(.5,.14,8,24),()=>new THREE.TetrahedronGeometry(.8,0),()=>new THREE.IcosahedronGeometry(.65,0)];
+ const RA=11.5,AA=i=>Math.PI-(i-(api.adv.length-1)/2)*.36;
+ api.adv.forEach((c,i)=>{const a=AA(i),lx=Math.sin(a)*RA,lz=Math.cos(a)*RA,g=new THREE.Group(),rcH=new THREE.Color(c.rc).getHex();g.position.set(lx,0,lz);g.rotation.y=a+Math.PI;H.add(g);
+  cyl(1.9,2,.16,0x2a3a50,0,.08,0,g,24);{const o=new THREE.Mesh(new THREE.TorusGeometry(1.92,.04,6,40),B(rcH));o.rotation.x=Math.PI/2;o.position.y=.17;g.add(o);}
+  box(2.2,.9,.5,0x33455c,0,.6,.7,g);{const e=box(2.2,.05,.52,B(rcH),0,1.07,.7,g);e.castShadow=false;}mon(g,.55,1.1,.7,0x16324a,Math.PI);
+  cyl(.07,.07,2.6,0x4b5d75,-1.1,1.4,-.9,g,8);const sh=new THREE.Mesh(SHAPES[i%SHAPES.length](),new THREE.MeshBasicMaterial({color:rcH,wireframe:true}));sh.position.set(-1.1,3.3,-.9);g.add(sh);anim.push(t=>{sh.rotation.set(t*.5,t*.8+i,0);});
+  const m=person(rcH,HAIR[(i+3)%HAIR.length]);sc.remove(m);m.position.set(0,.16,-.1);g.add(m);
+  const x=OX+lx,z=lz,sign=label([c.npc,c.name.replace('產業選修：','')],'#ffffff','#1c2a36',3.6);sign.position.set(x,4.4,z);sc.add(sign);
+  blocks2.push([x,z,2.1]);stalls.push({c,x,z,a,m,mk:null,adv:true,my:5.6,fx:OX+Math.sin(a)*(RA-3),fz:Math.cos(a)*(RA-3)});});
+ // 電梯：中庭和大樓之間來回
+ const lifts=[[9.5,9.5,'搭電梯到進階專科大樓'],[OX,10,'搭電梯回中庭']].map((q,k)=>{cyl(1.3,1.4,.14,0x33455c,q[0],.07,q[1],null,24);const o=new THREE.Mesh(new THREE.RingGeometry(1.05,1.22,32),B(0xf2c14e));o.rotation.x=-Math.PI/2;o.position.set(q[0],.16,q[1]);sc.add(o);
+  const bm=new THREE.Mesh(new THREE.CylinderGeometry(1.05,1.05,3.2,24,1,true),new THREE.MeshBasicMaterial({color:0xf2c14e,transparent:true,opacity:.13,side:THREE.DoubleSide,depthWrite:false}));bm.position.set(q[0],1.7,q[1]);sc.add(bm);anim.push(t=>{bm.material.opacity=.1+Math.sin(t*2)*.05;});
+  const l=label([k?'回中庭':'進階專科大樓'],'#ffffff','#fff',k?2.4:3.6);l.position.set(q[0],4,q[1]);sc.add(l);return {x:q[0],z:q[1],txt:q[2],to:k?0:1};});
+ let zone=0;const ZC=()=>zone?OX:0;
+ function ride(L){zone=L.to;const d=lifts[L.to?1:0];me.position.set(d.x,0,d.z-2.2);me.rotation.y=Math.PI;target=null;want=null;ring.visible=false;sun.position.set(ZC()+14,30,16);sun.target.position.set(ZC(),0,0);sun.target.updateMatrixWorld();}
+ sc.add(sun.target);
  // 玩家
  const me=person(0x17a07a,0x33271f);me.position.set(0,0,10);
  const ring=new THREE.Mesh(new THREE.RingGeometry(.3,.42,24),new THREE.MeshBasicMaterial({color:0x39d6ff,transparent:true,opacity:.8}));ring.rotation.x=-Math.PI/2;ring.position.y=.05;ring.visible=false;sc.add(ring);
  // 師傅頭上的標記
- window.v3dRefresh=()=>stalls.forEach(s=>{const t=api.tier(s.c);if(s.mk)sc.remove(s.mk);s.mk=label([t>=0?api.TIER[t]+'通過':'來上課'],t>=0?'#17a07a':'#c9860c','#ffffff',2.2);s.mk.position.set(s.x,6.3,s.z);sc.add(s.mk);});
+ window.v3dRefresh=()=>stalls.forEach(s=>{const t=api.tier(s.c),lk=s.adv&&api.locked(s.c);if(s.mk)sc.remove(s.mk);s.mk=label([lk?'未開放':t>=0?api.TIER[t]+'通過':'來上課'],lk?'#5b6672':t>=0?'#17a07a':'#c9860c','#ffffff',2.2);s.my=s.my||6.3;s.mk.position.set(s.x,s.my,s.z);sc.add(s.mk);});
  // 操作
- const keys={};let target=null,want=null,near=null;
+ const keys={};let target=null,want=null,near=null,nearL=null;const act=()=>{if(near)api.talk(near.c);else if(nearL)ride(nearL);};
  const KM={KeyW:[0,-1],ArrowUp:[0,-1],KeyS:[0,1],ArrowDown:[0,1],KeyA:[-1,0],ArrowLeft:[-1,0],KeyD:[1,0],ArrowRight:[1,0]};
  addEventListener('keydown',e=>{if(api.busy())return;if(KM[e.code]){keys[e.code]=1;target=null;want=null;ring.visible=false;if(e.code.startsWith('Arrow'))e.preventDefault();}
-  if((e.code==='KeyE'||e.code==='Enter')&&near&&document.activeElement.tagName!=='BUTTON'){e.preventDefault();api.talk(near.c);}});
+  if((e.code==='KeyE'||e.code==='Enter')&&(near||nearL)&&document.activeElement.tagName!=='BUTTON'){e.preventDefault();act();}});
  addEventListener('keyup',e=>{delete keys[e.code];});addEventListener('blur',()=>{for(const k in keys)delete keys[k];});
  const ray=new THREE.Raycaster(),gp=new THREE.Plane(new THREE.Vector3(0,1,0),0),v2=new THREE.Vector2(),hit=new THREE.Vector3();
  R.domElement.addEventListener('pointerdown',e=>{if(api.busy())return;const b=R.domElement.getBoundingClientRect();v2.set((e.clientX-b.left)/b.width*2-1,-(e.clientY-b.top)/b.height*2+1);ray.setFromCamera(v2,cam);
   if(!ray.ray.intersectPlane(gp,hit))return;let s=stalls.find(s=>Math.hypot(hit.x-s.x,hit.z-s.z)<3.2);
   if(s){target=[s.fx,s.fz];want=s;}else{target=[hit.x,hit.z];want=null;}ring.position.set(target[0],.05,target[1]);ring.visible=true;});
- tip.onclick=()=>{if(near)api.talk(near.c);};
+ tip.onclick=act;
  function step(dt){let dx=0,dz=0;for(const k in keys){dx+=KM[k][0];dz+=KM[k][1];}
   if(!dx&&!dz&&target){dx=target[0]-me.position.x;dz=target[1]-me.position.z;if(Math.hypot(dx,dz)<.25){target=null;ring.visible=false;dx=dz=0;if(want){const w=want;want=null;api.talk(w.c);}}}
   const l=Math.hypot(dx,dz),mv=l>0;
   if(mv){dx/=l;dz/=l;let nx=me.position.x+dx*6.5*dt,nz=me.position.z+dz*6.5*dt;
-   blocks.forEach(b=>{const d=Math.hypot(nx-b[0],nz-b[1]),r=b[2]+.35;if(d<r&&d>0){nx=b[0]+(nx-b[0])/d*r;nz=b[1]+(nz-b[1])/d*r;}});
-   const d=Math.hypot(nx,nz);if(d>21.8){nx*=21.8/d;nz*=21.8/d;}
+   (zone?blocks2:blocks).forEach(b=>{const d=Math.hypot(nx-b[0],nz-b[1]),r=b[2]+.35;if(d<r&&d>0){nx=b[0]+(nx-b[0])/d*r;nz=b[1]+(nz-b[1])/d*r;}});
+   if(zone){nx=Math.max(OX-21.5,Math.min(OX+21.5,nx));nz=Math.max(-16,Math.min(12.5,nz));}else{const d=Math.hypot(nx,nz);if(d>21.8){nx*=21.8/d;nz*=21.8/d;}}
    if(Math.hypot(nx-me.position.x,nz-me.position.z)<.01*dt*60&&target){target=null;ring.visible=false;}
    me.position.x=nx;me.position.z=nz;let da=Math.atan2(dx,dz)-me.rotation.y;da=Math.atan2(Math.sin(da),Math.cos(da));me.rotation.y+=da*Math.min(1,dt*12);}
   const t=performance.now()/1000,sw=mv?Math.sin(t*11)*.6:0;me.userData.L[0].rotation.x=sw;me.userData.L[1].rotation.x=-sw;me.userData.A[0].rotation.x=-sw;me.userData.A[1].rotation.x=sw;
-  anim.forEach(f=>f(t));near=null;let bd=3.4;stalls.forEach((s,i)=>{const d=Math.hypot(me.position.x-s.fx,me.position.z-s.fz);if(d<bd){bd=d;near=s;}s.m.position.y=.12+Math.sin(t*2+i)*.03;anim.length&&0;if(s.mk)s.mk.position.y=6.3+Math.sin(t*3+i)*.08;});
-  if(near){tip.textContent='跟'+near.c.npc+'說話（E）';tip.hidden=false;}else tip.hidden=true;
-  const fx=me.position.x*.6,fz=me.position.z*.55-5.5;cam.position.set(fx,29,fz+29);cam.lookAt(fx,1,fz);}
+  anim.forEach(f=>f(t));near=null;let bd=3.4;stalls.forEach((s,i)=>{const d=Math.hypot(me.position.x-s.fx,me.position.z-s.fz);if(d<bd){bd=d;near=s;}s.m.position.y=(s.adv?.16:.12)+Math.sin(t*2+i)*.03;if(s.mk)s.mk.position.y=s.my+Math.sin(t*3+i)*.08;});
+  nearL=null;if(!near)lifts.forEach(L=>{if(Math.hypot(me.position.x-L.x,me.position.z-L.z)<1.5)nearL=L;});
+  if(near){tip.textContent='跟'+near.c.npc+'說話（E）';tip.hidden=false;}else if(nearL){tip.textContent=nearL.txt+'（E）';tip.hidden=false;}else tip.hidden=true;
+  if(zone){const fx=OX+(me.position.x-OX)*.6,fz=me.position.z*.5-3;cam.position.set(fx,22,fz+23);cam.lookAt(fx,1,fz);}else{const fx=me.position.x*.6,fz=me.position.z*.55-5.5;cam.position.set(fx,29,fz+29);cam.lookAt(fx,1,fz);}}
  function size(){const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;R.setSize(w,h,false);cam.aspect=w/h;cam.fov=w/h<1.1?52:38;cam.updateProjectionMatrix();}
  if(window.ResizeObserver)new ResizeObserver(size).observe(host);addEventListener('resize',size);size();
  let last=performance.now();(function loop(now){requestAnimationFrame(loop);const dt=Math.min(.05,(now-last)/1000);last=now;if(!host.clientWidth)return;if(!api.busy())step(dt);R.render(sc,cam);})(last);
- window.v3dState=()=>({x:me.position.x,z:me.position.z,near:near&&near.c.id});
+ window.v3dState=()=>({x:me.position.x,z:me.position.z,zone,near:near&&near.c.id,lift:!!nearL});window.v3dRide=()=>ride(lifts[zone?1:0]);
 };

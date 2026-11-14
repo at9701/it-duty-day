@@ -51,7 +51,7 @@ button:focus-visible,.opt:focus-visible,.btn:focus-visible{outline:3px solid var
 .chip:hover{border-color:var(--accent)}
 .chip .ic{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:21px;flex:none}
 .chip b{display:block;line-height:1.3}.chip small{color:var(--muted);display:block;line-height:1.3}
-.chip.lock{cursor:default;opacity:.6;border-style:dashed}.chip.lock:hover{border-color:var(--line)}
+.chip.lock{opacity:.7;border-style:dashed}
 /* 跟師傅對話 */
 .talk{position:fixed;inset:0;z-index:20;background:rgba(28,42,54,.45);display:flex;align-items:center;justify-content:center;padding:16px}
 .talk .box{background:var(--panel);border-radius:18px;max-width:520px;width:100%;max-height:100%;overflow:auto;padding:20px;display:flex;flex-direction:column;gap:14px;box-shadow:0 16px 40px rgba(28,42,54,.3)}
@@ -98,7 +98,7 @@ pre{margin:0;background:#16212b;color:#d7e3ee;border-radius:10px;padding:12px 14
 <div class="wrap">
  <header><a class="back" href="../../">← 回首頁</a><h1>資訊職訓中心</h1><div class="sum"><span class="pill">基礎課程 <b id="sDone">0</b></span><span class="pill">星星 <b id="sStar">0</b></span><span class="pill">總分 <b id="sScore">0</b></span><button class="btn ghost" id="snd" style="padding:4px 12px;border-radius:999px" aria-label="音效開關">🔊</button></div></header>
  <div id="hub" style="display:flex;flex-direction:column;gap:16px">
-  <p class="lead">中庭周圍是九間實習教室，九位師傅各教一門每個資訊人員都該會的基礎課。找師傅說話就能考試：一次 8 題、三條命，錯一題以內就拿到稱號，從初級一路考到專家。想在中心裡走動可以用 <a href="../">3D 版</a>，進度是共用的。</p>
+  <p class="lead">中庭周圍是九間實習教室，九位師傅各教一門每個資訊人員都該會的基礎課；基礎考到中級，就能去進階專科大樓找各科主任。找師傅說話就能考試：一次 8 題、三條命，錯一題以內就拿到稱號，從初級一路考到專家。想在中心裡走動可以用 <a href="../">3D 版</a>，進度是共用的。</p>
   <div id="stage"></div>
   <h2 class="sec">基礎課程</h2>
   <div class="chips" id="chips"></div>
@@ -478,6 +478,86 @@ const DOMAINS=[
  {q:"兩個部門的需求撞期，雙方都堅持自己最急，你的人力只夠做一件。該怎麼處理？",a:["依既定的優先規則判斷，定不了就請雙方共同的主管裁決","先做跟你交情比較好的那個部門","兩件都接下來，然後兩件都延遲","自己憑感覺決定先做哪一邊，另外一個部門如果來問，就說技術上有困難沒辦法做"],why:"資源衝突是管理決策，不該由執行的人私下決定。有規則照規則，沒有就往上升級，並留下紀錄。"},
  {q:"團隊裡只有一個人長期負責夜間和假日的緊急處理。這個安排最大的問題是？",a:["人會過勞，而且他一不在就沒有人能接","沒有問題，同一個人處理最熟悉狀況","加班費的計算會比較複雜","其他同事會因為沒有機會在半夜接到電話，而覺得自己在團隊裡不受到重視"],why:"值班要輪替、要有交接和文件。把壓力集中在一個人身上，遲早會出錯或走人，兩種都是組織的損失。"}
 ]]},
+{id:'sys',lv:[[
+ {q:"AD 裡的 OU 和群組，用途上最主要的差別是？",a:["OU 用來套用群組原則和委派管理，群組用來授予權限","兩個完全一樣，只是名稱不同","OU 用來授予資料夾權限，群組用來套用原則","OU 只能放電腦，群組只能放使用者，兩者不能混用也不能互相包含"],why:"要對一批物件套原則，放進 OU；要讓一批人能存取某個資源，加進群組。"},
+ {q:"虛擬化平台的「線上移轉」（Live Migration／vMotion）是用來做什麼的？",a:["不停機把虛擬機搬到另一台實體主機","把虛擬機轉成實體機","幫虛擬機做備份","在虛擬機關機的狀態下，把它的磁碟檔案複製一份到另外一個儲存位置"],why:"實體主機要維護或負載不均時，可以把上面的虛擬機線上搬走，使用者不會感覺到中斷。"},
+ {q:"在雲端租一台虛擬機，自己安裝作業系統和軟體。這屬於哪一種服務模式？",a:["IaaS","PaaS","SaaS","On-premises"],why:"IaaS 給你運算、儲存、網路，上面的系統自己管。PaaS 連執行環境都幫你顧，SaaS 是直接用現成的軟體。"},
+ {q:"雲端的「共同責任模型」裡，下列哪一項通常是客戶自己的責任？",a:["資料的保護和存取權限的設定","機房的門禁和電力","實體伺服器的硬體維修","以上全部都是雲端業者的責任，客戶把系統搬上雲端之後就不需要再負責任何事情"],why:"業者負責雲「本身」的安全，客戶負責自己放在雲「上面」的東西。儲存桶設成公開而外洩，是客戶的責任。"},
+ {q:"「增量備份」備的是什麼？",a:["上一次備份（不管哪一種）之後有變動的資料","每次都備份全部的資料","上一次完整備份之後所有變動的資料","只備份作業系統的檔案，使用者的資料不在備份的範圍之內"],why:"增量只備上次以來的變動，最省空間，但還原時要完整備份加上每一份增量。「上次完整備份以來的變動」是差異備份。"},
+ {q:"Linux 使用 LVM 管理磁碟，最主要的好處是？",a:["可以彈性調整空間大小，不用重新分割","讀寫速度會變成兩倍","資料會自動加密","可以取代備份，因為 LVM 會自動把每個檔案都另外保存一份在不同的磁碟上面"],why:"LVM 在實體磁碟上多一層抽象，空間不夠時加一顆磁碟進來就能線上擴充。"},
+ {q:"AD 環境中，用戶端電腦是靠什麼找到網域控制站的？",a:["DNS","DHCP","NTP","用戶端會對整個網路廣播，逐一詢問每一台電腦是不是網域控制站"],why:"AD 高度依賴 DNS 的 SRV 紀錄。用戶端的 DNS 指到外面的伺服器，是「無法登入網域」最常見的原因之一。"},
+ {q:"公司網站某天早上突然全部跳出憑證錯誤的警告，前一天還好好的。最可能的原因是？",a:["TLS 憑證到期了","網站被改成 HTTP","使用者的瀏覽器同時壞了","網站伺服器的硬碟空間已經用完，沒有辦法再存放新的連線紀錄"],why:"憑證有期限，到期當天所有人同時出錯。應該把到期日放進監控，至少提前一個月提醒。"}
+]]},
+{id:'neteng',lv:[[
+ {q:"OSPF 是什麼？",a:["一種內部使用的動態路由協定","一種無線網路的加密方式","一種網路線的規格","防火牆廠商推出的一套專門用來過濾惡意網站的黑名單訂閱服務"],why:"OSPF 讓路由器自動交換路由資訊、計算最佳路徑，線路斷掉時會自動改走別條。"},
+ {q:"靜態路由和動態路由相比，最主要的缺點是？",a:["線路中斷時不會自動改道，要人去改","比較耗費路由器的 CPU","安全性比較差","只能用在 IPv6 的網路環境，傳統的 IPv4 網路沒有辦法設定靜態路由"],why:"靜態路由簡單、好預測，但不會隨網路變化調整。規模一大或需要備援時就要用動態路由。"},
+ {q:"ACL（存取控制清單）的規則是怎麼比對的？",a:["由上往下，符合第一條就執行並停止","全部比對完，取最嚴格的那一條","由下往上比對","隨機挑一條規則開始比對，所以每一次的結果都有可能會不一樣"],why:"順序決定結果，範圍大的規則放前面會把後面的蓋掉。而且清單最後通常有一條看不見的「全部拒絕」。"},
+ {q:"STP（擴張樹協定）會選出一台根橋接器（Root Bridge）。它是依什麼選的？",a:["Bridge ID 最小的（先比優先權，再比 MAC）","開機時間最早的那一台","連接埠數量最多的那一台","價格最貴、效能最好的那一台交換器會自動被選出來"],why:"沒設定優先權的話，可能是 MAC 最小的那台舊交換器當選。核心交換器應該手動把優先權調低。"},
+ {q:"HSRP 或 VRRP 的用途是什麼？",a:["讓兩台設備共用一個閘道 IP，一台故障另一台接手","加快無線網路的漫遊速度","把多條網路線綁成一條","自動幫用戶端的電腦分配 IP 位址以及 DNS 伺服器的設定"],why:"用戶端的預設閘道指向虛擬 IP，背後由兩台設備輪值。主要的那台掛了，使用者不用改任何設定。"},
+ {q:"企業無線網路用 WPA2／WPA3-Enterprise，和大家共用一組密碼（PSK）相比，最大的好處是？",a:["每個人用自己的帳號驗證，可以個別停用和追查","訊號涵蓋的範圍比較大","不需要無線基地台","連線的速度會比較快，因為不需要花時間輸入那一組很長的共用密碼"],why:"共用密碼只要一個人外流或離職就得全部換掉。個別帳號驗證（802.1X）才知道是誰連的。"},
+ {q:"Site-to-Site VPN 和 Remote Access VPN 的差別是？",a:["前者連接兩個據點的網路，後者讓個人裝置連回公司","前者比較便宜，後者比較貴","前者不加密，後者有加密","前者只能在同一棟大樓裡面使用，後者則只能在國外的時候才可以使用"],why:"分院和總院之間的固定通道是 Site-to-Site；同仁在家用筆電連回公司是 Remote Access。"},
+ {q:"網路設備的紀錄，為什麼要用 Syslog 送到集中的伺服器？",a:["設備本身存得少、重開就不見，集中才能保存和交叉比對","這樣設備的轉送效能會提升","因為 Syslog 會自動修復設備上的設定錯誤","集中之後就不需要再對每一台設備做設定檔的備份，因為紀錄裡面都有"],why:"交換器的緩衝區很小，出事時紀錄常常已經被蓋掉。集中保存後，還能把多台設備的時間軸放在一起看。"}
+]]},
+{id:'blue',lv:[[
+ {q:"SIEM 的主要功能是什麼？",a:["集中收集各種紀錄，關聯分析後產生告警","取代防火牆","自動幫所有電腦安裝更新","把公司所有的檔案都加密起來，只有通過驗證的人才可以解開閱讀"],why:"單看一台設備的紀錄常看不出問題。SIEM 把防火牆、端點、AD 的紀錄放在一起，才能拼出完整的攻擊過程。"},
+ {q:"收到一個資安告警。分析的第一步是什麼？",a:["確認是不是真的，以及影響到哪些主機和帳號","馬上把那台電腦重灌","直接結案，告警大多是誤報","先寫一份完整的報告呈給主管，等主管批示之後再開始看告警的內容"],why:"這個步驟叫分流（Triage）。先判斷真假和範圍，才知道要投入多少人力、要不要升級處理。"},
+ {q:"判斷一封信是不是釣魚信，下列哪一項最可靠？",a:["寄件者的實際網域，和連結真正指向的網址","信件的文筆通不通順","有沒有公司的標誌","信件裡面有沒有寫出收件人的全名，以及內容看起來是不是很緊急"],why:"顯示名稱、標誌、文筆都可以仿冒。網域和連結的真實目的地，還有 SPF、DKIM 的驗證結果比較難造假。"},
+ {q:"把攻擊者用的 IP 加進黑名單，這個防禦的效果為什麼有限？",a:["換一個 IP 對攻擊者來說非常容易","防火牆的黑名單最多只能放十筆","IP 位址沒辦法被封鎖","因為只要封鎖了一個 IP，防火牆的效能就會明顯下降，所以不建議使用"],why:"這是「痛苦金字塔」的概念：雜湊值、IP、網域都很好換。能偵測攻擊者的手法和行為，才會讓他真的痛。"},
+ {q:"調查事件時，發現各台設備的紀錄時間對不起來，差了好幾分鐘。平時應該做好什麼？",a:["所有設備都跟同一個 NTP 來源校時","每台設備使用不同的時區","每天手動調整一次時間","把所有設備的紀錄功能都關掉，只保留防火牆一台的紀錄，就不會有對不起來的問題"],why:"時間不準，就排不出事件的先後順序。校時是最基本、也最容易被忽略的調查前提。"},
+ {q:"偵測上所說的「漏報」（False Negative）是指什麼？",a:["真的有攻擊，但沒有產生告警","沒有攻擊，卻產生了告警","告警產生得太慢","告警的內容寫得太過簡略，值班的人員看不懂到底發生了什麼事情"],why:"誤報浪費人力，漏報則是完全不知道被打了。兩個要一起看，把誤報壓到零通常代表漏報變多。"},
+ {q:"要從一台被入侵的主機蒐集證據。依「揮發性」的順序，應該先取哪一種？",a:["記憶體內容","硬碟上的檔案","備份磁帶","列印出來的紙本文件，以及這台主機的採購和保固相關資料"],why:"越容易消失的越先取：記憶體、網路連線、執行中的程序，再來才是硬碟。關機後記憶體裡的東西就沒了。"},
+ {q:"同仁回報收到可疑信件，結果有一位坦承自己已經點了連結。資安單位比較好的態度是？",a:["感謝他回報並立刻協助處理，不要責備","公開檢討他，讓其他人引以為戒","記一次缺失","告訴他下次如果再發生同樣的事情，就不需要再特地回報給資安單位了"],why:"回報會被罵，下次就沒人敢說，資安單位就少了最重要的早期警報。要罰的是隱瞞，不是誠實。"}
+]]},
+{id:'red',lv:[[
+ {q:"滲透測試開始之前，最重要的一件事是什麼？",a:["取得書面授權，並確認範圍和規則","先偷偷掃一下看有沒有洞","準備最新的攻擊工具","先在社群網站上公開宣布即將要對這個目標進行測試，以示透明"],why:"沒有授權就是入侵，在台灣會觸犯刑法妨害電腦使用罪。範圍、時間、禁止事項、緊急聯絡人都要白紙黑字。"},
+ {q:"「被動偵察」（OSINT）的特點是什麼？",a:["只用公開資訊，不直接碰目標的系統","對目標做完整的連接埠掃描","直接嘗試登入目標的系統","寄送大量的釣魚信件給目標公司的全體員工，觀察有多少人會點擊"],why:"查公開的網域紀錄、徵才訊息、社群貼文，目標不會察覺。主動掃描才會在對方的紀錄上留下痕跡。"},
+ {q:"測試過程中，你發現一台「不在授權範圍內」的主機似乎有嚴重漏洞。該怎麼做？",a:["不要動它，記錄下來並告知客戶","既然發現了就順便測一下","當作沒看到","先把它打下來取得證據，這樣向客戶報告的時候才會比較有說服力"],why:"範圍外的系統可能屬於別人，碰了就是未授權存取。告知客戶，由他們決定要不要擴大範圍。"},
+ {q:"CVE 是什麼？",a:["公開漏洞的統一編號","一種加密演算法","一套防毒軟體","漏洞嚴重程度的評分，分數的範圍是從 0 分到 10 分"],why:"CVE 讓大家講同一個漏洞時有共同的名字。嚴重程度的分數是另一套，叫 CVSS。"},
+ {q:"測試時你成功進入資料庫，裡面有大量真實的個資。正確的做法是？",a:["只取得足以證明的最少證據，不下載、不外流，如實記錄","全部下載回去當作成果","把資料分享給同事看","挑幾筆知名人士的資料截圖放進報告的封面，讓客戶感受到問題有多嚴重"],why:"目的是證明「拿得到」，不是真的去拿。證據截到欄位名稱和筆數就夠，內容要遮蔽。"},
+ {q:"一份好的滲透測試報告，最重要的內容是什麼？",a:["每個弱點的風險、重現步驟和修補建議","測試人員用了多厲害的手法","使用的工具清單","攻擊畫面的截圖越多越好，文字的說明可以盡量省略以節省篇幅"],why:"報告是寫給要修的人看的。對方能照著重現、知道先修哪個、怎麼修，這份報告才有價值。"},
+ {q:"OWASP Top 10 是什麼？",a:["最常見的網站應用程式安全風險清單","十大駭客組織的排名","十種最好用的攻擊工具","全世界前十名最安全的網站，每一年由各國政府共同評選出來"],why:"它是網站安全的入門地圖，像存取控制失效、注入攻擊都在上面。開發和測試人員都該看過。"},
+ {q:"測試進行中，客戶的正式系統開始變慢、出現異常。你應該怎麼做？",a:["立刻停止測試，通知客戶的緊急聯絡人","繼續測完，結束後再一起報告","加快速度趕快測完","先不要講，默默觀察看看系統會不會自己恢復正常"],why:"測試不能造成實際損害。事前就要約定好緊急聯絡人和停止條件，出狀況第一時間通報。"}
+]]},
+{id:'dba',lv:[[
+ {q:"資料庫的「慢查詢紀錄」是用來做什麼的？",a:["找出執行時間過長的 SQL，當作調校的依據","記錄誰登入過資料庫","讓查詢故意變慢","把執行太久的查詢自動刪除，避免佔用資料庫的儲存空間"],why:"調校要從最花時間、最常執行的查詢下手。沒有紀錄就只能憑感覺猜。"},
+ {q:"為什麼「人登入用的帳號」和「程式連線用的帳號」要分開？",a:["才能分辨操作是誰做的，權限也能各自給最小的","分開之後查詢會比較快","因為授權費是依帳號數量計算的","這樣程式的帳號就可以不用設定密碼，連線的時候比較方便"],why:"大家都用同一組程式帳號登入，紀錄上就看不出是程式還是哪個人做的，出事也無從追查。"},
+ {q:"資料庫的備份檔，就放在資料庫所在的同一台主機上。最大的問題是？",a:["主機壞掉或被加密，備份會跟著一起沒有","備份的速度會變慢","還原的時候會需要比較多記憶體","沒有什麼問題，放在同一台主機還原的時候最快也最方便"],why:"備份要防的就是那台主機出事。至少要有一份在別的機器，最好還有一份離線或異地。"},
+ {q:"要在一張幾千萬筆的資料表上新增欄位或索引。應該注意什麼？",a:["可能會長時間鎖住資料表，要安排在離峰並先測試","隨時都可以做，不會有任何影響","做之前要先把整張表清空","一定要在業務最繁忙的尖峰時段做，這樣才能確認新的欄位有沒有問題"],why:"結構變更在大表上可能跑很久，期間其他操作被擋住。先在複本上測要多久，再決定怎麼做。"},
+ {q:"資料庫的交易紀錄檔越長越大，快把磁碟撐滿。最常見的原因是？",a:["一直沒有做交易紀錄的備份","資料表的數量太多","使用者的密碼太長","資料庫伺服器的時間設定錯誤，導致每一筆交易都被重複記錄了兩次"],why:"在需要保留完整紀錄的模式下，紀錄檔要備份之後才會釋放空間。沒排這個備份，它就只會一直長。"},
+ {q:"月底跑大型報表時，線上交易就變得很慢。架構上常見的解法是？",a:["把報表查詢導到唯讀的複本","禁止任何人跑報表","把報表改到上班的尖峰時段跑","把交易資料全部刪除，只保留最近一個星期的資料，報表就會跑得比較快"],why:"報表是大範圍的讀取，會跟交易搶資源。讀寫分離讓兩種負載各走各的。"},
+ {q:"資料庫裡早已超過保存期限的資料，應該怎麼處理？",a:["依規定歸檔或刪除，並留下處理紀錄","永遠留著，資料越多越好","想到的時候再隨意刪","複製一份給每一個部門各自保管，避免之後有人需要的時候找不到"],why:"過期的個資繼續留著，只有風險沒有用處，個資法也要求目的消失或期限屆滿後要刪除或停止利用。"},
+ {q:"正式資料庫的結構要變更（加欄位、改預存程序）。比較好的管理方式是？",a:["寫成腳本，進版本控制並經過審查再執行","直接用管理工具點一點改掉","請開發人員各自上去改","先在正式環境改好，之後有空的時候再回頭把測試環境改成一樣的"],why:"手動改的東西沒有紀錄、無法重現，測試和正式環境很快就不一致。腳本化之後，每次變更都查得到。"}
+]]},
+{id:'dev',lv:[[
+ {q:"需求還講不清楚就開始寫程式，最常見的後果是什麼？",a:["做出來的不是對方要的，整個重做","程式的執行速度會比較慢","會用掉比較多的硬碟空間","沒有什麼後果，寫出來之後使用者自然就會知道自己到底想要什麼"],why:"先確認「做到什麼程度算完成」。花一小時問清楚，常常可以省掉一個星期的重工。"},
+ {q:"單元測試的主要目的是什麼？",a:["確認每一小段程式的行為符合預期，改動時能馬上發現改壞了","測試使用者會不會操作","測試伺服器的硬體夠不夠力","取代所有其他種類的測試，有了單元測試之後系統就可以直接上線"],why:"有測試保護，才敢放心改舊程式。它不能取代整合測試和實際操作的驗證。"},
+ {q:"Git 合併時出現「衝突」（Conflict），代表什麼？",a:["兩邊改到同一段程式，Git 沒辦法自動決定要留哪個","儲存庫壞掉了","有人把分支刪除了","網路連線中斷，導致有一部分的檔案沒有成功下載到自己的電腦上"],why:"衝突不是錯誤，是 Git 請你來判斷。看懂兩邊各改了什麼再決定，不要直接整段蓋掉別人的。"},
+ {q:"HTTP 狀態碼 404 和 500，差別是什麼？",a:["404 是找不到這個資源，500 是伺服器端的程式出錯","兩個都代表成功","404 是伺服器錯誤，500 是找不到資源","404 代表使用者的網路斷線了，500 則代表使用者的瀏覽器版本太舊"],why:"4 開頭通常是請求這邊的問題（網址錯、沒權限），5 開頭是伺服器那邊的問題。排錯時先看這個。"},
+ {q:"設計 API 時，為什麼「刪除資料」不應該用 GET 來做？",a:["GET 應該只用來讀取，瀏覽器或爬蟲可能會自動去觸發它","GET 的速度比較慢","GET 沒辦法帶參數","因為 GET 的請求一定會被防火牆擋下來，沒有辦法送到伺服器"],why:"GET 被預期是安全、可重複的。預先載入、搜尋引擎、防毒掃描都可能去打連結，資料就莫名被刪了。"},
+ {q:"寫 log 時，下列哪一種資料不應該寫進去？",a:["密碼、金鑰、完整的身分證字號這類敏感資料","錯誤訊息","發生的時間","是哪一支程式、哪一個功能在什麼情況之下產生了這一筆紀錄"],why:"log 的權限通常比資料庫鬆，還會被送到別的系統。敏感資料寫進去，等於多一個外洩的地方。"},
+ {q:"網頁上已經用 JavaScript 檢查過輸入格式了，後端還需要再檢查一次嗎？",a:["需要，前端的檢查可以被繞過","不需要，檢查一次就夠了","看使用者有沒有登入","不需要，而且重複檢查會讓系統慢很多，使用者會明顯感覺到延遲"],why:"前端的檢查是為了使用體驗。攻擊者可以直接對 API 送請求，完全不經過你的網頁。"},
+ {q:"為什麼要把開發、測試、正式環境分開？",a:["避免還沒測好的程式或測試資料影響到正式的服務","這樣可以多買幾台伺服器","只是業界的習慣，沒有實際的作用","分開之後開發人員就不需要寫測試，因為測試環境會自動幫忙測試所有的功能"],why:"在正式環境直接改，一個小錯就是線上事故。分開之後，可以放心試、試壞了也沒關係。"}
+]]},
+{id:'grc',lv:[[
+ {q:"管理系統常講的 PDCA 是指什麼？",a:["規劃、執行、檢查、改善的循環","四種加密演算法","四個資安等級","採購、開發、建置、驗收這四個資訊專案一定要經過的階段"],why:"ISO 27001 的精神就是這個循環：訂計畫、照著做、檢查有沒有效、把問題改掉，然後再來一輪。"},
+ {q:"建立 ISMS 時，為什麼通常從「資產清冊」開始？",a:["不知道有什麼要保護，就沒辦法評估風險","因為稽核員只看這一份文件","因為它是所有文件裡最簡單的","清冊可以取代風險評鑑，有了清冊之後就不需要再另外評估每一項的風險"],why:"資產、威脅、弱點合起來才是風險。清冊漏掉的系統，後面的風險評鑑和控制也都不會涵蓋到它。"},
+ {q:"風險評鑑時，風險值最常見的算法是？",a:["發生的可能性 × 造成的衝擊","資產的購買價格 × 使用年限","員工人數 ÷ 電腦數量","去年發生的資安事件件數，加上今年預計會發生的資安事件件數"],why:"很可能發生但影響很小、和很少發生但一發生就很嚴重，都要考慮。兩個乘起來才能排出先後順序。"},
+ {q:"稽核員問：「帳號有定期清查嗎？」你回答「有」。接下來稽核員會要什麼？",a:["可以證明有做的紀錄","你的口頭保證","主管的簽名照","一份由你當場寫下來的切結書，保證每一季都有確實執行帳號的清查"],why:"稽核看的是證據。說有做但拿不出紀錄，在稽核上等同沒有做。"},
+ {q:"稽核發現「整個帳號清查的程序從來沒有執行過」。這比較可能被判定成什麼？",a:["主要不符合","觀察事項","改善建議","符合事項，因為程序文件已經有訂定出來了，只是還沒有時間開始執行"],why:"整個控制沒有運作，屬於系統性的失效，是主要不符合。偶發的單一缺漏通常才是次要不符合。"},
+ {q:"ISO 27001 要求定期召開「管理審查」。它的目的是什麼？",a:["讓最高管理階層檢視 ISMS 的成效，並決定資源和改善方向","讓資訊人員互相檢查彼此的工作","審查員工的出勤狀況","由外部的驗證公司來決定組織下一個年度的資訊安全預算應該編列多少"],why:"資安要有效，高層必須知道現況並給資源。管理審查就是把這件事固定下來的機制。"},
+ {q:"組織的資訊安全政策，應該由誰核准？",a:["最高管理階層","資訊單位的承辦人","委外的廠商","每一位員工各自決定自己要遵守哪些規定，再彙整起來成為政策"],why:"政策代表組織的承諾，也是往下訂所有程序的依據。由高層核准，推動時才有正當性。"},
+ {q:"內部稽核和外部的驗證稽核，主要差別是什麼？",a:["內稽是組織自己查自己有沒有做到，驗證稽核是第三方來判斷能否發證","內稽不需要留紀錄","外部稽核只看文件，不會到現場","內部稽核的結果在法律上具有強制力，外部的驗證稽核則只是僅供參考"],why:"內稽是自己先找問題並改善；驗證稽核由驗證機構執行，結果決定證書的發放和維持。"}
+]]},
+{id:'mgmt',lv:[[
+ {q:"ITIL 是什麼？",a:["一套 IT 服務管理的實務做法","一種程式語言","一個資安漏洞的編號","政府規定所有資訊人員上班之前都必須要先考取的一張專業證照"],why:"ITIL 整理了事件、問題、變更、服務台這些流程的做法。不必全部照抄，挑適合自己組織的用。"},
+ {q:"「我的電腦開不了機」和「我要申請一個新帳號」，在服務管理上分別屬於什麼？",a:["前者是事件，後者是服務請求","兩個都是事件","兩個都是變更","前者是問題管理的範圍，後者則是屬於重大資安事故，需要立即通報"],why:"事件是「本來能用的壞了」，要盡快恢復。服務請求是「申請一項標準的服務」，照流程處理就好。"},
+ {q:"專案管理常說的三個互相牽動的限制是什麼？",a:["範圍、時間、成本","硬體、軟體、網路","開發、測試、上線","老闆、主管、同事，這三種人的意見只要有一方不同意專案就無法進行"],why:"範圍變大，時間或成本一定要跟著動。只加需求、不加時間也不加人，最後犧牲的就是品質。"},
+ {q:"採購規格如果寫成只有某一家廠牌的產品才能符合，會有什麼問題？",a:["沒有競爭，價格和服務都容易被牽著走，也可能違反採購規定","沒有問題，這樣品質最有保障","驗收會比較簡單","交貨的時間會變得比較長，因為指定廠牌的產品通常都需要從國外進口"],why:"規格應該寫「需要的功能和效能」，不是抄某一家的型錄。綁規格在很多組織也是稽核的重點。"},
+ {q:"簽訂系統的維護合約時，下列哪一項最需要白紙黑字寫清楚？",a:["服務水準：多久回應、多久到場、沒做到怎麼辦","廠商業務人員的姓名","合約書的紙張大小","廠商公司的成立年份、資本額，以及歷年來得過哪些業界的獎項"],why:"「盡快處理」不是承諾。回應和修復時間、服務時段、罰則都寫明，出事時才有依據。"},
+ {q:"評估要買哪一套系統時，「總持有成本」（TCO）是指什麼？",a:["購買、建置、維護、人力、汰換全部加起來的成本","只有購買當下的價格","每年的電費","這一套系統預計在未來五年之內可以替公司多賺進來的營業收入"],why:"買的時候便宜，維護費、授權費和需要的人力可能貴得多。要看整個使用年限的總花費。"},
+ {q:"「廠商鎖定」（Vendor Lock-in）是指什麼風險？",a:["太依賴單一廠商的技術或格式，之後想換會非常困難又昂貴","廠商把機房的門鎖起來","廠商不願意報價","廠商派來的工程師因為簽了保密合約，所以不可以在其他的公司兼職"],why:"資料格式、專屬技術、只有原廠會維護，都會讓你失去談判籌碼。評估時要先想「退場要怎麼退」。"},
+ {q:"幫團隊訂 KPI，下列哪一個原則最重要？",a:["量得出來，而且真的跟要達成的目標有關","越多項越好","只挑一定能達成的","每一年都要訂得比前一年更高，不論實際的資源和工作量有沒有改變"],why:"量不出來的指標沒辦法追蹤；跟目標無關的指標會把大家帶去做沒有意義的事。"}
+]]},
 ];
 const DOM={};DOMAINS.forEach(d=>DOM[d.id]=d);
 // ===== 基礎課程：一門課一位師傅。src 是題庫來源（可以合併好幾個領域），每次從裡面抽 8 題 =====
@@ -493,7 +573,19 @@ const COURSES=[
  {id:'svc',ic:'💬',col:'#fde9f1',rc:'#d0568a',name:'服務與溝通',short:'服務',npc:'阿和',src:['svc'],hi:'技術再好，講不清楚也是白搭。怎麼問、怎麼回報、怎麼交接，都是功夫。'},
  {id:'gov',ic:'📜',col:'#eef0dc',rc:'#8a8f3c',name:'法規與職業倫理',short:'法遵',npc:'法叔',src:['gov'],hi:'有些事不是「能不能做」，是「可不可以做」。權限給你，不代表你可以隨便看。'}
 ];
-const ADV=['系統工程','網路工程','資安防禦','資安攻擊','資料庫管理','軟體開發','治理與稽核','IT 管理','產業選修：醫療資訊'];
+// ===== 進階專科：need 是要先考到中級的基礎課 =====
+const ADV=[
+ {id:'sys',ic:'🗄️',col:'#dcefff',rc:'#2a7fd4',name:'系統工程',job:'系統工程師',npc:'柯主任',src:['sys'],need:['os','hw'],hi:'伺服器、AD、虛擬化、雲端、備份。系統工程師顧的是大家看不到、但一停就全部停的東西。'},
+ {id:'neteng',ic:'🔀',col:'#dcf3ea',rc:'#2f9e7a',name:'網路工程',job:'網路工程師',npc:'路主任',src:['neteng'],need:['net'],hi:'路由、交換、無線、VPN。網路通的時候沒人記得你，不通的時候所有人都找你。'},
+ {id:'blue',ic:'🔍',col:'#e3ecf8',rc:'#4a82c8',name:'資安防禦',job:'資安防禦工程師',npc:'藍主任',src:['blue'],need:['sec'],hi:'監控、分析、應變。防守的人要每一次都擋下來，所以靠的是紀錄和流程，不是運氣。'},
+ {id:'red',ic:'🎯',col:'#fbe6e3',rc:'#d6453d',name:'資安攻擊',job:'滲透測試工程師',npc:'洪主任',src:['red'],need:['sec','net'],hi:'學攻擊是為了知道怎麼防。第一課不是工具，是授權和範圍，沒有授權就是犯罪。'},
+ {id:'dba',ic:'💾',col:'#f0e6fa',rc:'#8a5cc2',name:'資料庫管理',job:'資料庫管理師',npc:'戴主任',src:['dba'],need:['db'],hi:'效能、備份、權限。DBA 的工作是讓資料又快、又對、又救得回來。'},
+ {id:'dev',ic:'🧩',col:'#e6f4f1',rc:'#1f8f8f',name:'軟體開發',job:'軟體工程師',npc:'程主任',src:['dev'],need:['code'],hi:'會寫程式只是開始。需求、測試、版本、上線，每一步都會決定這支程式活多久。'},
+ {id:'grc',ic:'📋',col:'#eef0dc',rc:'#8a8f3c',name:'治理與稽核',job:'資安治理師',npc:'紀主任',src:['grc'],need:['gov'],hi:'制度不是寫給稽核員看的。寫了要做、做了要留紀錄、有問題要改，這樣才叫管理。'},
+ {id:'mgmt',ic:'🧭',col:'#fbf1d9',rc:'#c9860c',name:'IT 管理',job:'IT 管理師',npc:'管主任',src:['mgmt'],need:['svc','trouble'],hi:'管理是讓一群人把事情做好：流程、專案、採購、廠商，還有怎麼跟老闆要資源。'},
+ {id:'medit',ic:'🏥',col:'#fde9f1',rc:'#d0568a',name:'產業選修：醫療資訊',job:'醫療資訊工程師',npc:'易主任',src:['med'],need:['trouble'],hi:'醫院的系統停了，停的是看診和開刀。HIS、PACS、LIS 和醫材連網，這裡的規則跟一般公司不一樣。'}
+];
+const ALLC=COURSES.concat(ADV),CBY={};ALLC.forEach(c=>CBY[c.id]=c);
 const pool=(c,l)=>c.src.reduce((a,s)=>a.concat((DOM[s].lv[l])||[]),[]);
 // ===== 存檔 =====
 const KEY='ittrain_v1';let SAVE={};try{SAVE=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
@@ -501,7 +593,8 @@ const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(SAVE))}catch(e){}};
 const rec=(d,l)=>(SAVE[d]&&SAVE[d][l])||{stars:0,best:0};
 // 稱號：某一級拿到兩顆星以上就算通過
 const tierOf=c=>{let t=-1;for(let l=0;l<4;l++)if(rec(c.id,l).stars>=2)t=l;return t;};
-const titleOf=c=>{const t=tierOf(c);return t<0?'':TIER[t]+c.short+'技師';};
+const jobOf=c=>c.job||c.short+'技師';const titleOf=c=>{const t=tierOf(c);return t<0?'':TIER[t]+jobOf(c);};
+const lockedBy=c=>(c.need||[]).filter(id=>tierOf(CBY[id])<1).map(id=>CBY[id]);
 const doneN=()=>COURSES.filter(c=>tierOf(c)>=0).length;
 // ===== 音效 =====
 let AC=null,mute=false;try{mute=localStorage.getItem('itduty_mute')==='1'}catch(e){}
@@ -522,24 +615,25 @@ function build2D(){const st=$('stage');st.className='map';
   P.map((p,i)=>'<line x1="50" y1="34" x2="'+p[0]+'" y2="'+p[1]+'" stroke="#24344a" stroke-width="2.2"/><line x1="50" y1="34" x2="'+p[0]+'" y2="'+p[1]+'" stroke="'+COURSES[i].rc+'" stroke-width=".3" opacity=".7"/><line class="flow" x1="50" y1="34" x2="'+p[0]+'" y2="'+p[1]+'" stroke="'+COURSES[i].rc+'" stroke-width=".9" stroke-linecap="round" style="animation-delay:-'+(i*.45)+'s"/>').join('')+
   '<ellipse cx="50" cy="34" rx="12" ry="7.4" fill="#16263a" stroke="#39d6ff" stroke-width=".4"/><ellipse cx="50" cy="34" rx="10" ry="6" fill="none" stroke="#39d6ff" stroke-width=".15" stroke-dasharray=".8 .8"/>'+nodes+'</svg>'+
   '<div class="hall">基礎課程<small id="hallN"></small></div>'+
-  '<div class="gate" style="left:50%;top:1.5%;transform:translateX(-50%)">🔒 進階專科大樓　籌備中</div>';
+  '<div class="gate" style="left:50%;top:1.5%;transform:translateX(-50%)">進階專科大樓　課程在下方</div>';
  COURSES.forEach((c,i)=>{const b=document.createElement('button');b.className='npc';b.style.left=P[i][0]+'%';b.style.top=(P[i][1]/62*100)+'%';b.dataset.c=c.id;b.style.setProperty('--rc',c.rc);b.onclick=()=>openTalk(c);st.appendChild(b);});}
 function renderHub(){let ts=0,sc=0;const n=doneN();
- COURSES.forEach(c=>{for(let l=0;l<4;l++){const r=rec(c.id,l);ts+=r.stars;sc+=r.best;}});
+ ALLC.forEach(c=>{for(let l=0;l<4;l++){const r=rec(c.id,l);ts+=r.stars;sc+=r.best;}});
  $('sDone').textContent=n+'／'+COURSES.length;$('sStar').textContent=ts;$('sScore').textContent=sc.toLocaleString();
  const ch=$('chips');ch.innerHTML='';
  COURSES.forEach(c=>{const t=titleOf(c),b=document.createElement('button');b.className='chip';b.innerHTML='<span class="ic" style="background:'+c.col+'">'+c.ic+'</span><span style="min-width:0"><b>'+c.name+'</b><small>'+c.npc+'・'+(t||'還沒有稱號')+'</small></span>';b.onclick=()=>openTalk(c);ch.appendChild(b);});
- $('adv').innerHTML=ADV.map(a=>'<div class="chip lock"><span class="ic" style="background:var(--panel2)">🔒</span><span style="min-width:0"><b>'+a+'</b><small>籌備中</small></span></div>').join('');
+ const ad=$('adv');ad.innerHTML='';
+ ADV.forEach(c=>{const lk=lockedBy(c),t=titleOf(c),b=document.createElement('button');b.className='chip'+(lk.length?' lock':'');b.innerHTML='<span class="ic" style="background:'+(lk.length?'var(--panel2)':c.col)+'">'+(lk.length?'🔒':c.ic)+'</span><span style="min-width:0"><b>'+c.name+'</b><small>'+c.npc+'・'+(lk.length?'先考到中級：'+lk.map(x=>x.name).join('、'):(t||'還沒有稱號'))+'</small></span>';b.onclick=()=>openTalk(c);ad.appendChild(b);});
  document.querySelectorAll('.npc').forEach(b=>{const c=COURSES.find(x=>x.id===b.dataset.c),t=tierOf(c);b.setAttribute('aria-label','找'+c.npc+'學'+c.name);
   b.innerHTML=(t>=0?'<span class="mk done">'+TIER[t]+'</span>':'<span class="mk">！</span>')+'<span class="roof"></span><span class="hut">'+c.ic+'</span><span class="tag">'+c.npc+'<small>'+c.name+'</small></span>';});
  const hn=$('hallN');if(hn)hn.textContent='已通過 '+n+'／'+COURSES.length+' 門';
  if(window.v3dRefresh)v3dRefresh();}
 function closeTalk(){talk.hidden=true;talk.innerHTML='';}
-function openTalk(c){sfx.talk();const t=tierOf(c),ttl=titleOf(c);
- const say=t<0?c.hi:t<3&&pool(c,t+1).length<NQ?TIER[t]+'過了，不錯。'+TIER[t+1]+'的題目我還在準備，好了再來找我。':t===3?'你已經是專家了，我沒什麼好教的，想複習隨時來。':TIER[t]+'過了，要不要挑戰'+TIER[t+1]+'？';
- const btn=[0,1,2,3].map(l=>{const has=pool(c,l).length>=NQ,open=l===0||rec(c.id,l-1).stars>=2,r=rec(c.id,l);
-  return '<button data-l="'+l+'" '+(has&&open?'':'disabled')+'>'+TIER[l]+(has?(open?starsHTML(r.stars):'<span class="n">🔒 前一級先過</span>'):'<span class="n">製作中</span>')+'</button>';}).join('');
- talk.innerHTML='<div class="box" role="dialog" aria-modal="true" aria-label="'+c.npc+'"><div class="who"><span class="face" style="background:'+c.col+'">'+c.ic+'</span><div style="min-width:0"><h2>'+c.npc+'</h2><small>'+c.name+'</small></div></div><p class="say">'+say+'</p><div class="ttl">'+(ttl?'你的稱號：'+ttl:'通過初級就能拿到「初級'+c.short+'技師」')+'</div><div class="tiers">'+btn+'</div><div class="row"><button class="btn ghost" id="tClose">先不要</button></div></div>';
+function openTalk(c){sfx.talk();const t=tierOf(c),ttl=titleOf(c),lk=lockedBy(c);
+ const say=lk.length?'想走這一科，基礎要先夠。先去把「'+lk.map(x=>x.name).join('」「')+'」考到中級，再回來找我。':t<0?c.hi:t<3&&pool(c,t+1).length<NQ?TIER[t]+'過了，不錯。'+TIER[t+1]+'的題目我還在準備，好了再來找我。':t===3?'你已經是專家了，我沒什麼好教的，想複習隨時來。':TIER[t]+'過了，要不要挑戰'+TIER[t+1]+'？';
+ const btn=[0,1,2,3].map(l=>{const has=pool(c,l).length>=NQ,open=!lk.length&&(l===0||rec(c.id,l-1).stars>=2),r=rec(c.id,l);
+  return '<button data-l="'+l+'" '+(has&&open?'':'disabled')+'>'+TIER[l]+(has?(open?starsHTML(r.stars):'<span class="n">'+(lk.length?'🔒 未開放':'🔒 前一級先過')+'</span>'):'<span class="n">製作中</span>')+'</button>';}).join('');
+ talk.innerHTML='<div class="box" role="dialog" aria-modal="true" aria-label="'+c.npc+'"><div class="who"><span class="face" style="background:'+c.col+'">'+c.ic+'</span><div style="min-width:0"><h2>'+c.npc+'</h2><small>'+c.name+'</small></div></div><p class="say">'+say+'</p><div class="ttl">'+(ttl?'你的稱號：'+ttl:'通過初級就能拿到「初級'+jobOf(c)+'」')+'</div><div class="tiers">'+btn+'</div><div class="row"><button class="btn ghost" id="tClose">先不要</button></div></div>';
  talk.hidden=false;talk.querySelectorAll('.tiers button').forEach(b=>b.onclick=()=>{closeTalk();start(c,+b.dataset.l);});
  $('tClose').onclick=closeTalk;talk.onclick=e=>{if(e.target===talk)closeTalk();};(talk.querySelector('.tiers button:not(:disabled)')||$('tClose')).focus();}
 addEventListener('keydown',e=>{if(e.key==='Escape'&&!talk.hidden)closeTalk();});
@@ -565,7 +659,7 @@ function finish(){const g=G,n=g.qs.length,dead=g.lives<=0;const stars=dead?0:g.r
   (g.miss.length?'<div><b>答錯的題目</b>'+g.miss.map(q=>'<div class="miss">'+q.q+'<small>正確答案：'+q.a[0]+'</small><small>'+q.why+'</small></div>').join('')+'</div>':'')+
   '<div class="row"><button class="btn" id="again">再考一次</button><button class="btn ghost" id="home">回職訓中心</button></div></div>';
  $('again').onclick=()=>start(g.d,g.l);$('home').onclick=()=>{play.hidden=true;hub.hidden=false;hub.style.display='flex';renderHub();scrollTo(0,0);};}
-if(window.initVillage3D)initVillage3D({courses:COURSES,talk:openTalk,tier:tierOf,TIER,busy:()=>!talk.hidden||hub.hidden});else build2D();
+if(window.initVillage3D)initVillage3D({courses:COURSES,adv:ADV,locked:c=>lockedBy(c).length>0,talk:openTalk,tier:tierOf,TIER,busy:()=>!talk.hidden||hub.hidden});else build2D();
 renderHub();
 </script>
 </body>
