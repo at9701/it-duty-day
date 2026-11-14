@@ -5,8 +5,10 @@
 window.BLK3={};// key -> Set(tile) 家具擋住的格子，walk() 會看
 (function(){
 const canvas=document.getElementById('gl');
+// 畫質：高＝圓潤造型（人物、家具倒角、柔和陰影）；低＝原本的積木造型，給舊電腦用
+let HQ=true;try{HQ=localStorage.getItem('itduty_gfx')!=='low'}catch(e){}
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});
-renderer.setPixelRatio(Math.min(1.25,window.devicePixelRatio||1));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFShadowMap;renderer.shadowMap.autoUpdate=false;
+renderer.setPixelRatio(Math.min(1.25,window.devicePixelRatio||1));renderer.shadowMap.enabled=true;renderer.shadowMap.type=HQ?THREE.PCFSoftShadowMap:THREE.PCFShadowMap;renderer.shadowMap.autoUpdate=false;
 renderer.outputEncoding=THREE.sRGBEncoding;
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x0b0e14);scene.fog=new THREE.Fog(0x0b0e14,34,60);
 const camera=new THREE.PerspectiveCamera(42,1,0.1,200);
@@ -17,6 +19,8 @@ const ground=new THREE.Mesh(new THREE.PlaneGeometry(400,400),new THREE.MeshLambe
 function resize(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();extCam.aspect=w/h;extCam.updateProjectionMatrix();}
 // ---------- 共用素材 ----------
 const geo=new THREE.BoxGeometry(1,1,1);
+const RGEO=(()=>{const g=new THREE.BoxGeometry(1,1,1,2,2,2),P=g.attributes.position,N=g.attributes.normal,r=0.1,v=new THREE.Vector3(),c=new THREE.Vector3();
+ for(let i=0;i<P.count;i++){v.fromBufferAttribute(P,i);c.set(Math.max(-0.5+r,Math.min(0.5-r,v.x)),Math.max(-0.5+r,Math.min(0.5-r,v.y)),Math.max(-0.5+r,Math.min(0.5-r,v.z)));v.sub(c);if(v.lengthSq()>1e-9){v.normalize();N.setXYZ(i,v.x,v.y,v.z);P.setXYZ(i,c.x+v.x*r,c.y+v.y*r,c.z+v.z*r);}}return g;})();
 const MAT={};const mat=c=>MAT[c]||(MAT[c]=new THREE.MeshLambertMaterial({color:c}));
 const BMAT={};const bmat=c=>BMAT[c]||(BMAT[c]=new THREE.MeshBasicMaterial({color:c}));
 const hx=s=>typeof s==='number'?s:parseInt(String(s).replace('#',''),16);
@@ -32,11 +36,11 @@ const TEXC={};function checker(c1,c2){const k=c1+c2;if(TEXC[k])return TEXC[k];co
 // ---------- 靜態物件合批 ----------
 let STATIC=new Map();const _m4=new THREE.Matrix4(),_q=new THREE.Quaternion(),_p=new THREE.Vector3(),_s=new THREE.Vector3();
 let FG=null;// 目前樓層的 group
-function addInst(key,material,x,y,z,w,h,d,shadow){let g=STATIC.get(key);if(!g){g={material,shadow,list:[]};STATIC.set(key,g);}_p.set(x+w/2,y+h/2,z+d/2);_s.set(w,h,d);_m4.compose(_p,_q,_s);g.list.push(_m4.clone());}
+function addInst(key,material,x,y,z,w,h,d,shadow,rg){if(rg)key='R'+key;let g=STATIC.get(key);if(!g){g={material,shadow,list:[],geo:rg?RGEO:geo};STATIC.set(key,g);}_p.set(x+w/2,y+h/2,z+d/2);_s.set(w,h,d);_m4.compose(_p,_q,_s);g.list.push(_m4.clone());}
 let DEV=[];const DEV3={};function reg(kind,x,y,z){DEV.push({kind,x,y,z});}
-function box(x,y,z,w,h,d,c,shadow=true,dyn=false){if(dyn){const m=new THREE.Mesh(geo,mat(c));m.scale.set(w,h,d);m.position.set(x+w/2,y+h/2,z+d/2);m.castShadow=shadow;m.receiveShadow=true;FG.add(m);return m;}addInst('L'+c+(shadow?'s':''),mat(c),x,y,z,w,h,d,shadow);}
+function box(x,y,z,w,h,d,c,shadow=true,dyn=false){if(dyn){const m=new THREE.Mesh(geo,mat(c));m.scale.set(w,h,d);m.position.set(x+w/2,y+h/2,z+d/2);m.castShadow=shadow;m.receiveShadow=true;FG.add(m);return m;}addInst('L'+c+(shadow?'s':''),mat(c),x,y,z,w,h,d,shadow,HQ&&Math.max(w,h,d)<=1.6&&Math.min(w,h,d)>=0.04);}
 function emit(x,y,z,w,h,d,c,dyn=false){if(dyn){const m=new THREE.Mesh(geo,bmat(c));m.scale.set(w,h,d);m.position.set(x+w/2,y+h/2,z+d/2);FG.add(m);return m;}addInst('B'+c,bmat(c),x,y,z,w,h,d,false);}
-function flushStatic(){STATIC.forEach(g=>{const im=new THREE.InstancedMesh(geo,g.material,g.list.length);g.list.forEach((m,i)=>im.setMatrixAt(i,m));im.instanceMatrix.needsUpdate=true;im.castShadow=g.shadow;im.receiveShadow=true;FG.add(im);});STATIC=new Map();}
+function flushStatic(){STATIC.forEach(g=>{const im=new THREE.InstancedMesh(g.geo||geo,g.material,g.list.length);g.list.forEach((m,i)=>im.setMatrixAt(i,m));im.instanceMatrix.needsUpdate=true;im.castShadow=g.shadow;im.receiveShadow=true;FG.add(im);});STATIC=new Map();}
 let LEDS=[],ledMesh=null;const ledCol=new THREE.Color();
 function flushLEDs(){if(!LEDS.length)return;ledMesh=new THREE.InstancedMesh(geo,new THREE.MeshBasicMaterial({color:0xffffff}),LEDS.length);LEDS.forEach((l,i)=>{_p.set(l.x+l.w/2,l.y+l.h/2,l.z+l.d/2);_s.set(l.w,l.h,l.d);_m4.compose(_p,_q,_s);ledMesh.setMatrixAt(i,_m4);ledCol.setHex(l.color);ledMesh.setColorAt(i,ledCol);});ledMesh.instanceMatrix.needsUpdate=true;FG.add(ledMesh);}
 let _ledT=0;function tickLEDs(now){if(!ledMesh||now-_ledT<100)return;_ledT=now;const t=now/1000;for(let i=0;i<LEDS.length;i++){const l=LEDS[i];let on;if(l.alarm)on=Math.floor(t*l.rate+l.phase)%2===0;else{const v=Math.sin(t*l.rate*6.3+l.phase)*Math.sin(t*1.7+l.phase*0.7);on=v>-0.2;}ledCol.setHex(on?l.color:0x1a2230);ledMesh.setColorAt(i,ledCol);}ledMesh.instanceColor.needsUpdate=true;}
@@ -568,7 +572,7 @@ function detailUnit(r,kind){const x0=r.x,z0=r.y,w=r.w,h=r.h,last=x0+w-1,zb=z0+0.
 
 // ---------- 蓋一層樓 ----------
 let curKey=null,curS=null;
-const FPM={};const DGEO=new Set([geo]);
+const FPM={};const DGEO=new Set([geo,RGEO]);
 // 換樓層：把上一層的幾何全部釋放（材質都是快取的，留著重用）
 function disposeGroup(G){G.traverse(o=>{if(o.isInstancedMesh)o.dispose();if(o.geometry&&!DGEO.has(o.geometry))o.geometry.dispose();});}
 // 尋路需要某層的家具位置、但那層還沒畫過時：只算擋格，不建畫面
@@ -670,7 +674,7 @@ const OUTFIT={
  exec:{top:0x2b2b2b,pants:0x2b2b2b,shoe:0x111111,collar:0xffffff,tie:0x8a2a2a},
  cleaner:{top:0x7f8c8d,pants:0x5a6270,shoe:0x2b2b2b,apron:0x5a6270},
  it:{pants:0x2b3242,shoe:0x2b2b2b,lanyard:true}};
-function person(a){const lk=a.look||{shirt:a.color,hair:'#2b2b2b',skin:'#f1d3b3',style:0};const role=a.role||(lk.coat?'doctor':'it');const O=OUTFIT[role]||OUTFIT.it;
+function person(a){if(HQ)return person2(a);const lk=a.look||{shirt:a.color,hair:'#2b2b2b',skin:'#f1d3b3',style:0};const role=a.role||(lk.coat?'doctor':'it');const O=OUTFIT[role]||OUTFIT.it;
  const top=O.top!==undefined?O.top:hx(lk.shirt||a.color||'#3f8f74'),pants=O.pants,shoe=O.shoe,hair=hx(lk.hair||'#2b2b2b'),skin=hx(lk.skin||'#f1d3b3');const fem=a.g==='f';
  const g=new THREE.Group();const S=[];const add=(x,y,z,w,h,d,c)=>S.push([x,y,z,w,h,d,c]);
  const blob=new THREE.Mesh(BLOBGEO,BLOBMAT);blob.rotation.x=-Math.PI/2;blob.position.y=-0.29;blob.renderOrder=1;g.add(blob);
@@ -714,6 +718,52 @@ function person(a){const lk=a.look||{shirt:a.color,hair:'#2b2b2b',skin:'#f1d3b3'
  const L2=limb(0.1,0,[[0,-0.28,0,0.16,0.28,0.2,pants],[0,-0.32,0.03,0.17,0.07,0.26,shoe]]);
  const A1=limb(-0.28,0.47,[[0,-0.32,0,0.12,0.32,0.17,sleeve],[0,-0.42,0,0.1,0.1,0.13,skin]]);
  const A2=limb(0.28,0.47,[[0,-0.32,0,0.12,0.32,0.17,sleeve],[0,-0.42,0,0.1,0.1,0.13,skin]]);
+ g.userData.limbs=[L1,L2,A1,A2];g.position.y=0.3;g.userData.actor=a;return g;}
+// ---------- 圓潤版人物：球、圓柱合成（vertex color），結構和積木版一樣：身體一個 mesh＋四肢 ----------
+const SPH=new THREE.SphereGeometry(0.5,12,8),SPL=new THREE.SphereGeometry(0.5,8,6),CYL=new THREE.CylinderGeometry(0.5,0.5,1,12),TAP=new THREE.CylinderGeometry(0.42,0.5,1,12),HEMI=new THREE.SphereGeometry(0.5,12,6,0,Math.PI*2,0,Math.PI/2);
+const _mm=new THREE.Matrix4(),_mn=new THREE.Matrix3(),_mv=new THREE.Vector3(),_ms=new THREE.Vector3(),_mq=new THREE.Quaternion();
+function mergeG(items){let n=0;items.forEach(it=>{const g=it[0];n+=(g.index?g.index.count:g.attributes.position.count);});const pos=new Float32Array(n*3),nor=new Float32Array(n*3),col=new Float32Array(n*3);let o=0;
+ items.forEach(([g,x,y,z,sx,sy,sz,c])=>{_pc.setHex(c);_pc.convertSRGBToLinear();_mv.set(x,y,z);_ms.set(sx,sy,sz);_mm.compose(_mv,_mq,_ms);_mn.getNormalMatrix(_mm);const P=g.attributes.position,N=g.attributes.normal,I=g.index,cnt=I?I.count:P.count;
+  for(let k=0;k<cnt;k++){const i=I?I.getX(k):k;_mv.fromBufferAttribute(P,i).applyMatrix4(_mm);pos[o]=_mv.x;pos[o+1]=_mv.y;pos[o+2]=_mv.z;_mv.fromBufferAttribute(N,i).applyMatrix3(_mn).normalize();nor[o]=_mv.x;nor[o+1]=_mv.y;nor[o+2]=_mv.z;col[o]=_pc.r;col[o+1]=_pc.g;col[o+2]=_pc.b;o+=3;}});
+ const G=new THREE.BufferGeometry();G.setAttribute('position',new THREE.BufferAttribute(pos,3));G.setAttribute('normal',new THREE.BufferAttribute(nor,3));G.setAttribute('color',new THREE.BufferAttribute(col,3));return new THREE.Mesh(G,VCMAT);}
+function person2(a){const lk=a.look||{shirt:a.color,hair:'#2b2b2b',skin:'#f1d3b3',style:0};const role=a.role||(lk.coat?'doctor':'it');const O=OUTFIT[role]||OUTFIT.it;
+ const top=O.top!==undefined?O.top:hx(lk.shirt||a.color||'#3f8f74'),pants=O.pants,shoe=O.shoe,hair=hx(lk.hair||'#2b2b2b'),skin=hx(lk.skin||'#f1d3b3');const fem=a.g==='f';
+ const g=new THREE.Group();const S=[];const sp=(x,y,z,sx,sy,sz,c)=>S.push([SPH,x,y,z,sx,sy,sz,c]),sl=(x,y,z,sx,sy,sz,c)=>S.push([SPL,x,y,z,sx,sy,sz,c]),cy=(x,y,z,sx,sy,sz,c)=>S.push([CYL,x,y,z,sx,sy,sz,c]),tp=(x,y,z,sx,sy,sz,c)=>S.push([TAP,x,y,z,sx,sy,sz,c]),hm=(x,y,z,sx,sy,sz,c)=>S.push([HEMI,x,y,z,sx,sy,sz,c]),bx=(x,y,z,w,h,d,c)=>S.push([geo,x,y,z,w,h,d,c]);
+ const blob=new THREE.Mesh(BLOBGEO,BLOBMAT);blob.rotation.x=-Math.PI/2;blob.position.y=-0.29;blob.renderOrder=1;g.add(blob);
+ // 軀幹
+ tp(0,0.25,0,0.46,0.5,0.34,top);sp(0,0.48,0,0.4,0.12,0.3,top);sp(0,0.02,0,0.47,0.2,0.35,pants);
+ if(O.stripe)for(let i=-1;i<=1;i++)bx(i*0.11,0.26,0.165,0.03,0.42,0.02,O.stripe);
+ if(O.trim){bx(0,0.45,0.15,0.2,0.05,0.03,O.trim);bx(-0.13,0.14,0.17,0.09,0.07,0.02,O.trim);}
+ if(O.coat){tp(0,0.12,0,0.5,0.76,0.38,O.coat);sp(0,0.49,0,0.43,0.12,0.33,O.coat);bx(0,0.2,0.18,0.07,0.56,0.03,top);bx(0.13,0.16,0.185,0.09,0.09,0.02,0xe3e7ec);}
+ if(O.vest){tp(0,0.25,0,0.5,0.46,0.37,O.vest);bx(0,0.26,0.177,0.08,0.44,0.03,top);}
+ if(O.apron){bx(0,0.14,0.175,0.3,0.5,0.03,O.apron);bx(0,0.44,0.17,0.18,0.04,0.03,O.apron);}
+ if(O.collar){bx(0,0.42,0.165,0.13,0.1,0.03,O.collar);bx(0,0.26,0.178,0.05,0.24,0.02,O.tie);}
+ if(O.belt){cy(0,0.05,0,0.49,0.05,0.37,O.belt);bx(0.1,0.05,0.185,0.05,0.04,0.02,0xb8a040);}
+ if(O.patch){sl(-0.2,0.42,0,0.08,0.1,0.14,O.patch);sl(0.2,0.42,0,0.08,0.1,0.14,O.patch);bx(-0.11,0.36,0.172,0.06,0.07,0.02,O.patch);}
+ if(O.steth){bx(-0.07,0.34,0.19,0.02,0.22,0.02,0x2b3242);bx(0.07,0.34,0.19,0.02,0.22,0.02,0x2b3242);sl(0,0.22,0.2,0.06,0.06,0.03,0x8a94a8);}
+ if(O.badge||O.lanyard){const lc=O.lanyard?0x2a7fd4:0x3f8f74;bx(-0.055,0.38,0.178,0.015,0.2,0.02,lc);bx(0.055,0.38,0.178,0.015,0.2,0.02,lc);bx(0,0.24,0.19,0.1,0.12,0.02,0xf4f6f8);bx(0,0.29,0.195,0.1,0.025,0.02,lc);}
+ // 頭
+ cy(0,0.53,0,0.13,0.08,0.13,skin);sp(0,0.76,0,0.47,0.45,0.43,skin);sl(-0.23,0.75,0,0.06,0.1,0.09,skin);sl(0.23,0.75,0,0.06,0.1,0.09,skin);
+ sl(-0.085,0.765,0.195,0.065,0.085,0.04,0x1b1b1b);sl(0.085,0.765,0.195,0.065,0.085,0.04,0x1b1b1b);sl(-0.07,0.785,0.213,0.024,0.026,0.012,0xffffff);sl(0.1,0.785,0.213,0.024,0.026,0.012,0xffffff);
+ sl(0,0.675,0.205,0.07,0.022,0.02,0xb0605a);if(fem){sl(-0.15,0.7,0.18,0.07,0.04,0.03,0xf2a0a0);sl(0.15,0.7,0.18,0.07,0.04,0.03,0xf2a0a0);}
+ // 頭髮
+ const st=lk.style|0;const cap=O.cap||lk.cap||(lk.hat?'hat':null);
+ hm(0,0.79,-0.01,0.51,0.48,0.47,hair);sp(0,0.76,-0.07,0.49,0.42,0.38,hair);sp(0,0.93,0.13,0.36,0.1,0.16,hair);
+ if(fem){if(st===0){cy(0,0.56,-0.12,0.44,0.44,0.22,hair);sp(-0.21,0.62,-0.02,0.1,0.34,0.26,hair);sp(0.21,0.62,-0.02,0.1,0.34,0.26,hair);}
+  else if(st===1){sp(0,0.62,-0.27,0.13,0.3,0.13,hair);sl(0,0.78,-0.25,0.08,0.08,0.08,0xe06c8a);}
+  else{sp(0,1.0,-0.1,0.18,0.18,0.18,hair);}}
+ else{if(st===1){sl(-0.08,1.0,0.03,0.13,0.1,0.16,hair);sl(0.08,1.01,-0.03,0.12,0.1,0.15,hair);}else if(st===2){sp(0.09,0.95,0.1,0.26,0.1,0.18,hair);}}
+ if(lk.glasses){bx(-0.085,0.765,0.225,0.11,0.09,0.012,0x2b3242);bx(0.085,0.765,0.225,0.11,0.09,0.012,0x2b3242);bx(-0.085,0.765,0.23,0.08,0.06,0.008,0x9ad0e8);bx(0.085,0.765,0.23,0.08,0.06,0.008,0x9ad0e8);bx(0,0.78,0.228,0.06,0.015,0.008,0x2b3242);}
+ if(cap==='nurse'){cy(0,1.0,0.02,0.3,0.07,0.26,0xffffff);bx(0,1.0,0.15,0.07,0.04,0.02,0xe06c8a);}
+ else if(cap==='scrub'){hm(0,0.78,0,0.54,0.52,0.5,0x3f8f74);sp(0,0.78,-0.08,0.5,0.4,0.38,0x3f8f74);}
+ else if(cap==='security'){cy(0,1.0,0,0.46,0.1,0.44,0x1f2d4a);bx(0,0.96,0.26,0.36,0.025,0.16,0x111111);bx(0,1.01,0.222,0.08,0.05,0.01,0xf2b84b);}
+ else if(cap==='vendor'){cy(0,1.0,0,0.46,0.08,0.44,O.apron||0xc0392b);bx(0,0.97,0.26,0.34,0.025,0.14,O.apron||0xc0392b);}
+ else if(cap==='hat'){cy(0,1.0,0,0.46,0.1,0.44,0x2a7fd4);bx(0,0.96,0.26,0.36,0.025,0.15,0x1b5fa0);}
+ if(O.mask){sp(0,0.69,0.15,0.32,0.17,0.2,0x9ad0e8);}
+ g.add(mergeG(S));
+ const limb=(x,y,parts)=>{const p=new THREE.Group();p.position.set(x,y,0);p.add(mergeG(parts));g.add(p);return p;};
+ const sleeve=O.coat||O.vest&&top||top;const leg=()=>[[CYL,0,-0.13,0,0.17,0.28,0.19,pants],[SPH,0,-0.27,0.035,0.19,0.11,0.29,shoe]],arm=()=>[[SPL,0,-0.01,0,0.15,0.15,0.17,sleeve],[CYL,0,-0.16,0,0.13,0.3,0.15,sleeve],[SPL,0,-0.35,0,0.12,0.12,0.13,skin]];
+ const L1=limb(-0.1,0,leg()),L2=limb(0.1,0,leg()),A1=limb(-0.28,0.46,arm()),A2=limb(0.28,0.46,arm());
  g.userData.limbs=[L1,L2,A1,A2];g.position.y=0.3;g.userData.actor=a;return g;}
 function legs(g,sw){const L=g.userData.limbs;if(!L)return;L[0].rotation.x=sw;L[1].rotation.x=-sw;L[2].rotation.x=-sw*0.8;L[3].rotation.x=sw*0.8;}
 
@@ -859,6 +909,8 @@ function goUrgent(){if(!S||S.over||S.paused)return;const P=S.player;if(P.phone||
  const ts=visible().filter(t=>!t.assignee||t.assignee===P).sort((a,b)=>((a.kind==='prio'?0:1)-(b.kind==='prio'?0:1))||((a.t+a.pat)-(b.t+b.pat)));
  if(!ts.length){toast('現在沒有等你處理的工單');return;}const t=ts[0];toast('帶你去：'+locName(t.room)+'・'+t.title);hitTask(t);}
 document.getElementById('dkNext').onclick=goUrgent;
+{const gb=document.getElementById('gfx');const ui=()=>{gb.textContent=HQ?'畫質：高':'畫質：低';};ui();gb.onclick=()=>{HQ=!HQ;try{localStorage.setItem('itduty_gfx',HQ?'high':'low')}catch(e){}ui();renderer.shadowMap.type=HQ?THREE.PCFSoftShadowMap:THREE.PCFShadowMap;scene.traverse(o=>{if(o.material&&o.material.isMaterial)o.material.needsUpdate=true;});
+  for(const [a,e] of AG){scene.remove(e.g);e.g.traverse(o=>{if(o.geometry&&o.geometry!==BLOBGEO)o.geometry.dispose();});}AG.clear();curKey=null;toast(HQ?'畫質：高（圓潤造型）':'畫質：低（積木造型，比較順）');};}
 window.addEventListener('keydown',e=>{if(e.key==='f'||e.key==='F'){if(e.target&&/INPUT|TEXTAREA/.test(e.target.tagName))return;goUrgent();}});
 // ---------- 音效（合成音，不用載檔案） ----------
 let AC=null,mute=false;try{mute=localStorage.getItem('itduty_mute')==='1'}catch(e){}
