@@ -33,6 +33,8 @@ function wallTex(upper,band,tile){const c=document.createElement('canvas');c.wid
 const WALLMATS={stair:wallTex('#e2e4e8','#9aa3ad'),office:wallTex('#ece7dc','#5b8fd6'),meet:wallTex('#efe8dc','#b08a5a'),lobby:wallTex('#f3eee3','#c9a24a'),clinic:wallTex('#f1f3f0','#7fb5a0'),shop:wallTex('#f4efe6','#d98c3a'),exec:wallTex('#efe6da','#8a2a2a'),ward:wallTex('#f0f5f6','#6fb6d6'),imaging:wallTex('#e9ecf1','#8a94a8'),server:wallTex('#dfe3e8','#2f8f8a'),hall:wallTex('#f1ede4','#7fb5a0'),wc:wallTex('#f6fafc','#6fb6d6',true)};
 const FLOORC={stair:['#8492ab','#7b89a3'],office:['#9db4de','#91a9d6'],meet:['#cfb98d','#c5ae80'],lobby:['#e6c88d','#ddbd7e'],clinic:['#8ccfb6','#80c6ac'],shop:['#efb564','#e6a955'],exec:['#a9705a','#9f6650'],ward:['#efbd9b','#e7b18d'],imaging:['#93abe0','#869fd8'],server:['#4b5568','#444e60'],hall:['#dcc394','#d3b886'],wc:['#a3d2e6','#96c9df']};
 const TEXC={};function checker(c1,c2){const k=c1+c2;if(TEXC[k])return TEXC[k];const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');g.fillStyle=c1;g.fillRect(0,0,64,64);g.fillStyle=c2;g.fillRect(0,0,32,32);g.fillRect(32,32,32,32);g.strokeStyle='rgba(0,0,0,.15)';g.strokeRect(0.5,0.5,63,63);const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.encoding=THREE.sRGBEncoding;return TEXC[k]=new THREE.MeshLambertMaterial({map:t});}
+// ---------- 牆腳暗部：牆和地板交界一條漸層，東西才像是站在地上 ----------
+const AOM=(()=>{const mk=rot=>{const c=document.createElement('canvas');c.width=4;c.height=32;const g=c.getContext('2d');const gr=g.createLinearGradient(0,0,0,32);gr.addColorStop(0,'rgba(20,28,40,0.42)');gr.addColorStop(0.5,'rgba(20,28,40,0.12)');gr.addColorStop(1,'rgba(20,28,40,0)');g.fillStyle=gr;g.fillRect(0,0,4,32);const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;if(rot){t.center.set(0.5,0.5);t.rotation=rot;}return new THREE.MeshBasicMaterial({map:t,transparent:true,depthWrite:false,side:THREE.DoubleSide});};return {ns:mk(0),ew:mk(Math.PI/2)};})();
 // ---------- 靜態物件合批 ----------
 let STATIC=new Map();const _m4=new THREE.Matrix4(),_q=new THREE.Quaternion(),_p=new THREE.Vector3(),_s=new THREE.Vector3();
 let FG=null;// 目前樓層的 group
@@ -652,7 +654,8 @@ function buildFloor(key){if(!DRY&&FG){scene.remove(FG);disposeGroup(FG);}
  const fp=(x,z,w,d,kind)=>{const [c1,c2]=FLOORC[kind];const fk=kind+'|'+w+'|'+d;let m=FPM[fk];if(!m){m=checker(c1,c2).clone();m.map=m.map.clone();m.map.needsUpdate=true;m.map.repeat.set(w/2,d/2);FPM[fk]=m;}const p=new THREE.Mesh(new THREE.PlaneGeometry(w,d),m);p.rotation.x=-Math.PI/2;p.position.set(x+w/2,0,z+d/2);p.receiveShadow=true;FG.add(p);};
  F.rooms.forEach(r=>{fp(r.x,r.y,r.w,r.h,KIND(r.id));if(r.noWall)fp(r.x,WALLROW,r.w,1,KIND(r.id));});fp(1,NZ,W-2,SWALL-NZ,'hall');CORE3.forEach(c=>fp(c.x,SWALL+1,c.w,H-SWALL-2,coreKind(c.id)));fp(20,SWALL,8,1,'lobby');
  for(let y=0;y<H;y++)for(let x=0;x<W;x++){const v=g[y][x];
-  if(v===1){const zn=zoneOf(x,y);const hg=y>=SWALL?0.55:1.35;addInst('wall_'+zn,WALLMATS[zn]||WALLMATS.hall,x,0,y,1,hg,1,true);box(x,hg,y,1,0.08,1,0xc9c3b6,false);}
+  if(v===1){const zn=zoneOf(x,y);const hg=y>=SWALL?0.55:1.35;addInst('wall_'+zn,WALLMATS[zn]||WALLMATS.hall,x,0,y,1,hg,1,true);box(x,hg,y,1,0.08,1,0xc9c3b6,false);
+   if(HQ){const fl=(yy,xx)=>yy>=0&&yy<H&&xx>=0&&xx<W&&g[yy][xx]!==1;if(fl(y+1,x))addInst('aoN',AOM.ns,x,0.012,y+1,1,0.002,0.45,false);if(fl(y-1,x))addInst('aoN',AOM.ns,x,0.012,y,1,0.002,-0.45,false);if(fl(y,x+1))addInst('aoE',AOM.ew,x+1,0.012,y,0.45,0.002,1,false);if(fl(y,x-1))addInst('aoE',AOM.ew,x,0.012,y,-0.45,0.002,1,false);}}
   else if(v===3&&y<SWALL&&g[y][x-1]===3){}
   else if(v===3&&y<SWALL&&g[y][x+1]===3){const FR=0x8a94a8;box(x,0,y,0.08,1.35,1,FR);box(x+1.92,0,y,0.08,1.35,1,FR);box(x,1.25,y,2,0.1,1,FR);box(x,1.35,y,2,0.06,1,0xc9c3b6,false);box(x+0.08,0,y,1.84,0.012,1,0x6b7585,false);
    addInst('glass',GLASS,x+0.08,0,y+0.42,0.55,1.22,0.06,false);addInst('glass',GLASS,x+1.37,0,y+0.48,0.55,1.22,0.06,false);box(x+0.08,0,y+0.42,0.55,0.08,0.06,0x8a94a8,false);box(x+1.37,0,y+0.48,0.55,0.08,0.06,0x8a94a8,false);box(x+0.6,0,y+0.42,0.03,1.22,0.06,0x8a94a8,false);box(x+1.37,0,y+0.48,0.03,1.22,0.06,0x8a94a8,false);
@@ -823,7 +826,8 @@ function legs(g,sw){const L=g.userData.limbs;if(!L)return;L[0].rotation.x=sw;L[1
 
 const SITTERS={doctor:1,clerk:1,tech:1,pharm:1,researcher:1,exec:1,nurse:1,it:1,admin:1,staff:1};
 const AG=new Map();// actor -> {g,ang,phase}
-function actorG(a){let e=AG.get(a);if(!e){e={g:person(a),ang:0,phase:0};scene.add(e.g);AG.set(a,e);}return e;}
+function actorG(a){let e=AG.get(a);if(!e){if(a.npc&&!a._bs){const r1=Math.random(),r2=Math.random();const pt=a.role==='patient';a._bs=pt&&r1<0.14?[0.7,0.68]:[0.94+r2*0.16,0.93+r1*0.14];if(pt&&a._bs[1]>0.9&&r2<0.3&&a.look)a.look=Object.assign({},a.look,{hair:'#cfd2d6'});}
+  e={g:person(a),ang:0,phase:0,bs:(HQ&&a._bs)||[1,1]};e.g.scale.set(e.bs[0],e.bs[1],e.bs[0]);scene.add(e.g);AG.set(a,e);}return e;}
 
 // ---------- 標籤（HTML 投影） ----------
 const LB=document.getElementById('labels');const lbPool=new Map();let lbUsed=new Set();const _v=new THREE.Vector3();
@@ -867,8 +871,8 @@ function tickActors(key,now){const F=FLOORS[key];const list=[...(F.npcs||[]),...
  list.forEach(a=>{const e=actorG(a);seen.add(a);e.g.visible=true;const wx=a.x+a.px+0.5,wz=a.y+a.py+0.5;const walking=a.path.length>0;
   if(walking&&a.path[0]){const dx=a.path[0][0]-a.x,dy=a.path[0][1]-a.y;const tgt=Math.atan2(dx,dy);let d=tgt-e.ang;while(d>Math.PI)d-=Math.PI*2;while(d<-Math.PI)d+=Math.PI*2;e.ang+=d*0.25;}
   else{const dm={d:0,u:Math.PI,l:-Math.PI/2,r:Math.PI/2}[a.dir||'d']||0;let d=dm-e.ang;while(d>Math.PI)d-=Math.PI*2;while(d<-Math.PI)d+=Math.PI*2;e.ang+=d*0.15;}
-  if(walking)e.phase+=0.34*Math.min(2,S.speed);legs(e.g,walking?Math.sin(e.phase)*0.7:0);if(HQ&&!walking){const L=e.g.userData.limbs,ph=now/900+(e.seed||(e.seed=Math.random()*6.28));e.g.scale.y=1+0.012*Math.sin(ph*1.7);if(L){L[2].rotation.z=-0.06-0.03*Math.sin(ph);L[3].rotation.z=0.06+0.03*Math.sin(ph);}}else if(e.g.scale.y!==1){e.g.scale.y=1;const L=e.g.userData.limbs;if(L){L[2].rotation.z=0;L[3].rotation.z=0;}}
-  let px=wx,py=0.3+(walking?Math.abs(Math.sin(e.phase))*0.03:0),pz=wz;
+  if(walking)e.phase+=0.34*Math.min(2,S.speed);legs(e.g,walking?Math.sin(e.phase)*0.7:0);if(HQ&&!walking){const L=e.g.userData.limbs,ph=now/900+(e.seed||(e.seed=Math.random()*6.28));e.g.scale.y=e.bs[1]*(1+0.012*Math.sin(ph*1.7));if(L){L[2].rotation.z=-0.06-0.03*Math.sin(ph);L[3].rotation.z=0.06+0.03*Math.sin(ph);}}else if(e.g.scale.y!==e.bs[1]){e.g.scale.y=e.bs[1];const L=e.g.userData.limbs;if(L){L[2].rotation.z=0;L[3].rotation.z=0;}}
+  let px=wx,py=0.3*e.bs[1]+(walking?Math.abs(Math.sin(e.phase))*0.03:0),pz=wz;
   if(a.npc&&HQ){const L=e.g.userData.limbs;if(walking){if(e.seat){e.seat.used=null;e.seat=null;}}
    else{if(!e.seat&&now>(e.seatT||0)){e.seatT=now+3000+Math.random()*5000;const want=a.role==='patient'?'wseat':SITTERS[a.role]?'seat':null;
      if(want&&(a.role!=='nurse'||(e.seed||0)<3.1)){let best=null,bd=7.3;const h=a.home;for(const sd of DEV3[key]||[]){if(sd.kind!==want||sd.used)continue;if(h&&(sd.x<h.x-0.6||sd.x>h.x+h.w+0.6||sd.z<h.y-1.6||sd.z>h.y+h.h+1.6))continue;const d=(sd.x-wx)*(sd.x-wx)+(sd.z-wz)*(sd.z-wz);if(d<bd){bd=d;best=sd;}}
@@ -921,9 +925,9 @@ function draw3d(){const now=performance.now();if(!S){renderExterior(now);return;
  const dt=now-lastT;lastT=now;if(dt>0&&dt<500){fpsHist.push(1000/dt);if(fpsHist.length>90){const avg=fpsHist.reduce((a,b)=>a+b)/fpsHist.length;fpsHist.length=0;const fn=document.getElementById('fpsNote');fn.hidden=false;fn.textContent=Math.round(avg)+' fps';if(avg<30&&degraded===0){degraded=1;renderer.setPixelRatio(1);toast('畫面偏慢，已降低解析度');}else if(avg<24&&degraded===1){degraded=2;renderer.shadowMap.enabled=false;toast('已關閉陰影換流暢');}}}}
 window.draw3d=draw3d;
 // ---------- 開場：院區外觀 ----------
-const extScene=new THREE.Scene();extScene.background=new THREE.Color(0x0b1220);extScene.fog=new THREE.Fog(0x0b1220,60,140);
+const extScene=new THREE.Scene();extScene.background=new THREE.Color(0xa9cdea);extScene.fog=new THREE.Fog(0xa9cdea,70,170);
 const extCam=new THREE.PerspectiveCamera(40,1,0.1,300);
-extScene.add(new THREE.HemisphereLight(0xcfe0ff,0x1a2230,0.8));const esun=new THREE.DirectionalLight(0xffe8c8,0.7);esun.position.set(30,40,20);extScene.add(esun);
+extScene.add(new THREE.HemisphereLight(0xfff3e2,0x9fb58c,0.95));const esun=new THREE.DirectionalLight(0xffe8c8,0.9);esun.position.set(30,40,20);extScene.add(esun);
 let EXT=null,extDiff=null;
 function winTex(w,h,seed){const c=document.createElement('canvas');c.width=w*8;c.height=h*8;const g=c.getContext('2d');g.fillStyle='#d9dde4';g.fillRect(0,0,c.width,c.height);let s=seed;const rn=()=>(s=(s*16807)%2147483647)/2147483647;
  for(let j=0;j<h;j++)for(let i=0;i<w;i++){const lit=rn()<0.55;g.fillStyle=lit?(rn()<0.5?'#fff2c2':'#cfe6ff'):'#2a3140';g.fillRect(i*8+1,j*8+2,6,4);}const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.magFilter=THREE.NearestFilter;return t;}
