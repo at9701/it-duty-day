@@ -3,34 +3,65 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>資訊專業訓練</title>
+<title>資訊訓練村</title>
 <style>
-/* 版面：上方總進度，下方領域卡片；作答時換成單一題目卡 */
+/* 版面：上方進度，中間訓練村（2D 地圖或 3D 場景），下方課程一覽；作答時換成單一題目卡 */
 :root{--bg:#eaf0f4;--panel:#ffffff;--panel2:#f0f5f8;--line:#d2dde6;--fg:#1c2a36;--muted:#617384;--accent:#17a07a;--warn:#c9860c;--crit:#d6453d;--info:#2a7fd4;
  --sans:"PingFang TC","Microsoft JhengHei","Noto Sans TC",system-ui,sans-serif;--mono:ui-monospace,"SF Mono",Consolas,"Courier New",monospace}
-*{box-sizing:border-box}
+*{box-sizing:border-box}[hidden]{display:none!important}
 html,body{margin:0}
 body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px;line-height:1.6;padding:20px max(16px,env(safe-area-inset-right,0px)) 60px max(16px,env(safe-area-inset-left,0px))}
-.wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.wrap{max-width:1040px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
 header{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
-header h1{font-size:24px;margin:0;flex:1 1 200px}
+header h1{font-size:24px;margin:0;flex:1 1 160px}
 a.back{color:var(--muted);text-decoration:none;font-size:14px}a.back:hover{color:var(--fg)}
-.sum{display:flex;gap:10px;flex-wrap:wrap}
+.sum{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .pill{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:4px 14px;font-size:14px;font-variant-numeric:tabular-nums}
 .pill b{color:var(--accent)}
-.lead{color:var(--muted);margin:0;max-width:62ch}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
-.dom{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:0 4px 14px rgba(28,42,54,.08)}
-.dom .top{display:flex;gap:12px;align-items:center}
-.dom .ic{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex:none}
-.dom h2{font-size:17px;margin:0}.dom p{margin:0;color:var(--muted);font-size:13px}
-.dom .rank{font-size:12px;color:var(--accent);font-weight:700}
-.lv{display:flex;gap:8px}
-.lv button{flex:1;min-width:0;border:1px solid var(--line);background:var(--panel2);color:var(--fg);border-radius:12px;padding:8px 4px;font:inherit;font-size:13px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
-.lv button:hover:not(:disabled){border-color:var(--accent)}
-.lv button:disabled{opacity:.5;cursor:not-allowed}
-.lv button:focus-visible,.opt:focus-visible,.btn:focus-visible{outline:3px solid var(--info);outline-offset:2px}
+.lead{color:var(--muted);margin:0;max-width:68ch}.lead a{color:var(--accent)}
+h2.sec{font-size:16px;margin:6px 0 0}
 .stars{color:var(--warn);letter-spacing:2px;font-size:14px}.stars i{color:var(--line);font-style:normal}
+button:focus-visible,.opt:focus-visible,.btn:focus-visible{outline:3px solid var(--info);outline-offset:2px}
+/* 2D 訓練村地圖 */
+.map{position:relative;width:100%;aspect-ratio:100/62;border-radius:18px;overflow:hidden;border:1px solid var(--line);box-shadow:0 8px 24px rgba(28,42,54,.1);background:#8fc77e}
+.map svg{position:absolute;inset:0;width:100%;height:100%}
+.npc{position:absolute;transform:translate(-50%,-50%);border:0;background:none;padding:0;font:inherit;color:var(--fg);cursor:pointer;display:flex;flex-direction:column;align-items:center;width:112px}
+.npc .roof{width:74px;height:16px;border-radius:10px 10px 3px 3px;box-shadow:0 2px 0 rgba(0,0,0,.15)}
+.npc .hut{width:62px;height:40px;background:#fff8ea;border:2px solid #b89c6a;border-top:0;border-radius:0 0 8px 8px;display:flex;align-items:center;justify-content:center;font-size:24px;transition:transform .15s}
+.npc:hover .hut{transform:translateY(-3px)}
+.npc .tag{margin-top:3px;background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:10px;padding:1px 8px;font-size:12px;font-weight:700;line-height:1.35;text-align:center;white-space:nowrap}
+.npc .tag small{display:block;font-weight:400;color:var(--muted);font-size:11px}
+.npc .mk{position:absolute;top:-14px;right:10px;background:var(--warn);color:#fff;border-radius:999px;font-size:11px;font-weight:800;padding:0 7px;line-height:18px}
+.npc .mk.done{background:var(--accent)}
+.hall{position:absolute;left:50%;top:51.6%;transform:translate(-50%,-50%);background:#fff;border:2px solid #b89c6a;border-radius:14px;padding:6px 14px;text-align:center;font-weight:800;line-height:1.3;box-shadow:0 3px 0 rgba(0,0,0,.12)}
+.hall small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+.gate{position:absolute;background:rgba(28,42,54,.72);color:#fff;border-radius:10px;padding:3px 10px;font-size:12px;line-height:1.4;text-align:center}
+@media (max-width:700px){.map{display:none}}
+/* 3D 訓練村 */
+.v3d{position:relative;width:100%;aspect-ratio:16/9;max-height:72vh;min-height:300px;border-radius:18px;overflow:hidden;border:1px solid var(--line);box-shadow:0 8px 24px rgba(28,42,54,.1);background:#bfe3f5;touch-action:none}
+.v3d canvas{display:block;width:100%;height:100%}
+.v3d .tip{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:2}
+.v3d .how{position:absolute;left:12px;top:10px;background:rgba(255,255,255,.88);border-radius:10px;padding:3px 10px;font-size:12px;color:var(--muted);pointer-events:none}
+/* 課程一覽 */
+.chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.chip{display:flex;gap:10px;align-items:center;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px 12px;font:inherit;color:var(--fg);cursor:pointer;min-width:0}
+.chip:hover{border-color:var(--accent)}
+.chip .ic{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:21px;flex:none}
+.chip b{display:block;line-height:1.3}.chip small{color:var(--muted);display:block;line-height:1.3}
+.chip.lock{cursor:default;opacity:.6;border-style:dashed}.chip.lock:hover{border-color:var(--line)}
+/* 跟師傅對話 */
+.talk{position:fixed;inset:0;z-index:20;background:rgba(28,42,54,.45);display:flex;align-items:center;justify-content:center;padding:16px}
+.talk .box{background:var(--panel);border-radius:18px;max-width:520px;width:100%;max-height:100%;overflow:auto;padding:20px;display:flex;flex-direction:column;gap:14px;box-shadow:0 16px 40px rgba(28,42,54,.3)}
+.talk .who{display:flex;gap:12px;align-items:center}
+.talk .face{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;flex:none}
+.talk h2{margin:0;font-size:18px}.talk .who small{color:var(--muted)}
+.talk .say{background:var(--panel2);border-radius:4px 14px 14px 14px;padding:10px 14px;margin:0}
+.talk .ttl{font-weight:700;color:var(--accent)}
+.tiers{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.tiers button{min-width:0;border:1px solid var(--line);background:var(--panel2);color:var(--fg);border-radius:12px;padding:8px 2px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+.tiers button:hover:not(:disabled){border-color:var(--accent)}
+.tiers button:disabled{opacity:.5;cursor:not-allowed}
+.tiers button span.n{font-size:11px;font-weight:400;color:var(--muted)}
 /* 作答 */
 #play{display:flex;flex-direction:column;gap:14px;max-width:720px;margin:0 auto;width:100%}
 .bar{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
@@ -62,13 +93,19 @@ pre{margin:0;background:#16212b;color:#d7e3ee;border-radius:10px;padding:12px 14
 </head>
 <body>
 <div class="wrap">
- <header><a class="back" href="../">← 回首頁</a><h1>資訊專業訓練</h1><div class="sum"><span class="pill">星星 <b id="sStar">0</b></span><span class="pill">總分 <b id="sScore">0</b></span><button class="btn ghost" id="snd" style="padding:4px 12px;border-radius:999px" aria-label="音效開關">🔊</button></div></header>
- <div id="hub" style="display:flex;flex-direction:column;gap:18px">
-  <p class="lead">每個領域三關：新手、熟手、專家。一關 8 題，有三條命，連續答對有加分。過關拿星星，兩顆星以上解鎖下一關。進度存在這台電腦的瀏覽器裡。</p>
-  <div class="grid" id="grid"></div>
+ <header><a class="back" href="{{HOME}}">← 回首頁</a><h1>資訊訓練村</h1><div class="sum"><span class="pill">基礎課程 <b id="sDone">0</b></span><span class="pill">星星 <b id="sStar">0</b></span><span class="pill">總分 <b id="sScore">0</b></span><button class="btn ghost" id="snd" style="padding:4px 12px;border-radius:999px" aria-label="音效開關">🔊</button></div></header>
+ <div id="hub" style="display:flex;flex-direction:column;gap:16px">
+  <p class="lead">村子中央是基礎學堂，九位師傅各教一門每個資訊人員都該會的課。找師傅說話就能考試：一次 8 題、三條命，錯一題以內就拿到稱號，從初級一路考到專家。{{ALT}}</p>
+  <div id="stage"></div>
+  <h2 class="sec">基礎課程</h2>
+  <div class="chips" id="chips"></div>
+  <h2 class="sec">進階課程（專科）</h2>
+  <div class="chips" id="adv"></div>
  </div>
  <div id="play" hidden></div>
 </div>
+<div class="talk" id="talk" hidden></div>
+<!--V3D-->
 <script>
 // ===== 題庫：每題 {q 題目, code 可省略, a 四個選項（第一個是正確答案，出題時會打亂）, why 解說} =====
 const DOMAINS=[
@@ -172,35 +209,92 @@ const DOMAINS=[
  {q:'我國的資通安全事件分成幾級？哪一級最嚴重？',a:['分成四級，第四級最嚴重','分成三級，第一級最嚴重','分成五級，第五級最嚴重','分成四級，第一級最嚴重'],why:'依機密性、完整性、可用性受影響的程度分一到四級，數字越大越嚴重。'},
  {q:'帳號和存取權限為什麼要定期清查？',a:['人員調動或離職後，常會留下不該有的權限','清查之後系統的負載降低，跑得比較快','可以節省軟體授權費用','只是為了應付稽核'],why:'沒收回的權限是內部風險和入侵後擴散的常見來源。'},
 ]]},
+{id:'code',lv:[[
+ {q:'每天早上都要手動把同一份報表複製到另一個資料夾。比較好的做法是？',a:['寫成腳本，交給排程每天自動跑','請同事輪流做，這樣比較不會有人忘記','繼續手動做，做久了自然就會越來越快','買一套更貴的軟體來做'],why:'重複、固定、有規則的事最適合自動化：省時間，也不會因為人忘記而漏掉。'},
+ {q:'這段 Python 會印出什麼？',code:'for i in range(3):\n    print(i)',a:['0、1、2 各一行','1、2、3 各一行','只印一個 3','印三次 i 這個字'],why:'<code>range(3)</code> 是從 0 開始數三個數：0、1、2。很多語言都是從 0 開始算。'},
+ {q:'腳本跑到一半出錯，畫面噴了一大串錯誤訊息。先看哪裡？',a:['最後幾行：錯誤的種類，還有是哪個檔案的第幾行','不用看，整段複製起來直接重跑一次，通常第二次就會過','只看第一行就好','把訊息清掉，免得被別人看到'],why:'大部分語言的錯誤訊息，最關鍵的錯誤種類和行號都在最後面。'},
+ {q:'寫好一支會改資料的腳本，第一次執行應該在哪裡跑？',a:['測試環境，或先拿一份複本來跑','直接在正式環境跑，有問題再說','找離峰時間在正式環境跑就很安全了，因為那時候沒有人在用','在主管的電腦上跑'],why:'會改資料的東西先在不怕壞的地方試。離峰只是影響的人少，資料壞了一樣是壞了。'},
+ {q:'版本控制（例如 Git）最主要是幫你做什麼？',a:['記錄每一次改了什麼、誰改的，改壞了可以退回去','讓程式執行的速度變快','自動幫你把程式裡的錯誤修好','把程式碼加密，讓別人沒有辦法看到內容'],why:'版本控制記的是「變更的歷史」。出事時能知道是哪一次改動造成的，也能退回上一版。'},
+ {q:'腳本需要連資料庫，帳號密碼要怎麼處理？',a:['不要寫死在程式裡，放在權限管好的設定檔或密碼管理工具','直接寫在腳本最上面，這樣之後要改密碼的時候最好找','寫在註解裡提醒自己','用檔名來記'],why:'密碼寫死在程式裡，程式傳到哪、密碼就外流到哪。分開放，並且把那個檔案的權限管好。'},
+ {q:'這行指令如果 <code>DIR</code> 這個變數剛好是空的，會發生什麼事？',code:'rm -rf "$DIR"/*',a:['變成 rm -rf /*，從根目錄開始刪','什麼事都不會發生，因為沒有指定目錄','系統會跳出確認視窗問你要不要刪','只會刪掉目前所在的這個目錄，其他地方的檔案都不受影響'],why:'變數是空的，路徑就變成 <code>/*</code>。動到刪除的腳本，執行前一定要先檢查變數有沒有值。'},
+ {q:'程式裡的 <code>if</code> 是用來做什麼的？',a:['依條件決定要不要執行某段程式','把同一段程式重複執行很多次','宣告一個新的變數來存放資料','結束整支程式'],why:'<code>if</code> 是條件判斷。重複執行是迴圈（<code>for</code>、<code>while</code>）的工作。'}
+]]},
+{id:'svc',lv:[[
+ {q:'使用者打來只說「電腦怪怪的」。你應該先問什麼？',a:['什麼時候開始、做什麼動作時出現、畫面上寫什麼','你的電腦是哪一年買的、當初是跟哪一家廠商買的','你有沒有亂裝東西','先不問，直接遠端進去看'],why:'先把「怪」變成具體的現象：時間、動作、訊息。這三樣問到，方向通常就出來了。'},
+ {q:'問題一時解決不了，還要再查。這時候該跟使用者說什麼？',a:['現在查到哪、接下來要做什麼、大概什麼時候會回覆','跟他說這個問題很複雜，請他耐心等，有結果一定會通知','先不講，等修好再一次說明','請他自己先上網查查看'],why:'使用者最怕的是「不知道現在怎樣」。講清楚現況、下一步、回覆時間，他才有辦法安排自己的工作。'},
+ {q:'下班前手上有一件沒處理完的案子要交接。交接內容最重要的是？',a:['已經做了什麼、目前狀態、還沒做的、要找誰','只要寫案件編號，接手的人自己去翻紀錄就看得懂了','口頭講一下就好','把使用者的電話留給下一班'],why:'交接是讓下一個人不用從頭來。做過的、現況、待辦、聯絡人，四樣缺一樣就會重工或漏接。'},
+ {q:'要跟不懂技術的主管報告一件系統異常。怎麼講最好？',a:['先講影響到誰、現在怎麼處理、需要他決定什麼','從技術原因開始完整說明，把每個細節都交代清楚，這樣才顯得專業','盡量多用專有名詞','等他問了再回答'],why:'主管要的是「影響」和「需要我做什麼」。技術細節他有興趣再補。'},
+ {q:'使用者很生氣，一接起來就開始罵。比較好的第一步是？',a:['先聽完，再把他的問題重述一次確認','馬上打斷他，跟他解釋這不是資訊部門的問題','請他冷靜一點再打來','直接把電話轉給主管處理，這種情況不是第一線該面對的'],why:'人在氣頭上聽不進解釋。先讓他講完、確認你有聽懂，後面才談得下去。'},
+ {q:'你處理完了，覺得應該修好了。結案之前還要做什麼？',a:['請使用者實際操作一次，確認真的可以用','直接結案就好，如果還有問題使用者自己會再打電話進來報修','拍照留存當作證明','重開機三次確保穩定'],why:'你覺得好了不算，使用者能做完他要做的事才算。當場確認，省掉第二次報修。'},
+ {q:'使用者問了一個你不確定答案的問題。該怎麼回？',a:['「這個我確認一下再回覆你」，然後真的回覆','憑印象先給一個聽起來合理的答案，免得讓對方覺得你不專業','跟他說這不歸你管','請他去問別人'],why:'不確定就說不確定。猜錯的代價比晚一點回答大很多，尤其對方會照你說的去做。'},
+ {q:'你發現一個可能影響很多人的異常，但還沒查出原因。什麼時候該通報主管？',a:['現在就先通報，邊查邊更新','等查出原因之後再報，資訊不完整的時候報上去只會被問倒','等修好再一起報告','等有使用者來抱怨的時候再通報，這樣才能確認真的有影響'],why:'影響範圍大的事，通報要比查原因早。主管需要時間調人、對外說明，不能最後一個知道。'}
+]]},
 ];
+const DOM={};DOMAINS.forEach(d=>DOM[d.id]=d);
+// ===== 基礎課程：一門課一位師傅。src 是題庫來源（可以合併好幾個領域），每次從裡面抽 8 題 =====
+const TIER=['初級','中級','高級','專家'],NQ=8;
+const COURSES=[
+ {id:'hw',ic:'🖥️',col:'#e3ecf8',rc:'#4a82c8',name:'電腦與硬體',short:'硬體',npc:'阿國師',src:['hw','sw'],hi:'機器不會騙人，壞哪裡就是哪裡。硬體、軟體、驅動，先把基本的搞懂。'},
+ {id:'os',ic:'🪟',col:'#dcf3ea',rc:'#2f9e7a',name:'作業系統',short:'系統',npc:'小安姊',src:['win','linux'],hi:'Windows、Linux 都要會一點。黑黑的畫面不用怕，指令就那幾個在輪。'},
+ {id:'net',ic:'🌐',col:'#dcefff',rc:'#2a7fd4',name:'網路基礎',short:'網路',npc:'線哥',src:['net'],hi:'網路不通先別急著重開機。一層一層查，查到哪一層斷，答案就在那。'},
+ {id:'sec',ic:'🛡️',col:'#fbe6e3',rc:'#d6453d',name:'資訊安全基礎',short:'資安',npc:'盾姊',src:['sec'],hi:'資安不是資安人員的事，是每個人的事。很多事故都是從一封信開始的。'},
+ {id:'db',ic:'🗄️',col:'#f0e6fa',rc:'#8a5cc2',name:'資料庫基礎',short:'資料庫',npc:'庫伯',src:['db'],hi:'資料是公司的命。動手之前先想一件事：改錯了，救不救得回來？'},
+ {id:'code',ic:'⌨️',col:'#e6f4f1',rc:'#1f8f8f',name:'程式與腳本基礎',short:'程式',npc:'小碼',src:['code'],hi:'同一件事手動做到第三次，就該寫成腳本了。不用很厲害，看得懂、敢改就好。'},
+ {id:'trouble',ic:'🛠️',col:'#fbf1d9',rc:'#c9860c',name:'異常排除的方法',short:'排除',npc:'老查',src:['trouble'],hi:'先問、先分、再動手。這三步不要跳，跳了就是在碰運氣。'},
+ {id:'svc',ic:'💬',col:'#fde9f1',rc:'#d0568a',name:'服務與溝通',short:'服務',npc:'阿和',src:['svc'],hi:'技術再好，講不清楚也是白搭。怎麼問、怎麼回報、怎麼交接，都是功夫。'},
+ {id:'gov',ic:'📜',col:'#eef0dc',rc:'#8a8f3c',name:'法規與職業倫理',short:'法遵',npc:'法叔',src:['gov'],hi:'有些事不是「能不能做」，是「可不可以做」。權限給你，不代表你可以隨便看。'}
+];
+const ADV=['系統工程','網路工程','資安防禦','資安攻擊','資料庫管理','軟體開發','治理與稽核','IT 管理','產業選修：醫療資訊'];
+const pool=(c,l)=>c.src.reduce((a,s)=>a.concat((DOM[s].lv[l])||[]),[]);
 // ===== 存檔 =====
 const KEY='ittrain_v1';let SAVE={};try{SAVE=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(SAVE))}catch(e){}};
 const rec=(d,l)=>(SAVE[d]&&SAVE[d][l])||{stars:0,best:0};
-const LVN=['新手','熟手','專家'];
+// 稱號：某一級拿到兩顆星以上就算通過
+const tierOf=c=>{let t=-1;for(let l=0;l<4;l++)if(rec(c.id,l).stars>=2)t=l;return t;};
+const titleOf=c=>{const t=tierOf(c);return t<0?'':TIER[t]+c.short+'技師';};
+const doneN=()=>COURSES.filter(c=>tierOf(c)>=0).length;
 // ===== 音效 =====
 let AC=null,mute=false;try{mute=localStorage.getItem('itduty_mute')==='1'}catch(e){}
 const sndB=document.getElementById('snd');const sndUI=()=>{sndB.textContent=mute?'🔇':'🔊'};sndUI();sndB.onclick=()=>{mute=!mute;try{localStorage.setItem('itduty_mute',mute?'1':'0')}catch(e){}sndUI();};
 addEventListener('pointerdown',()=>{if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}else if(AC.state==='suspended')AC.resume();},true);
 function tone(f,t0,d,type,v){if(mute||!AC||AC.state!=='running')return;const o=AC.createOscillator(),g=AC.createGain();o.type=type||'sine';o.frequency.value=f;const t=AC.currentTime+t0;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v||.12,t+.015);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d+.03);}
-const sfx={good:()=>{tone(660,0,.1);tone(990,.09,.16);},bad:()=>{tone(300,0,.18,'sawtooth',.07);tone(210,.15,.26,'sawtooth',.07);},win:()=>{[523,659,784,1047].forEach((f,i)=>tone(f,i*.11,.2));},lose:()=>{[392,330,262].forEach((f,i)=>tone(f,i*.16,.28,'triangle'));}};
-// ===== 首頁 =====
-const $=id=>document.getElementById(id);const hub=$('hub'),play=$('play');
+const sfx={good:()=>{tone(660,0,.1);tone(990,.09,.16);},bad:()=>{tone(300,0,.18,'sawtooth',.07);tone(210,.15,.26,'sawtooth',.07);},win:()=>{[523,659,784,1047].forEach((f,i)=>tone(f,i*.11,.2));},lose:()=>{[392,330,262].forEach((f,i)=>tone(f,i*.16,.28,'triangle'));},talk:()=>{tone(520,0,.07);tone(700,.06,.09);}};
+// ===== 訓練村 =====
+const $=id=>document.getElementById(id);const hub=$('hub'),play=$('play'),talk=$('talk');
 const starsHTML=n=>'<span class="stars">'+'★'.repeat(n)+'<i>'+'★'.repeat(3-n)+'</i></span>';
-function renderHub(){let ts=0,sc=0;const grid=$('grid');grid.innerHTML='';
- DOMAINS.forEach(d=>{let got=0;const card=document.createElement('div');card.className='dom';
-  const lvB=[0,1,2].map(l=>{const r=rec(d.id,l);got+=r.stars;ts+=r.stars;sc+=r.best;const has=!!d.lv[l];const open=l===0||rec(d.id,l-1).stars>=2;
-   return '<button data-l="'+l+'" '+(has&&open?'':'disabled')+' aria-label="'+d.name+' '+LVN[l]+'">'+LVN[l]+(has?(open?starsHTML(r.stars):'<span style="font-size:12px;color:var(--muted)">🔒 前一關兩顆星</span>'):'<span style="font-size:12px;color:var(--muted)">製作中</span>')+'</button>';}).join('');
-  const rk=got>=7?d.ranks[2]:got>=4?d.ranks[1]:got>=2?d.ranks[0]:'';
-  card.innerHTML='<div class="top"><span class="ic" style="background:'+d.col+'">'+d.ic+'</span><div style="min-width:0"><h2>'+d.name+'</h2>'+(rk?'<span class="rank">稱號：'+rk+'</span>':'')+'</div></div><p>'+d.desc+'</p><div class="lv">'+lvB+'</div>';
-  card.querySelectorAll('button').forEach(b=>b.onclick=()=>start(d,+b.dataset.l));grid.appendChild(card);});
- $('sStar').textContent=ts+'／'+DOMAINS.length*9;$('sScore').textContent=sc.toLocaleString();}
+function build2D(){const st=$('stage');st.className='map';
+ const P=COURSES.map((c,i)=>{const a=(i*40-90)*Math.PI/180;return [50+37*Math.cos(a),32+23*Math.sin(a)];});
+ let trees='';[[6,8],[14,30],[5,50],[22,56],[40,58.5],[62,58.5],[80,56],[95,48],[88,30],[94,10],[30,5],[70,5],[33,32],[67,32],[41,17],[59,17],[40,46],[60,46]].forEach(t=>{trees+='<ellipse cx="'+t[0]+'" cy="'+(t[1]+1.6)+'" rx="2" ry=".7" fill="rgba(0,0,0,.14)"/><circle cx="'+t[0]+'" cy="'+t[1]+'" r="2" fill="#4f9a57"/><circle cx="'+(t[0]-.6)+'" cy="'+(t[1]-.7)+'" r="1.1" fill="#6bb56f"/>';});
+ st.innerHTML='<svg viewBox="0 0 100 62" preserveAspectRatio="none" aria-hidden="true"><rect width="100" height="62" fill="#8fc77e"/><ellipse cx="50" cy="32" rx="37" ry="23" fill="none" stroke="#e6d3a3" stroke-width="3.4"/>'+P.map(p=>'<line x1="50" y1="32" x2="'+p[0]+'" y2="'+p[1]+'" stroke="#e6d3a3" stroke-width="2.2"/>').join('')+'<ellipse cx="50" cy="32" rx="12" ry="7.4" fill="#d9d5cb" stroke="#bdb8ab" stroke-width=".5"/>'+trees+'</svg>'+
+  '<div class="hall">基礎學堂<small id="hallN"></small></div>'+
+  '<div class="gate" style="left:1.5%;top:3%">🔒 進階專科區<br>籌備中</div><div class="gate" style="right:1.5%;top:3%">🔒 進階專科區<br>籌備中</div>';
+ COURSES.forEach((c,i)=>{const b=document.createElement('button');b.className='npc';b.style.left=P[i][0]+'%';b.style.top=(P[i][1]/62*100)+'%';b.dataset.c=c.id;b.onclick=()=>openTalk(c);st.appendChild(b);});}
+function renderHub(){let ts=0,sc=0;const n=doneN();
+ COURSES.forEach(c=>{for(let l=0;l<4;l++){const r=rec(c.id,l);ts+=r.stars;sc+=r.best;}});
+ $('sDone').textContent=n+'／'+COURSES.length;$('sStar').textContent=ts;$('sScore').textContent=sc.toLocaleString();
+ const ch=$('chips');ch.innerHTML='';
+ COURSES.forEach(c=>{const t=titleOf(c),b=document.createElement('button');b.className='chip';b.innerHTML='<span class="ic" style="background:'+c.col+'">'+c.ic+'</span><span style="min-width:0"><b>'+c.name+'</b><small>'+c.npc+'・'+(t||'還沒有稱號')+'</small></span>';b.onclick=()=>openTalk(c);ch.appendChild(b);});
+ $('adv').innerHTML=ADV.map(a=>'<div class="chip lock"><span class="ic" style="background:var(--panel2)">🔒</span><span style="min-width:0"><b>'+a+'</b><small>籌備中</small></span></div>').join('');
+ document.querySelectorAll('.npc').forEach(b=>{const c=COURSES.find(x=>x.id===b.dataset.c),t=tierOf(c);b.setAttribute('aria-label','找'+c.npc+'學'+c.name);
+  b.innerHTML=(t>=0?'<span class="mk done">'+TIER[t]+'</span>':'<span class="mk">！</span>')+'<span class="roof" style="background:'+c.rc+'"></span><span class="hut">'+c.ic+'</span><span class="tag">'+c.npc+'<small>'+c.name+'</small></span>';});
+ const hn=$('hallN');if(hn)hn.textContent='已通過 '+n+'／'+COURSES.length+' 門';
+ if(window.v3dRefresh)v3dRefresh();}
+function closeTalk(){talk.hidden=true;talk.innerHTML='';}
+function openTalk(c){sfx.talk();const t=tierOf(c),ttl=titleOf(c);
+ const say=t<0?c.hi:t===0&&!pool(c,1).length?'初級過了，不錯。中級的題目我還在準備，好了再來找我。':'又來啦？準備好就挑一級。';
+ const btn=[0,1,2,3].map(l=>{const has=pool(c,l).length>=NQ,open=l===0||rec(c.id,l-1).stars>=2,r=rec(c.id,l);
+  return '<button data-l="'+l+'" '+(has&&open?'':'disabled')+'>'+TIER[l]+(has?(open?starsHTML(r.stars):'<span class="n">🔒 前一級先過</span>'):'<span class="n">製作中</span>')+'</button>';}).join('');
+ talk.innerHTML='<div class="box" role="dialog" aria-modal="true" aria-label="'+c.npc+'"><div class="who"><span class="face" style="background:'+c.col+'">'+c.ic+'</span><div style="min-width:0"><h2>'+c.npc+'</h2><small>'+c.name+'</small></div></div><p class="say">'+say+'</p><div class="ttl">'+(ttl?'你的稱號：'+ttl:'通過初級就能拿到「初級'+c.short+'技師」')+'</div><div class="tiers">'+btn+'</div><div class="row"><button class="btn ghost" id="tClose">先不要</button></div></div>';
+ talk.hidden=false;talk.querySelectorAll('.tiers button').forEach(b=>b.onclick=()=>{closeTalk();start(c,+b.dataset.l);});
+ $('tClose').onclick=closeTalk;talk.onclick=e=>{if(e.target===talk)closeTalk();};(talk.querySelector('.tiers button:not(:disabled)')||$('tClose')).focus();}
+addEventListener('keydown',e=>{if(e.key==='Escape'&&!talk.hidden)closeTalk();});
 // ===== 作答 =====
 const shuf=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
 let G=null;
-function start(d,l){G={d,l,qs:shuf(d.lv[l]),i:0,lives:3,combo:0,score:0,right:0,miss:[]};hub.hidden=true;hub.style.display='none';play.hidden=false;ask();scrollTo(0,0);}
+function start(d,l){G={d,l,qs:shuf(pool(d,l)).slice(0,NQ),i:0,lives:3,combo:0,score:0,right:0,miss:[]};hub.hidden=true;hub.style.display='none';play.hidden=false;ask();scrollTo(0,0);}
 function ask(){const g=G,q=g.qs[g.i];const opts=shuf(q.a.map((t,k)=>({t,ok:k===0})));
- play.innerHTML='<div class="bar"><span class="name">'+g.d.ic+' '+g.d.name+'・'+LVN[g.l]+'</span><span class="hearts" aria-label="剩 '+g.lives+' 條命">'+'❤️'.repeat(g.lives)+'<i>'+'❤️'.repeat(3-g.lives)+'</i></span><span class="combo">'+(g.combo>=2?'連對 ×'+g.combo:'')+'</span></div><div class="prog"><i style="width:'+(g.i/g.qs.length*100)+'%"></i></div>'+
+ play.innerHTML='<div class="bar"><span class="name">'+g.d.ic+' '+g.d.name+'・'+TIER[g.l]+'</span><span class="hearts" aria-label="剩 '+g.lives+' 條命">'+'❤️'.repeat(g.lives)+'<i>'+'❤️'.repeat(3-g.lives)+'</i></span><span class="combo">'+(g.combo>=2?'連對 ×'+g.combo:'')+'</span></div><div class="prog"><i style="width:'+(g.i/g.qs.length*100)+'%"></i></div>'+
   '<div class="qcard" id="qc"><span class="qno">第 '+(g.i+1)+'／'+g.qs.length+' 題　分數 '+g.score.toLocaleString()+'</span><p class="q">'+q.q+'</p>'+(q.code?'<pre>'+q.code+'</pre>':'')+'<div class="opts" id="opts"></div><div id="fb"></div></div>';
  const box=$('opts');opts.forEach(o=>{const b=document.createElement('button');b.className='opt';b.innerHTML=o.t.replace(/&(?!amp;|lt;|gt;)/g,'&amp;');b.onclick=()=>answer(o,b,opts,q);box.appendChild(b);});}
 function answer(o,btn,opts,q){const g=G;[...$('opts').children].forEach((b,k)=>{b.disabled=true;if(opts[k].ok)b.classList.add('right');});const qc=$('qc');
@@ -210,12 +304,14 @@ function answer(o,btn,opts,q){const g=G;[...$('opts').children].forEach((b,k)=>{
  $('fb').innerHTML='<div class="why'+(o.ok?'':' bad')+'"><b>'+(o.ok?'✔ 答對了':'✘ 答錯了，扣一條命')+'</b>'+q.why+'</div><button class="btn" id="nx" style="margin-top:12px">'+(last?'看結果':'下一題')+'</button>';
  const nx=$('nx');nx.onclick=()=>{if(last)finish();else{g.i++;ask();scrollTo(0,0);}};nx.focus();}
 function finish(){const g=G,n=g.qs.length,dead=g.lives<=0;const stars=dead?0:g.right===n?3:g.right>=n-1?2:1;
- SAVE[g.d.id]=SAVE[g.d.id]||{};const old=rec(g.d.id,g.l);SAVE[g.d.id][g.l]={stars:Math.max(old.stars,stars),best:Math.max(old.best,dead?0:g.score)};save();(dead?sfx.lose:sfx.win)();
- const nextOpen=!dead&&stars>=2&&g.l<2&&g.d.lv[g.l+1];
- play.innerHTML='<div class="qcard"><span class="qno">'+g.d.ic+' '+g.d.name+'・'+LVN[g.l]+'</span><p class="q">'+(dead?'三條命用完了，這關要重來':'過關！')+'</p><div class="big">'+'★'.repeat(stars)+'<i>'+'★'.repeat(3-stars)+'</i></div><div>答對 '+g.right+'／'+n+' 題　分數 '+g.score.toLocaleString()+(stars<2&&!dead?'　<span style="color:var(--muted)">兩顆星以上才會解鎖下一關</span>':'')+'</div>'+
+ const before=tierOf(g.d);SAVE[g.d.id]=SAVE[g.d.id]||{};const old=rec(g.d.id,g.l);SAVE[g.d.id][g.l]={stars:Math.max(old.stars,stars),best:Math.max(old.best,dead?0:g.score)};save();(dead?sfx.lose:sfx.win)();
+ const up=tierOf(g.d)>before,pass=stars>=2;
+ const head=dead?'三條命用完了，這次沒過':pass?(up?'通過！你現在是「'+titleOf(g.d)+'」':'通過！'):'考完了，但錯超過一題，還拿不到稱號';
+ play.innerHTML='<div class="qcard"><span class="qno">'+g.d.ic+' '+g.d.name+'・'+TIER[g.l]+'　'+g.d.npc+'</span><p class="q">'+head+'</p><div class="big">'+'★'.repeat(stars)+'<i>'+'★'.repeat(3-stars)+'</i></div><div>答對 '+g.right+'／'+n+' 題　分數 '+g.score.toLocaleString()+'</div>'+
   (g.miss.length?'<div><b>答錯的題目</b>'+g.miss.map(q=>'<div class="miss">'+q.q+'<small>正確答案：'+q.a[0]+'</small><small>'+q.why+'</small></div>').join('')+'</div>':'')+
-  '<div class="row"><button class="btn" id="again">再打一次</button>'+(nextOpen?'<button class="btn" id="nextLv">挑戰'+LVN[g.l+1]+'關</button>':'')+'<button class="btn ghost" id="home">回領域列表</button></div></div>';
- $('again').onclick=()=>start(g.d,g.l);if(nextOpen)$('nextLv').onclick=()=>start(g.d,g.l+1);$('home').onclick=()=>{play.hidden=true;hub.hidden=false;hub.style.display='flex';renderHub();scrollTo(0,0);};}
+  '<div class="row"><button class="btn" id="again">再考一次</button><button class="btn ghost" id="home">回訓練村</button></div></div>';
+ $('again').onclick=()=>start(g.d,g.l);$('home').onclick=()=>{play.hidden=true;hub.hidden=false;hub.style.display='flex';renderHub();scrollTo(0,0);};}
+if(window.initVillage3D)initVillage3D({courses:COURSES,talk:openTalk,tier:tierOf,TIER,busy:()=>!talk.hidden||hub.hidden});else build2D();
 renderHub();
 </script>
 </body>

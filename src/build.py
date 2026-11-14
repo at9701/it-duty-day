@@ -50,8 +50,15 @@ assert out.count(H)==1 and src.count(H)==1
 for d in ('game','2d','train'): os.makedirs(os.path.join(ROOT,d),exist_ok=True)
 open(os.path.join(ROOT,'game','index.html'),'w',encoding='utf-8').write(out.replace(H,H[:-4]+'電腦比較舊、跑不動的話，可以改玩 <a href="../2d/" style="color:var(--accent)">2D 版</a>。<a href="../" style="color:var(--accent)">回首頁</a></p>'))
 open(os.path.join(ROOT,'index.html'),'w',encoding='utf-8').write(open('landing.html',encoding='utf-8').read())
-open(os.path.join(ROOT,'train','index.html'),'w',encoding='utf-8').write(open('train.html',encoding='utf-8').read())
+tr=open('train.html',encoding='utf-8').read()
+assert tr.count('<!--V3D-->')==1 and tr.count('{{HOME}}')==1 and tr.count('{{ALT}}')==1
+os.makedirs(os.path.join(ROOT,'train','2d'),exist_ok=True)
+# 專業訓練：train/ 是 3D 訓練村（內嵌 three.js），train/2d/ 是 2D 地圖版
+t3=tr.replace('<!--V3D-->','<script>/* three.js r128 (MIT) 內嵌 */\n'+three+'\n</script>\n<script>\n'+open('village3d.js',encoding='utf-8').read()+'</script>').replace('{{HOME}}','../').replace('{{ALT}}','電腦比較舊的話，可以改用 <a href="2d/">2D 地圖版</a>，進度是共用的。')
+open(os.path.join(ROOT,'train','index.html'),'w',encoding='utf-8').write(t3)
+open(os.path.join(ROOT,'train','2d','index.html'),'w',encoding='utf-8').write(tr.replace('<!--V3D-->','').replace('{{HOME}}','../../').replace('{{ALT}}','想在村子裡走動可以用 <a href="../">3D 版</a>，進度是共用的。'))
 open(os.path.join(ROOT,'2d','index.html'),'w',encoding='utf-8').write(open('head2d.html',encoding='utf-8').read()+src.replace(H,H[:-4]+'想看立體的醫院可以玩 <a href="../game/" style="color:var(--accent)">3D 版</a>。<a href="../" style="color:var(--accent)">回首頁</a></p>'))
+if '--train' in sys.argv: open(sys.argv[sys.argv.index('--train')+1],'w',encoding='utf-8').write(t3.replace('<a class="back" href="../">← 回首頁</a>','').replace('電腦比較舊的話，可以改用 <a href="2d/">2D 地圖版</a>，進度是共用的。',''))
 # 選用：--plain 路徑，輸出不含 2D 連結的單檔 3D 版
 if '--plain' in sys.argv: open(sys.argv[sys.argv.index('--plain')+1],'w',encoding='utf-8').write(out)
 print('built',len(out))
