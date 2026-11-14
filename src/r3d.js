@@ -508,7 +508,12 @@ function furnish(r,kind){CURK=kind;const x0=r.x,z0=r.y,w=r.w,h=r.h,zb=z0+0.02,la
   corners();break;}
  case 'exec':{const dx=x0+Math.max(1,Math.floor(w/2)-1);blk(dx,zi+0.5,2,0.9);box(dx,0,zi+0.5,2,0.75,0.9,0x3a2820);box(dx-0.05,0.75,zi+0.45,2.1,0.06,1.0,0x4e352c);monitor(dx+0.8,0.81,zi+0.7);box(dx+0.3,0.81,zi+1.1,0.3,0.05,0.2,0xdfe3e8);chair(dx+0.8,zi+1.3,false,0x2b2b2b);chair(dx+0.1,zi-0.15,true,0x5a3a3a);chair(dx+1.1,zi-0.15,true,0x5a3a3a);
   bookshelf(x0+0.1,zb,Math.max(1,Math.min(3,w/2-0.5)));if(w>4)bookshelf(last-Math.min(2,w/2-1.2)+0.9,zb,Math.min(2,w/2-1.2));box(x0+0.15,0,zf+0.1,0.08,1.6,0.08,0x8a94a8);box(x0+0.19,0.9,zf+0.1,0.35,0.6,0.03,0xef6b6b);
-  if(w>=4){sofa(x0+0.5,zi2+0.3,Math.min(1.7,w-2),0x5a3a3a);blk(x0+0.8,zi2+1.15,0.9,0.5);box(x0+0.8,0,zi2+1.15,0.9,0.4,0.5,0x4e352c);}plant(last,z0+0.2);clock(dx+2.4,zb);break;}
+  if(w>=4){sofa(x0+0.5,zi2+0.3,Math.min(1.7,w-2),0x5a3a3a);blk(x0+0.8,zi2+1.15,0.9,0.5);box(x0+0.8,0,zi2+1.15,0.9,0.4,0.5,0x4e352c);}
+   if(w>=10){// 大間的主管室：會客區多兩張單椅、東側小會議桌配電視、門口是秘書座位
+    chair(x0+2.4,zi2+0.9,false,0x5a3a3a);chair(x0+2.4,zi2+1.7,false,0x5a3a3a);
+    const tx=last-4.2;if(tx>dx+3){blk(tx,z0+2.0,3.2,0.9);box(tx,0.65,z0+2.0,3.2,0.06,0.9,0x4e352c);[[0.1,0.1],[3.0,0.1],[0.1,0.7],[3.0,0.7]].forEach(([q,c])=>box(tx+q,0,z0+2.0+c,0.1,0.65,0.1,0x3a2820));for(let c=tx+0.1;c+0.7<=tx+3.2;c+=1.0){chair(c,z0+1.2,true,0x5a3a3a);chair(c,z0+2.75,false,0x5a3a3a);}tv(tx+0.9,zb,1.4);}
+    const sx=door+2<=last-3?door+2:door-4;desk(sx,z0+5.6,0x4e352c);desk(sx+1,z0+5.6,0x4e352c);chair(sx+0.55,z0+5.35,false);monitor(sx+0.3,0.6,z0+5.85);box(sx+1.2,0.61,z0+5.85,0.18,0.06,0.2,0x2b3242,false);fileCabinet(sx+2,z0+5.3);lowPanel(sx-0.2,z0+5.1,0.06,1.5);textPlate(sx+0.3,1.5,z0+6.1,1.0,0.16,'秘書','#ffffff','#5a3a3a',true);}
+   plant(last,z0+0.2);clock(dx+2.4,zb);break;}
  case 'server':{// 機房：機櫃成排、排間是冷熱通道，上方線架；後牆空調箱；東側配電盤、電池櫃、UPS；門口監控台
   const xs=x0+3,xe=last-3,mid=Math.floor((xs+xe)/2);
   [2,4].forEach((dz,ri)=>{for(let x=xs;x<=xe;x++){if(xe-xs>=13&&x===mid)continue;rack(x,z0+dz,x*3+ri*5);}
