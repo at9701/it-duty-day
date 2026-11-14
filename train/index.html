@@ -102,7 +102,7 @@ pre{margin:0;background:#16212b;color:#d7e3ee;border-radius:10px;padding:12px 14
 <div class="wrap">
  <header><a class="back" href="../">← 回首頁</a><h1>資訊職訓中心</h1><div class="sum"><span class="pill">基礎課程 <b id="sDone">0</b></span><span class="pill">星星 <b id="sStar">0</b></span><span class="pill">總分 <b id="sScore">0</b></span><button class="btn ghost" id="snd" style="padding:4px 12px;border-radius:999px" aria-label="音效開關">🔊</button></div></header>
  <div id="hub" style="display:flex;flex-direction:column;gap:16px">
-  <p class="lead">中庭周圍是九間實習教室，九位師傅各教一門每個資訊人員都該會的基礎課；基礎考過，就能去進階專科大樓，照六條專業路線找各科主任。技能等級代表通過知識測驗，不等於實作能力的認證。找師傅說話就能考試：一次 8 題、三條命，錯一題以內就算通過，每一項技能從初級一路考到專家。電腦比較舊的話，可以改用 <a href="2d/">2D 地圖版</a>，進度是共用的。</p>
+  <p class="lead">中庭周圍是九間實習教室，九位師傅各教一門每個資訊人員都該會的基礎課；基礎考過，就能去進階專科大樓，照六條專業路線找各科大師。技能等級代表通過知識測驗，不等於實作能力的認證。找師傅說話就能考試：一次 8 題、三條命，錯一題以內就算通過，每一項技能從初級一路考到專家。電腦比較舊的話，可以改用 <a href="2d/">2D 地圖版</a>，進度是共用的。</p>
   <div id="stage"></div>
   <h2 class="sec">基礎課程</h2>
   <div class="chips" id="chips"></div>
@@ -248,64 +248,91 @@ window.initVillage3D=function(api){
   else{const w=1.6+rnd()*2.4;box(w,h,w,0x1a2a40,x,h/2,z);const c=[CY,0x4fe08a,0xf2c14e,0xd0568a][i%4];for(let k=0;k<3;k++){const e=box(w+.04,.08,w+.04,B(c),x,h*(.3+k*.25),z);e.castShadow=false;const ph=rnd()*6;anim.push(t=>{e.visible=Math.sin(t*1.3+ph+k)>-.7;});}}}
  // 飄在空中的資料光點
  for(let i=0;i<12;i++){const a=rnd()*Math.PI*2,r=4+rnd()*20,d=new THREE.Mesh(new THREE.BoxGeometry(.1,.1,.1),B(i%3?CY:0x4fe08a));const y0=1+rnd()*6,sp=.3+rnd()*.5;sc.add(d);anim.push(t=>{d.position.set(Math.sin(a+t*.03)*r,((y0+t*sp)%7)+.6,Math.cos(a+t*.03)*r);});}
- // 進階專科大樓內部：放在很遠的地方，搭電梯過去。九個諮詢台圍成弧形，每科一個會轉的標誌
- const OX=300,blocks2=[],H=new THREE.Group();H.position.x=OX;sc.add(H);
- box(46,.2,32,0x182538,0,-.1,-2,H);{const gr=new THREE.GridHelper(46,23,0x2a4a68,0x20344c);gr.position.set(0,.012,-2);gr.scale.z=32/46;H.add(gr);}
- box(46,9,.5,0x1c2b40,0,4.5,-18,H);box(.5,9,32,0x1c2b40,-23,4.5,-2,H);box(.5,9,32,0x1c2b40,23,4.5,-2,H);
- for(let k=0;k<9;k++){scr(H,-20+k*5,5.5,-17.72,3.4,4.5,k%2?0x16324a:0x1d4466);}{const e=box(46,.12,.1,B(CY),0,8.6,-17.7,H);e.castShadow=false;const e2=box(46,.12,.1,B(CY),0,1.2,-17.7,H);e2.castShadow=false;}
- {const o=new THREE.Mesh(new THREE.RingGeometry(4.2,4.35,48),B(CY));o.rotation.x=-Math.PI/2;o.position.y=.03;H.add(o);const l=label(['進階專科大樓'],'#ffffff','#fff',5);l.position.set(OX,10.2,-17);sc.add(l);}
- const SHAPES=[()=>new THREE.BoxGeometry(.9,.9,.9),()=>new THREE.TorusKnotGeometry(.45,.12,48,8),()=>new THREE.OctahedronGeometry(.7,0),()=>new THREE.ConeGeometry(.6,1.1,4),()=>new THREE.CylinderGeometry(.55,.55,.8,20),()=>new THREE.DodecahedronGeometry(.65,0),()=>new THREE.TorusGeometry(.5,.14,8,24),()=>new THREE.TetrahedronGeometry(.8,0),()=>new THREE.IcosahedronGeometry(.65,0)];
- const RA=15,AA=i=>Math.PI-(i-(api.adv.length-1)/2)*.245;
- // 路線標示：畫在地板上，每條路線一段弧線加名稱，不擋到主任的名牌
+ // 進階專科大樓內部：放在很遠的地方，搭電梯過去。六條路線各一間房間，沒有屋頂；後排四間小的，左右各一間大的
+ const OX=300,blocks2=[],rects=[],rooms=[],H=new THREE.Group();H.position.x=OX;sc.add(H);
  const floorText=(txt,col,w)=>{const cv=document.createElement('canvas');cv.width=txt.length*112+40;cv.height=160;const x=cv.getContext('2d');x.font='900 104px "PingFang TC","Microsoft JhengHei","Noto Sans TC",sans-serif';x.textAlign='center';x.textBaseline='middle';x.lineWidth=10;x.strokeStyle='rgba(8,16,30,.9)';x.strokeText(txt,cv.width/2,84);x.fillStyle=col;x.fillText(txt,cv.width/2,84);
   const m=new THREE.Mesh(new THREE.PlaneGeometry(w,w*160/cv.width),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(cv),transparent:true,depthWrite:false}));m.rotation.x=-Math.PI/2;return m;};
- {const G={},TC=['#39d6ff','#4fe08a','#ff7b6b','#c79bff','#3fd6c8','#f2c14e'];api.adv.forEach((c,i)=>{(G[c.track]=G[c.track]||[]).push(AA(i));});let k=0;for(const t in G){const as=G[t],lo=Math.min(...as),hi=Math.max(...as),mid=(lo+hi)/2,col=TC[k%TC.length],r=RA-2.7;
-   const arc=new THREE.Mesh(new THREE.RingGeometry(r-.09,r+.09,40,1,lo-Math.PI/2-.1,hi-lo+.2),new THREE.MeshBasicMaterial({color:col,side:THREE.DoubleSide}));arc.rotation.x=-Math.PI/2;arc.position.y=.04;H.add(arc);
-   const rr=as.length>2?r-1.4:r-[1.3,1.3,2.7,4.1,1.3,1.3][k%6],w=t.length*.95,ft=floorText(t,col,w);ft.position.set(Math.sin(mid)*rr,.05,Math.cos(mid)*rr);H.add(ft);k++;}
-  const ct=floorText('進階專科大樓','#39d6ff',6);ct.position.set(0,.05,-.4);H.add(ct);const c2=floorText('走近各科主任按 E','#bfefff',5.6);c2.position.set(0,.05,1.3);H.add(c2);}
- api.adv.forEach((c,i)=>{const a=AA(i),lx=Math.sin(a)*RA,lz=Math.cos(a)*RA,g=new THREE.Group(),rcH=new THREE.Color(c.rc).getHex();g.position.set(lx,0,lz);g.rotation.y=a+Math.PI;H.add(g);
-  cyl(1.9,2,.16,0x2a3a50,0,.08,0,g,24);{const o=new THREE.Mesh(new THREE.TorusGeometry(1.92,.04,6,40),B(rcH));o.rotation.x=Math.PI/2;o.position.y=.17;g.add(o);}
-  box(2.2,.9,.5,0x33455c,0,.6,.7,g);{const e=box(2.2,.05,.52,B(rcH),0,1.07,.7,g);e.castShadow=false;}mon(g,.55,1.1,.7,0x16324a,Math.PI);
-  cyl(.07,.07,2.6,0x4b5d75,-1.1,1.4,-.9,g,8);const sh=new THREE.Mesh(SHAPES[i%SHAPES.length](),new THREE.MeshBasicMaterial({color:rcH,wireframe:true}));sh.position.set(-1.1,3.3,-.9);g.add(sh);anim.push(t=>{sh.rotation.set(t*.5,t*.8+i,0);});
-  const m=person(rcH,HAIR[(i+3)%HAIR.length]);sc.remove(m);m.position.set(0,.16,-.1);g.add(m);
-  const x=OX+lx,z=lz,sign=label([c.name,c.npc+'｜'+c.track],'#ffffff','#1c2a36',4.2);sign.position.set(x,4.5,z);sc.add(sign);
-  blocks2.push([x,z,2.1]);stalls.push({c,x,z,a,m,mk:null,adv:true,my:5.9,fx:OX+Math.sin(a)*(RA-3),fz:Math.cos(a)*(RA-3)});});
+ box(46,.2,33,0x182538,0,-.1,-2,H);{const gr=new THREE.GridHelper(46,23,0x2a4a68,0x20344c);gr.position.set(0,.012,-2);gr.scale.z=33/46;H.add(gr);}
+ box(46,9,.5,0x1c2b40,0,4.5,-18.2,H);box(.5,9,33,0x1c2b40,-23,4.5,-2,H);box(.5,9,33,0x1c2b40,23,4.5,-2,H);
+ for(let k=0;k<9;k++)scr(H,-20+k*5,6.6,-17.9,3.4,3,k%2?0x16324a:0x1d4466);{const e=box(46,.12,.1,B(CY),0,8.6,-17.9,H);e.castShadow=false;}
+ // 牆：w(x0,z0,x1,z1,高度,頂邊顏色)，同時登記成不能穿過的矩形
+ const wall=(x0,z0,x1,z1,h,col)=>{const w=Math.abs(x1-x0)||.3,d=Math.abs(z1-z0)||.3,cx=(x0+x1)/2,cz=(z0+z1)/2;box(w,h,d,0x33455c,cx,h/2,cz,H);if(col!=null){const e=box(w+.02,.08,d+.02,B(col),cx,h+.04,cz,H);e.castShadow=false;}rects.push([OX+cx-w/2,cz-d/2,OX+cx+w/2,cz+d/2]);};
+ const solid=(x0,z0,x1,z1)=>rects.push([OX+x0,z0,OX+x1,z1]);
+ const plant=(x,z,g)=>{cyl(.26,.2,.42,0x4b5d75,x,.21,z,g||H,10);sph(.42,0x3f9a6a,x,.85,z,g||H);sph(.26,0x55b57e,x+.12,1.2,z-.05,g||H);};
+ const TC={'系統與基礎設施':'#39d6ff','網路與通訊':'#4fe08a','資訊安全':'#ff7b6b','資料庫與資料平台':'#c79bff','軟體開發與整合':'#3fd6c8','IT 營運與治理':'#f2c14e'};
+ const byTrack={};api.adv.forEach(c=>{(byTrack[c.track]=byTrack[c.track]||[]).push(c);});
+ // 一位大師的座位：桌子、螢幕、椅子，大師站在桌子後面朝南
+ function seat(c,x,z,idx){const g=new THREE.Group();g.position.set(x,0,z);H.add(g);const rcH=new THREE.Color(c.rc).getHex();
+  box(2,.8,.75,0x3b4b63,0,.4,.75,g);box(2.06,.06,.81,0x55677f,0,.83,.75,g);{const e=box(2.06,.05,.05,B(rcH),0,.6,1.14,g);e.castShadow=false;}
+  mon(g,.5,.86,.75,0x16324a,Math.PI);box(.3,.03,.22,0xdfe6ee,-.45,.87,.8,g);cyl(.07,.06,.13,0xf4f1ea,-.85,.92,.6,g,10);
+  box(.5,.08,.5,0x26313c,0,.48,-.75,g);box(.5,.55,.08,0x26313c,0,.8,-1,g);cyl(.05,.05,.46,0x5b6672,0,.24,-.75,g,8);
+  const m=person(rcH,HAIR[(idx+3)%HAIR.length]);sc.remove(m);m.position.set(0,0,-.15);g.add(m);
+  const sign=label([c.name,c.npc],'#ffffff','#1c2a36',3.1);sign.position.set(OX+x,3.25,z);sc.add(sign);
+  blocks2.push([OX+x,z+.75,1.15]);stalls.push({c,x:OX+x,z,a:0,m,mk:null,adv:true,my:4.25,mw:1.7,fx:OX+x,fz:z+2.2});}
+ // 一間房間：地板、牆、門上的路線牌、裡面的擺設
+ function room(track,x0,z0,x1,z1,door,seats){const col=new THREE.Color(TC[track]).getHex(),w=x1-x0,d=z1-z0,cx=(x0+x1)/2,cz=(z0+z1)/2,cs=byTrack[track]||[];
+  box(w,.05,d,new THREE.Color(TC[track]).multiplyScalar(.2).getHex(),cx,.03,cz,H);box(w-1.4,.02,d-1.4,new THREE.Color(TC[track]).multiplyScalar(.3).getHex(),cx,.065,cz,H);
+  let io,sx,sz;
+  if(door==='s'){wall(x0,z1,cx-1.3,z1,1,col);wall(cx+1.3,z1,x1,z1,1,col);wall(x0,z0,x0,z1,2.3,col);wall(x1,z0,x1,z1,2.3,col);box(.34,2.6,.34,0x4b5d75,cx-1.3,1.3,z1,H);box(.34,2.6,.34,0x4b5d75,cx+1.3,1.3,z1,H);{const e=box(2.9,.14,.2,B(col),cx,2.6,z1,H);e.castShadow=false;}
+   io={out:[OX+cx,z1+1.3],in:[OX+cx,z1-1.3]};sx=cx;sz=z1;
+   scr(H,cx,2.6,z0+.3,w-2.2,1.5,0x10283c);{const e=scr(H,cx,2.6,z0+.33,w-2.6,.08,col);anim.push(t=>{e.position.y=2+((t*.25)%1)*1.2;});}plant(x0+.8,z0+.9);box(.9,1.6,.5,0x3b4b63,x1-.9,.8,z0+.7,H);for(let k=0;k<3;k++)scr(H,x1-.9,.4+k*.5,z0+.96,.7,.06,col);}
+  else{const sgn=door==='e'?1:-1,xd=door==='e'?x1:x0,dz=cz;wall(xd,z0,xd,dz-1.4,1,col);wall(xd,dz+1.4,xd,z1,1,col);wall(x0,z0,x1,z0,2.3,col);wall(x0,z1,x1,z1,1,col);box(.34,2.6,.34,0x4b5d75,xd,1.3,dz-1.4,H);box(.34,2.6,.34,0x4b5d75,xd,1.3,dz+1.4,H);{const e=box(.2,.14,3.1,B(col),xd,2.6,dz,H);e.castShadow=false;}
+   io={out:[OX+xd+sgn*1.3,dz],in:[OX+xd-sgn*1.3,dz]};sx=xd;sz=dz;
+   scr(H,cx,2.9,z0+.3,w-2.4,1.6,0x10283c);{const e=scr(H,cx,2.9,z0+.33,w-2.8,.08,col);anim.push(t=>{e.position.y=2.25+((t*.25)%1)*1.3;});}
+   const ox=door==='e'?x0+.9:x1-.9;plant(ox,z0+1);plant(ox,z1-1);for(let k=0;k<3;k++){box(.8,2,.7,0x26313c,ox,1,cz-1.6+k*1.6,H);for(let j=0;j<5;j++){const dd=scr(H,ox+(door==='e'?.42:-.42),.4+j*.36,cz-1.6+k*1.6,.05,.08,j%2?0x4fe08a:col);dd.rotation.y=Math.PI/2;anim.push(t=>{dd.visible=Math.sin(t*(3+j)+k*2)>-.4;});}}
+   box(2.6,.5,1.1,0x3b4b63,cx+(door==='e'?1.2:-1.2),.25,cz,H);box(2.6,.08,1.1,0x55677f,cx+(door==='e'?1.2:-1.2),.54,cz,H);solid(cx+(door==='e'?1.2:-1.2)-1.4,cz-.65,cx+(door==='e'?1.2:-1.2)+1.4,cz+.65);}
+  const sg=label([track],TC[track],'#10202e',Math.max(3.4,track.length*.62));sg.position.set(OX+sx,3.6,sz);sc.add(sg);
+  rooms.push({x0:OX+x0,z0,x1:OX+x1,z1,out:io.out,in:io.in});cs.forEach((c,k)=>{const s=seats[k]||seats[seats.length-1];seat(c,s[0],s[1],stalls.length);});}
+ room('網路與通訊',-13,-17.6,-6.5,-10,'s',[[-9.75,-14.6]]);
+ room('資訊安全',-6.5,-17.6,0,-10,'s',[[-4.85,-14.6],[-1.65,-14.6]]);
+ room('資料庫與資料平台',0,-17.6,6.5,-10,'s',[[3.25,-14.6]]);
+ room('軟體開發與整合',6.5,-17.6,13,-10,'s',[[9.75,-14.6]]);
+ room('系統與基礎設施',-22.6,-9,-13,8,'e',[[-20.4,-6],[-16.2,-6],[-20.4,3.6],[-16.2,3.6]]);
+ room('IT 營運與治理',13,-9,22.6,8,'w',[[16.2,-6],[20.4,-6],[16.2,3.6],[20.4,3.6]]);
+ // 四個角落不開放：後面是機櫃，前面是休息區
+ [[-22.6,-17.6,-13,-9],[13,-17.6,22.6,-9]].forEach(q=>{solid(q[0],q[1],q[2],q[3]+.1);box(q[2]-q[0],.06,q[3]-q[1],0x121c2b,(q[0]+q[2])/2,.03,(q[1]+q[3])/2,H);for(let k=0;k<4;k++){const x=q[0]+1.4+k*2.2;box(1.2,2.8,1.4,0x1b2636,x,1.4,q[1]+2.2,H);for(let j=0;j<6;j++){const dd=scr(H,x,.5+j*.38,q[1]+2.92,.8,.05,j%3?0x2f86b8:0x4fe08a);anim.push(t=>{dd.visible=Math.sin(t*(2+j*.6)+k)>-.5;});}}box(q[2]-q[0],1,.3,0x33455c,(q[0]+q[2])/2,.5,q[3],H);});
+ [[-22.6,8,-13,14.4],[13,8,22.6,14.4]].forEach(q=>{solid(q[0],q[1]-.1,q[2],q[3]);const cx=(q[0]+q[2])/2;box(q[2]-q[0],.06,q[3]-q[1],0x1f3147,cx,.03,(q[1]+q[3])/2,H);box(3.4,.45,1.1,0x3f6f8f,cx,.25,11,H);box(3.4,.6,.25,0x3f6f8f,cx,.6,11.5,H);box(1.2,.4,1.2,0x55677f,cx,.2,9.3,H);plant(cx-2.6,10.8);plant(cx+2.6,10.8);plant(q[0]+1,13.4);plant(q[2]-1,13.4);});
+ // 大廳：中央標誌、服務台
+ {const o=new THREE.Mesh(new THREE.RingGeometry(3.3,3.45,48),B(CY));o.rotation.x=-Math.PI/2;o.position.y=.03;H.add(o);const ct=floorText('進階專科大樓','#39d6ff',5);ct.position.set(0,.05,-.3);H.add(ct);const c2=floorText('六條路線，各在一間房間','#bfefff',4.6);c2.position.set(0,.05,1);H.add(c2);
+  const l=label(['進階專科大樓'],'#ffffff','#fff',5);l.position.set(OX,9.6,-17.5);sc.add(l);plant(-11.6,-8.2);plant(11.6,-8.2);plant(-11.6,12.6);plant(11.6,12.6);}
  // 電梯：中庭和大樓之間來回
- const lifts=[[9.5,9.5,'搭電梯到進階專科大樓'],[OX,10,'搭電梯回中庭']].map((q,k)=>{cyl(1.3,1.4,.14,0x33455c,q[0],.07,q[1],null,24);const o=new THREE.Mesh(new THREE.RingGeometry(1.05,1.22,32),B(0xf2c14e));o.rotation.x=-Math.PI/2;o.position.set(q[0],.16,q[1]);sc.add(o);
+ const lifts=[[9.5,9.5,'搭電梯到進階專科大樓'],[OX,11.6,'搭電梯回中庭']].map((q,k)=>{cyl(1.3,1.4,.14,0x33455c,q[0],.07,q[1],null,24);const o=new THREE.Mesh(new THREE.RingGeometry(1.05,1.22,32),B(0xf2c14e));o.rotation.x=-Math.PI/2;o.position.set(q[0],.16,q[1]);sc.add(o);
   const bm=new THREE.Mesh(new THREE.CylinderGeometry(1.05,1.05,3.2,24,1,true),new THREE.MeshBasicMaterial({color:0xf2c14e,transparent:true,opacity:.13,side:THREE.DoubleSide,depthWrite:false}));bm.position.set(q[0],1.7,q[1]);sc.add(bm);anim.push(t=>{bm.material.opacity=.1+Math.sin(t*2)*.05;});
   const l=label([k?'回中庭':'進階專科大樓'],'#ffffff','#fff',k?2.4:3.6);l.position.set(q[0],4,q[1]);sc.add(l);return {x:q[0],z:q[1],txt:q[2],to:k?0:1};});
  let zone=0;const ZC=()=>zone?OX:0;
- function ride(L){zone=L.to;const d=lifts[L.to?1:0];me.position.set(d.x,0,d.z-2.2);me.rotation.y=Math.PI;target=null;want=null;ring.visible=false;sun.position.set(ZC()+14,30,16);sun.target.position.set(ZC(),0,0);sun.target.updateMatrixWorld();}
+ function ride(L){zone=L.to;const d=lifts[L.to?1:0];me.position.set(d.x,0,d.z-2.2);me.rotation.y=Math.PI;target=null;path=[];want=null;ring.visible=false;sun.position.set(ZC()+14,30,16);sun.target.position.set(ZC(),0,0);sun.target.updateMatrixWorld();}
  sc.add(sun.target);
  // 玩家
  const me=person(0x17a07a,0x33271f);me.position.set(0,0,10);
  const ring=new THREE.Mesh(new THREE.RingGeometry(.3,.42,24),new THREE.MeshBasicMaterial({color:0x39d6ff,transparent:true,opacity:.8}));ring.rotation.x=-Math.PI/2;ring.position.y=.05;ring.visible=false;sc.add(ring);
  // 師傅頭上的標記
- window.v3dRefresh=()=>stalls.forEach(s=>{const t=api.tier(s.c),lk=s.adv&&api.locked(s.c);if(s.mk)sc.remove(s.mk);s.mk=label([lk?'未開放':t>=0?api.TIER[t]+'通過':'來上課'],lk?'#5b6672':t>=0?'#17a07a':'#c9860c','#ffffff',2.2);s.my=s.my||6.3;s.mk.position.set(s.x,s.my,s.z);sc.add(s.mk);});
+ window.v3dRefresh=()=>stalls.forEach(s=>{const t=api.tier(s.c),lk=s.adv&&api.locked(s.c);if(s.mk)sc.remove(s.mk);s.mk=label([lk?'未開放':t>=0?api.TIER[t]+'通過':'來上課'],lk?'#5b6672':t>=0?'#17a07a':'#c9860c','#ffffff',s.mw||2.2);s.my=s.my||6.3;s.mk.position.set(s.x,s.my,s.z);sc.add(s.mk);});
  // 操作
- const keys={};let target=null,want=null,near=null,nearL=null;const act=()=>{if(near)api.talk(near.c);else if(nearL)ride(nearL);};
+ const keys={};let target=null,want=null,near=null,nearL=null,path=[];const act=()=>{if(near)api.talk(near.c);else if(nearL)ride(nearL);};
  const KM={KeyW:[0,-1],ArrowUp:[0,-1],KeyS:[0,1],ArrowDown:[0,1],KeyA:[-1,0],ArrowLeft:[-1,0],KeyD:[1,0],ArrowRight:[1,0]};
- addEventListener('keydown',e=>{if(api.busy())return;if(KM[e.code]){keys[e.code]=1;target=null;want=null;ring.visible=false;if(e.code.startsWith('Arrow'))e.preventDefault();}
+ addEventListener('keydown',e=>{if(api.busy())return;if(KM[e.code]){keys[e.code]=1;target=null;path=[];want=null;ring.visible=false;if(e.code.startsWith('Arrow'))e.preventDefault();}
   if((e.code==='KeyE'||e.code==='Enter')&&(near||nearL)&&document.activeElement.tagName!=='BUTTON'){e.preventDefault();act();}});
  addEventListener('keyup',e=>{delete keys[e.code];});addEventListener('blur',()=>{for(const k in keys)delete keys[k];});
  const ray=new THREE.Raycaster(),gp=new THREE.Plane(new THREE.Vector3(0,1,0),0),v2=new THREE.Vector2(),hit=new THREE.Vector3();
  R.domElement.addEventListener('pointerdown',e=>{if(api.busy())return;const b=R.domElement.getBoundingClientRect();v2.set((e.clientX-b.left)/b.width*2-1,-(e.clientY-b.top)/b.height*2+1);ray.setFromCamera(v2,cam);
   if(!ray.ray.intersectPlane(gp,hit))return;let s=stalls.find(s=>Math.hypot(hit.x-s.x,hit.z-s.z)<3.2);
-  if(s){target=[s.fx,s.fz];want=s;}else{target=[hit.x,hit.z];want=null;}ring.position.set(target[0],.05,target[1]);ring.visible=true;});
+  let goal;if(s){goal=[s.fx,s.fz];want=s;}else{goal=[hit.x,hit.z];want=null;}path=[];
+  if(zone){const ro=(x,z)=>rooms.find(r=>x>r.x0&&x<r.x1&&z>r.z0&&z<r.z1),a=ro(me.position.x,me.position.z),b=ro(goal[0],goal[1]);if(a!==b){if(a)path.push(a.in,a.out);if(b)path.push(b.out,b.in);}}
+  path.push(goal);target=path.shift();ring.position.set(goal[0],.05,goal[1]);ring.visible=true;});
  tip.onclick=act;
  function step(dt){let dx=0,dz=0;for(const k in keys){dx+=KM[k][0];dz+=KM[k][1];}
-  if(!dx&&!dz&&target){dx=target[0]-me.position.x;dz=target[1]-me.position.z;if(Math.hypot(dx,dz)<.25){target=null;ring.visible=false;dx=dz=0;if(want){const w=want;want=null;api.talk(w.c);}}}
+  if(!dx&&!dz&&target){dx=target[0]-me.position.x;dz=target[1]-me.position.z;if(Math.hypot(dx,dz)<.3){if(path.length){target=path.shift();dx=target[0]-me.position.x;dz=target[1]-me.position.z;}else{target=null;ring.visible=false;dx=dz=0;if(want){const w=want;want=null;api.talk(w.c);}}}}
   const l=Math.hypot(dx,dz),mv=l>0;
   if(mv){dx/=l;dz/=l;let nx=me.position.x+dx*6.5*dt,nz=me.position.z+dz*6.5*dt;
    (zone?blocks2:blocks).forEach(b=>{const d=Math.hypot(nx-b[0],nz-b[1]),r=b[2]+.35;if(d<r&&d>0){nx=b[0]+(nx-b[0])/d*r;nz=b[1]+(nz-b[1])/d*r;}});
-   if(zone){nx=Math.max(OX-21.5,Math.min(OX+21.5,nx));nz=Math.max(-16,Math.min(12.5,nz));}else{const d=Math.hypot(nx,nz);if(d>21.8){nx*=21.8/d;nz*=21.8/d;}}
-   if(Math.hypot(nx-me.position.x,nz-me.position.z)<.01*dt*60&&target){target=null;ring.visible=false;}
+   if(zone){nx=Math.max(OX-22.2,Math.min(OX+22.2,nx));nz=Math.max(-17.2,Math.min(13.6,nz));const P=.38,hitR=(x,z)=>rects.some(r=>x>r[0]-P&&x<r[2]+P&&z>r[1]-P&&z<r[3]+P),ox=me.position.x,oz=me.position.z;if(hitR(nx,nz)){if(!hitR(nx,oz))nz=oz;else if(!hitR(ox,nz))nx=ox;else{nx=ox;nz=oz;}}}else{const d=Math.hypot(nx,nz);if(d>21.8){nx*=21.8/d;nz*=21.8/d;}}
+   if(Math.hypot(nx-me.position.x,nz-me.position.z)<.01*dt*60&&target){target=null;path=[];want=null;ring.visible=false;}
    me.position.x=nx;me.position.z=nz;let da=Math.atan2(dx,dz)-me.rotation.y;da=Math.atan2(Math.sin(da),Math.cos(da));me.rotation.y+=da*Math.min(1,dt*12);}
   const t=performance.now()/1000,sw=mv?Math.sin(t*11)*.6:0;me.userData.L[0].rotation.x=sw;me.userData.L[1].rotation.x=-sw;me.userData.A[0].rotation.x=-sw;me.userData.A[1].rotation.x=sw;
   anim.forEach(f=>f(t));near=null;let bd=3.4;stalls.forEach((s,i)=>{const d=Math.hypot(me.position.x-s.fx,me.position.z-s.fz);if(d<bd){bd=d;near=s;}s.m.position.y=(s.adv?.16:.12)+Math.sin(t*2+i)*.03;if(s.mk)s.mk.position.y=s.my+Math.sin(t*3+i)*.08;});
   nearL=null;if(!near)lifts.forEach(L=>{if(Math.hypot(me.position.x-L.x,me.position.z-L.z)<1.5)nearL=L;});
   if(near){tip.textContent='跟'+near.c.npc+'說話（E）';tip.hidden=false;}else if(nearL){tip.textContent=nearL.txt+'（E）';tip.hidden=false;}else tip.hidden=true;
-  if(zone){const fx=OX+(me.position.x-OX)*.6,fz=me.position.z*.5-5;cam.position.set(fx,27,fz+27);cam.lookAt(fx,1,fz);}else{const fx=me.position.x*.6,fz=me.position.z*.55-5.5;cam.position.set(fx,29,fz+29);cam.lookAt(fx,1,fz);}}
+  if(zone){const fx=OX+(me.position.x-OX)*.5,fz=me.position.z*.45-4.5;cam.position.set(fx,31,fz+25);cam.lookAt(fx,1,fz);}else{const fx=me.position.x*.6,fz=me.position.z*.55-5.5;cam.position.set(fx,29,fz+29);cam.lookAt(fx,1,fz);}}
  function size(){const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;R.setSize(w,h,false);cam.aspect=w/h;cam.fov=w/h<1.1?52:38;cam.updateProjectionMatrix();}
  if(window.ResizeObserver)new ResizeObserver(size).observe(host);addEventListener('resize',size);size();
  let last=performance.now();(function loop(now){requestAnimationFrame(loop);const dt=Math.min(.05,(now-last)/1000);last=now;if(!host.clientWidth)return;if(!api.busy())step(dt);R.render(sc,cam);})(last);
@@ -1169,19 +1196,19 @@ const COURSES=[
 ];
 // ===== 進階專科：need 是要先考到中級的基礎課 =====
 const ADV=[
- {track:'系統與基礎設施',id:'sys',ic:'🗄️',col:'#dcefff',rc:'#2a7fd4',name:'系統工程',npc:'柯主任',src:['sys'],need:['os','hw'],hi:'伺服器、AD、虛擬化、雲端、備份。系統工程師顧的是大家看不到、但一停就全部停的東西。'},
- {track:'系統與基礎設施',id:'iam',ic:'🪪',col:'#e3ecf8',rc:'#5b8def',name:'身分與存取管理',npc:'艾主任',src:['iam'],need:[['os',1],['sec',0]],hi:'帳號、權限、單一登入、特權管理。現在的系統到處都是，能守的那道門就是「你是誰、你能做什麼」。'},
- {track:'系統與基礎設施',id:'virt',ic:'🧱',col:'#e6f4f1',rc:'#14a3a3',name:'虛擬化與運算平台',npc:'韋主任',src:['virt'],need:[['os',1],['hw',1],['net',0]],hi:'虛擬機、叢集、容器。一台主機上跑幾十個系統，方便是方便，倒的時候也是一起倒。'},
- {track:'系統與基礎設施',id:'bcdr',ic:'🛟',col:'#fbf1d9',rc:'#e0902a',name:'備份、復原與營運持續',npc:'傅主任',src:['bcdr'],need:[['os',1],['db',0]],hi:'備份不是重點，還原才是。沒有還原過的備份，只能算是一個願望。'},
- {track:'網路與通訊',id:'neteng',ic:'🔀',col:'#dcf3ea',rc:'#2f9e7a',name:'網路工程',npc:'路主任',src:['neteng'],need:['net'],hi:'路由、交換、無線、VPN。網路通的時候沒人記得你，不通的時候所有人都找你。'},
- {track:'資訊安全',id:'blue',ic:'🔍',col:'#e3ecf8',rc:'#4a82c8',name:'資安防禦',npc:'藍主任',src:['blue'],need:['sec'],hi:'監控、分析、應變。防守的人要每一次都擋下來，所以靠的是紀錄和流程，不是運氣。'},
- {track:'資訊安全',id:'red',ic:'🎯',col:'#fbe6e3',rc:'#d6453d',name:'資安攻擊',npc:'洪主任',src:['red'],need:['sec','net'],hi:'學攻擊是為了知道怎麼防。第一課不是工具，是授權和範圍，沒有授權就是犯罪。'},
- {track:'資料庫與資料平台',id:'dba',ic:'💾',col:'#f0e6fa',rc:'#8a5cc2',name:'資料庫管理',npc:'戴主任',src:['dba'],need:['db'],hi:'效能、備份、權限。DBA 的工作是讓資料又快、又對、又救得回來。'},
- {track:'軟體開發與整合',id:'dev',ic:'🧩',col:'#e6f4f1',rc:'#1f8f8f',name:'軟體開發',npc:'程主任',src:['dev'],need:['code'],hi:'會寫程式只是開始。需求、測試、版本、上線，每一步都會決定這支程式活多久。'},
- {track:'IT 營運與治理',id:'mgmt',ic:'🧭',col:'#fbf1d9',rc:'#c9860c',name:'IT 管理',npc:'管主任',src:['mgmt'],need:['svc','trouble'],hi:'管理是讓一群人把事情做好：流程、專案、採購、廠商，還有怎麼跟老闆要資源。'},
- {track:'IT 營運與治理',id:'itsm',ic:'🎫',col:'#f0e6fa',rc:'#9a6cd0',name:'IT 服務與變更管理',npc:'施主任',src:['itsm'],need:[['svc',1],['trouble',1]],hi:'事件、問題、變更、請求。流程不是為了麻煩人，是為了讓同樣的錯不要犯第二次。'},
- {track:'IT 營運與治理',id:'grc',ic:'📋',col:'#eef0dc',rc:'#8a8f3c',name:'治理與稽核',npc:'紀主任',src:['grc'],need:['gov'],hi:'制度不是寫給稽核員看的。寫了要做、做了要留紀錄、有問題要改，這樣才叫管理。'},
- {track:'IT 營運與治理',id:'law',ic:'⚖️',col:'#fde9f1',rc:'#d0568a',name:'資通安全法規',npc:'律主任',src:['law'],need:['gov'],hi:'資安法、個資法、刑法、營業秘密法。法條會修，所以重點是知道有哪些法、管到什麼、出事要找哪一條。'}
+ {track:'系統與基礎設施',id:'sys',ic:'🗄️',col:'#dcefff',rc:'#2a7fd4',name:'系統工程',npc:'柯大師',src:['sys'],need:['os','hw'],hi:'伺服器、AD、虛擬化、雲端、備份。系統工程師顧的是大家看不到、但一停就全部停的東西。'},
+ {track:'系統與基礎設施',id:'iam',ic:'🪪',col:'#e3ecf8',rc:'#5b8def',name:'身分與存取管理',npc:'艾大師',src:['iam'],need:[['os',1],['sec',0]],hi:'帳號、權限、單一登入、特權管理。現在的系統到處都是，能守的那道門就是「你是誰、你能做什麼」。'},
+ {track:'系統與基礎設施',id:'virt',ic:'🧱',col:'#e6f4f1',rc:'#14a3a3',name:'虛擬化與運算平台',npc:'韋大師',src:['virt'],need:[['os',1],['hw',1],['net',0]],hi:'虛擬機、叢集、容器。一台主機上跑幾十個系統，方便是方便，倒的時候也是一起倒。'},
+ {track:'系統與基礎設施',id:'bcdr',ic:'🛟',col:'#fbf1d9',rc:'#e0902a',name:'備份、復原與營運持續',npc:'傅大師',src:['bcdr'],need:[['os',1],['db',0]],hi:'備份不是重點，還原才是。沒有還原過的備份，只能算是一個願望。'},
+ {track:'網路與通訊',id:'neteng',ic:'🔀',col:'#dcf3ea',rc:'#2f9e7a',name:'網路工程',npc:'路大師',src:['neteng'],need:['net'],hi:'路由、交換、無線、VPN。網路通的時候沒人記得你，不通的時候所有人都找你。'},
+ {track:'資訊安全',id:'blue',ic:'🔍',col:'#e3ecf8',rc:'#4a82c8',name:'資安防禦',npc:'藍大師',src:['blue'],need:['sec'],hi:'監控、分析、應變。防守的人要每一次都擋下來，所以靠的是紀錄和流程，不是運氣。'},
+ {track:'資訊安全',id:'red',ic:'🎯',col:'#fbe6e3',rc:'#d6453d',name:'資安攻擊',npc:'洪大師',src:['red'],need:['sec','net'],hi:'學攻擊是為了知道怎麼防。第一課不是工具，是授權和範圍，沒有授權就是犯罪。'},
+ {track:'資料庫與資料平台',id:'dba',ic:'💾',col:'#f0e6fa',rc:'#8a5cc2',name:'資料庫管理',npc:'戴大師',src:['dba'],need:['db'],hi:'效能、備份、權限。DBA 的工作是讓資料又快、又對、又救得回來。'},
+ {track:'軟體開發與整合',id:'dev',ic:'🧩',col:'#e6f4f1',rc:'#1f8f8f',name:'軟體開發',npc:'程大師',src:['dev'],need:['code'],hi:'會寫程式只是開始。需求、測試、版本、上線，每一步都會決定這支程式活多久。'},
+ {track:'IT 營運與治理',id:'mgmt',ic:'🧭',col:'#fbf1d9',rc:'#c9860c',name:'IT 管理',npc:'管大師',src:['mgmt'],need:['svc','trouble'],hi:'管理是讓一群人把事情做好：流程、專案、採購、廠商，還有怎麼跟老闆要資源。'},
+ {track:'IT 營運與治理',id:'itsm',ic:'🎫',col:'#f0e6fa',rc:'#9a6cd0',name:'IT 服務與變更管理',npc:'施大師',src:['itsm'],need:[['svc',1],['trouble',1]],hi:'事件、問題、變更、請求。流程不是為了麻煩人，是為了讓同樣的錯不要犯第二次。'},
+ {track:'IT 營運與治理',id:'grc',ic:'📋',col:'#eef0dc',rc:'#8a8f3c',name:'治理與稽核',npc:'紀大師',src:['grc'],need:['gov'],hi:'制度不是寫給稽核員看的。寫了要做、做了要留紀錄、有問題要改，這樣才叫管理。'},
+ {track:'IT 營運與治理',id:'law',ic:'⚖️',col:'#fde9f1',rc:'#d0568a',name:'資通安全法規',npc:'律大師',src:['law'],need:['gov'],hi:'資安法、個資法、刑法、營業秘密法。法條會修，所以重點是知道有哪些法、管到什麼、出事要找哪一條。'}
 ];
 const ALLC=COURSES.concat(ADV),CBY={};ALLC.forEach(c=>CBY[c.id]=c);
 const pool=(c,l)=>c.src.reduce((a,s)=>a.concat((DOM[s].lv[l])||[]),[]);

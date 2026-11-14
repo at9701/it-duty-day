@@ -102,7 +102,7 @@ pre{margin:0;background:#16212b;color:#d7e3ee;border-radius:10px;padding:12px 14
 <div class="wrap">
  <header><a class="back" href="{{HOME}}">← 回首頁</a><h1>資訊職訓中心</h1><div class="sum"><span class="pill">基礎課程 <b id="sDone">0</b></span><span class="pill">星星 <b id="sStar">0</b></span><span class="pill">總分 <b id="sScore">0</b></span><button class="btn ghost" id="snd" style="padding:4px 12px;border-radius:999px" aria-label="音效開關">🔊</button></div></header>
  <div id="hub" style="display:flex;flex-direction:column;gap:16px">
-  <p class="lead">中庭周圍是九間實習教室，九位師傅各教一門每個資訊人員都該會的基礎課；基礎考過，就能去進階專科大樓，照六條專業路線找各科主任。技能等級代表通過知識測驗，不等於實作能力的認證。找師傅說話就能考試：一次 8 題、三條命，錯一題以內就算通過，每一項技能從初級一路考到專家。{{ALT}}</p>
+  <p class="lead">中庭周圍是九間實習教室，九位師傅各教一門每個資訊人員都該會的基礎課；基礎考過，就能去進階專科大樓，照六條專業路線找各科大師。技能等級代表通過知識測驗，不等於實作能力的認證。找師傅說話就能考試：一次 8 題、三條命，錯一題以內就算通過，每一項技能從初級一路考到專家。{{ALT}}</p>
   <div id="stage"></div>
   <h2 class="sec">基礎課程</h2>
   <div class="chips" id="chips"></div>
@@ -970,19 +970,19 @@ const COURSES=[
 ];
 // ===== 進階專科：need 是要先考到中級的基礎課 =====
 const ADV=[
- {track:'系統與基礎設施',id:'sys',ic:'🗄️',col:'#dcefff',rc:'#2a7fd4',name:'系統工程',npc:'柯主任',src:['sys'],need:['os','hw'],hi:'伺服器、AD、虛擬化、雲端、備份。系統工程師顧的是大家看不到、但一停就全部停的東西。'},
- {track:'系統與基礎設施',id:'iam',ic:'🪪',col:'#e3ecf8',rc:'#5b8def',name:'身分與存取管理',npc:'艾主任',src:['iam'],need:[['os',1],['sec',0]],hi:'帳號、權限、單一登入、特權管理。現在的系統到處都是，能守的那道門就是「你是誰、你能做什麼」。'},
- {track:'系統與基礎設施',id:'virt',ic:'🧱',col:'#e6f4f1',rc:'#14a3a3',name:'虛擬化與運算平台',npc:'韋主任',src:['virt'],need:[['os',1],['hw',1],['net',0]],hi:'虛擬機、叢集、容器。一台主機上跑幾十個系統，方便是方便，倒的時候也是一起倒。'},
- {track:'系統與基礎設施',id:'bcdr',ic:'🛟',col:'#fbf1d9',rc:'#e0902a',name:'備份、復原與營運持續',npc:'傅主任',src:['bcdr'],need:[['os',1],['db',0]],hi:'備份不是重點，還原才是。沒有還原過的備份，只能算是一個願望。'},
- {track:'網路與通訊',id:'neteng',ic:'🔀',col:'#dcf3ea',rc:'#2f9e7a',name:'網路工程',npc:'路主任',src:['neteng'],need:['net'],hi:'路由、交換、無線、VPN。網路通的時候沒人記得你，不通的時候所有人都找你。'},
- {track:'資訊安全',id:'blue',ic:'🔍',col:'#e3ecf8',rc:'#4a82c8',name:'資安防禦',npc:'藍主任',src:['blue'],need:['sec'],hi:'監控、分析、應變。防守的人要每一次都擋下來，所以靠的是紀錄和流程，不是運氣。'},
- {track:'資訊安全',id:'red',ic:'🎯',col:'#fbe6e3',rc:'#d6453d',name:'資安攻擊',npc:'洪主任',src:['red'],need:['sec','net'],hi:'學攻擊是為了知道怎麼防。第一課不是工具，是授權和範圍，沒有授權就是犯罪。'},
- {track:'資料庫與資料平台',id:'dba',ic:'💾',col:'#f0e6fa',rc:'#8a5cc2',name:'資料庫管理',npc:'戴主任',src:['dba'],need:['db'],hi:'效能、備份、權限。DBA 的工作是讓資料又快、又對、又救得回來。'},
- {track:'軟體開發與整合',id:'dev',ic:'🧩',col:'#e6f4f1',rc:'#1f8f8f',name:'軟體開發',npc:'程主任',src:['dev'],need:['code'],hi:'會寫程式只是開始。需求、測試、版本、上線，每一步都會決定這支程式活多久。'},
- {track:'IT 營運與治理',id:'mgmt',ic:'🧭',col:'#fbf1d9',rc:'#c9860c',name:'IT 管理',npc:'管主任',src:['mgmt'],need:['svc','trouble'],hi:'管理是讓一群人把事情做好：流程、專案、採購、廠商，還有怎麼跟老闆要資源。'},
- {track:'IT 營運與治理',id:'itsm',ic:'🎫',col:'#f0e6fa',rc:'#9a6cd0',name:'IT 服務與變更管理',npc:'施主任',src:['itsm'],need:[['svc',1],['trouble',1]],hi:'事件、問題、變更、請求。流程不是為了麻煩人，是為了讓同樣的錯不要犯第二次。'},
- {track:'IT 營運與治理',id:'grc',ic:'📋',col:'#eef0dc',rc:'#8a8f3c',name:'治理與稽核',npc:'紀主任',src:['grc'],need:['gov'],hi:'制度不是寫給稽核員看的。寫了要做、做了要留紀錄、有問題要改，這樣才叫管理。'},
- {track:'IT 營運與治理',id:'law',ic:'⚖️',col:'#fde9f1',rc:'#d0568a',name:'資通安全法規',npc:'律主任',src:['law'],need:['gov'],hi:'資安法、個資法、刑法、營業秘密法。法條會修，所以重點是知道有哪些法、管到什麼、出事要找哪一條。'}
+ {track:'系統與基礎設施',id:'sys',ic:'🗄️',col:'#dcefff',rc:'#2a7fd4',name:'系統工程',npc:'柯大師',src:['sys'],need:['os','hw'],hi:'伺服器、AD、虛擬化、雲端、備份。系統工程師顧的是大家看不到、但一停就全部停的東西。'},
+ {track:'系統與基礎設施',id:'iam',ic:'🪪',col:'#e3ecf8',rc:'#5b8def',name:'身分與存取管理',npc:'艾大師',src:['iam'],need:[['os',1],['sec',0]],hi:'帳號、權限、單一登入、特權管理。現在的系統到處都是，能守的那道門就是「你是誰、你能做什麼」。'},
+ {track:'系統與基礎設施',id:'virt',ic:'🧱',col:'#e6f4f1',rc:'#14a3a3',name:'虛擬化與運算平台',npc:'韋大師',src:['virt'],need:[['os',1],['hw',1],['net',0]],hi:'虛擬機、叢集、容器。一台主機上跑幾十個系統，方便是方便，倒的時候也是一起倒。'},
+ {track:'系統與基礎設施',id:'bcdr',ic:'🛟',col:'#fbf1d9',rc:'#e0902a',name:'備份、復原與營運持續',npc:'傅大師',src:['bcdr'],need:[['os',1],['db',0]],hi:'備份不是重點，還原才是。沒有還原過的備份，只能算是一個願望。'},
+ {track:'網路與通訊',id:'neteng',ic:'🔀',col:'#dcf3ea',rc:'#2f9e7a',name:'網路工程',npc:'路大師',src:['neteng'],need:['net'],hi:'路由、交換、無線、VPN。網路通的時候沒人記得你，不通的時候所有人都找你。'},
+ {track:'資訊安全',id:'blue',ic:'🔍',col:'#e3ecf8',rc:'#4a82c8',name:'資安防禦',npc:'藍大師',src:['blue'],need:['sec'],hi:'監控、分析、應變。防守的人要每一次都擋下來，所以靠的是紀錄和流程，不是運氣。'},
+ {track:'資訊安全',id:'red',ic:'🎯',col:'#fbe6e3',rc:'#d6453d',name:'資安攻擊',npc:'洪大師',src:['red'],need:['sec','net'],hi:'學攻擊是為了知道怎麼防。第一課不是工具，是授權和範圍，沒有授權就是犯罪。'},
+ {track:'資料庫與資料平台',id:'dba',ic:'💾',col:'#f0e6fa',rc:'#8a5cc2',name:'資料庫管理',npc:'戴大師',src:['dba'],need:['db'],hi:'效能、備份、權限。DBA 的工作是讓資料又快、又對、又救得回來。'},
+ {track:'軟體開發與整合',id:'dev',ic:'🧩',col:'#e6f4f1',rc:'#1f8f8f',name:'軟體開發',npc:'程大師',src:['dev'],need:['code'],hi:'會寫程式只是開始。需求、測試、版本、上線，每一步都會決定這支程式活多久。'},
+ {track:'IT 營運與治理',id:'mgmt',ic:'🧭',col:'#fbf1d9',rc:'#c9860c',name:'IT 管理',npc:'管大師',src:['mgmt'],need:['svc','trouble'],hi:'管理是讓一群人把事情做好：流程、專案、採購、廠商，還有怎麼跟老闆要資源。'},
+ {track:'IT 營運與治理',id:'itsm',ic:'🎫',col:'#f0e6fa',rc:'#9a6cd0',name:'IT 服務與變更管理',npc:'施大師',src:['itsm'],need:[['svc',1],['trouble',1]],hi:'事件、問題、變更、請求。流程不是為了麻煩人，是為了讓同樣的錯不要犯第二次。'},
+ {track:'IT 營運與治理',id:'grc',ic:'📋',col:'#eef0dc',rc:'#8a8f3c',name:'治理與稽核',npc:'紀大師',src:['grc'],need:['gov'],hi:'制度不是寫給稽核員看的。寫了要做、做了要留紀錄、有問題要改，這樣才叫管理。'},
+ {track:'IT 營運與治理',id:'law',ic:'⚖️',col:'#fde9f1',rc:'#d0568a',name:'資通安全法規',npc:'律大師',src:['law'],need:['gov'],hi:'資安法、個資法、刑法、營業秘密法。法條會修，所以重點是知道有哪些法、管到什麼、出事要找哪一條。'}
 ];
 const ALLC=COURSES.concat(ADV),CBY={};ALLC.forEach(c=>CBY[c.id]=c);
 const pool=(c,l)=>c.src.reduce((a,s)=>a.concat((DOM[s].lv[l])||[]),[]);
