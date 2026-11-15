@@ -112,6 +112,7 @@ pre{margin:0;background:#16212b;color:#d7e3ee;border-radius:10px;padding:12px 14
 .figw{overflow-x:auto;border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--panel)}.fig{display:block;width:100%;min-width:500px;max-width:640px;height:auto;margin:0 auto;font-family:inherit}
 .fig rect{fill:var(--panel2);stroke:var(--line);stroke-width:1.5}.fig rect.a{fill:var(--accent);stroke:var(--accent)}.fig rect.w{fill:var(--crit);stroke:var(--crit)}.fig rect.off{fill:none;stroke-dasharray:4 3;stroke:var(--muted)}.fig rect.frame{fill:none;stroke:var(--muted);stroke-dasharray:6 4}
 .fig text{font-size:13px;fill:var(--fg)}.fig text.a,.fig text.w{fill:#fff;font-weight:700}.fig text.off,.fig text.n{fill:var(--muted)}.fig text.n{font-size:12px}.fig text.h{font-weight:700}.fig text.big{font-size:26px;font-weight:800;fill:var(--accent)}.fig text.big2{font-size:16px;font-weight:800;fill:var(--accent)}.fig text.c{font-family:var(--mono);font-size:12px}.fig text.sm{font-size:11px}.fig text.sm2{font-size:11px;fill:#fff}
+.fig rect.term{fill:#14202b;stroke:#14202b}.fig rect.bsod{fill:#1e5fbf;stroke:#1e5fbf}.fig text.t{fill:#d7e3ee;font-family:var(--mono);font-size:12px}.fig rect.bsod~text.t{fill:#fff;font-family:inherit;font-size:13px}.fig text.tc{fill:#6fe0b8;font-family:var(--mono);font-size:12px;font-weight:700}
 .fig line,.fig path.back{stroke:var(--muted);stroke-width:1.6;fill:none}.fig marker path{fill:var(--muted)}
 .chk{border-top:2px dashed var(--line);padding-top:14px;display:flex;flex-direction:column;gap:8px}.chk p{margin:0;font-weight:700;font-size:1.05em}.chk .opts{display:flex;flex-direction:column;gap:8px}.chk .note{font-size:.85em;color:var(--muted)}
 .topics button.ok{border-color:var(--accent)}.topics button.ok::before{content:"✓ "}.topics button.no{border-color:var(--crit)}.topics button.no::before{content:"✕ "}
@@ -2158,6 +2159,45 @@ const FIG={
 'gov/ISO 27001':()=>fFlow('管理制度的循環',['辨識風險','選擇｜控制措施','執行','檢查與｜改善'],'做完一輪再回到第一步，持續循環'),
 'os/日誌':()=>fS(100,'tail -f 會跟著檔案尾端',fB(0,8,330,24,'09:00:01 啟動完成','off')+fB(0,36,330,24,'09:00:05 使用者登入','off')+fB(0,64,330,24,'09:00:09 ERROR 連線逾時　← 新的一行','w')+fT(450,34,'tail -f','big2')+fT(450,62,'有新的行｜就立刻顯示','n')),
 'os/磁碟空間':()=>fS(96,'df 與 du 的差別',fB(0,8,270,40,'df -h：整個分割區還剩多少','a')+fB(290,8,270,40,'du -sh：這個目錄佔了多少','a')+'<rect x="0" y="60" width="270" height="20" rx="6" class="off"/><rect x="0" y="60" width="250" height="20" rx="6" class="w"/>'+fT(135,75,'已用 93%','sm2')+fT(425,75,'/var/log　38G','c'))};
+const fTerm=(label,lines)=>fS(18+lines.length*19,label,'<rect x="0" y="0" width="560" height="'+(18+lines.length*19)+'" rx="8" class="term"/>'+lines.map((l,i)=>'<text x="14" y="'+(24+i*19)+'" class="'+(/^[$>]/.test(l)?'tc':'t')+'" xml:space="preserve">'+l+'</text>').join(''));
+Object.assign(FIG,{
+'hw/儲存裝置':()=>fCols('HDD 與 SSD',[['HDD 傳統硬碟','碟片轉動＋讀寫頭｜慢・怕摔・便宜'],['SSD 固態硬碟','晶片，沒有會動的零件｜快・耐震・較貴']],'兩種都會壞，重要資料都要備份'),
+'hw/維修安全':()=>fFlow('拆機前的順序',['關機','拔電源線','放靜電｜摸金屬機殼','再動手']),
+'hw/散熱':()=>fFlow('過熱的連鎖反應',['灰塵堵住｜風扇','溫度上升','自動降速｜變很慢','自動關機｜（保護機制）'],null,['','','','w']),
+'hw/驅動程式':()=>fFlow('驅動程式是翻譯',['作業系統','驅動程式｜（翻譯）','硬體裝置'],'型號要對，來源要是原廠或系統更新',['','a','']),
+'hw/更新管理':()=>fFlow('修補程式公開之後',['漏洞被發現','修補程式發布｜漏洞同時曝光','攻擊者鎖定｜還沒更新的電腦'],'愈晚更新，風險愈高',['','a','w']),
+'hw/執行環境':()=>fS(134,'多支程式共用執行環境',['程式甲','程式乙','程式丙'].map((s,i)=>fB(40+i*170,6,140,36,s,'')+fA(110+i*170,44,110+i*170,66)).join('')+fB(40,68,480,40,'共用的執行環境（.NET、Java、Visual C++ 可轉發套件）','a')+fT(280,126,'沒裝或版本不對 → 程式說「缺少某個 DLL」','n')),
+'hw/軟體安裝規範':()=>fFlow('公司電腦裝軟體',['查核可清單','沒有就申請','確認授權｜可用於公司','從官方來源｜安裝']),
+'hw/相容性':()=>fFlow('相容模式',['舊程式','相容模式｜Windows 假裝成舊版','可以執行'],'救得了一部分舊程式，但不會變安全',['','a','']),
+'hw/瀏覽器問題':()=>fFlow('只有這台怪怪的',['別台正常｜只有這台怪','Ctrl+F5｜清快取','開無痕視窗｜（不載入擴充功能）','換瀏覽器｜比對']),
+'hw/作業系統架構':()=>fCols('32 位元與 64 位元',[['32 位元','最多用到約 4 GB｜記憶體'],['64 位元','可用更多記憶體｜也能跑 32 位元程式']],'驅動程式的位元數要和作業系統一致'),
+'hw/軟體授權':()=>fCols('免費與開源是兩回事',[['免費','講的是價錢'],['開源','講的是原始碼｜可以看、可以改'],['授權條款','兩種都有｜都要遵守']]),
+'os/網路指令':()=>fTerm('ipconfig /all 的輸出',['&gt; ipconfig /all','IPv4 位址 . . . : 192.168.1.10','子網路遮罩 . . : 255.255.255.0','預設閘道 . . . : 192.168.1.1','DHCP 伺服器 . . : 192.168.1.1    ← 加 /all 才看得到','DNS 伺服器  . . : 192.168.1.2    ← 加 /all 才看得到']),
+'os/事件紀錄':()=>fCols('事件檢視器常看的三類',[['系統','服務、驅動程式｜開關機'],['應用程式','程式的錯誤'],['安全性','登入、權限變更']],'查問題時，用發生的時間去對'),
+'os/系統修復':()=>fFlow('sfc 做的事',['sfc /scannow','把系統檔和｜正確版本比對','不一樣就還原'],'只修系統檔，不動個人檔案和安裝的程式',['a','','']),
+'os/遠端桌面':()=>fS(124,'遠端桌面不要直接對外',fB(0,6,130,40,'網際網路','')+fA(132,26,196,26)+fB(200,6,360,40,'直接連 3389　✕　不停被掃描、被猜密碼','w')+fB(0,62,130,40,'在外面的你','')+fA(132,82,196,82)+fB(200,62,150,40,'先連 VPN','a')+fA(352,82,396,82)+fB(400,62,160,40,'再連 3389　✓','a')+fT(280,118,'改埠號不算防護','n')),
+'os/檔案指令':()=>fTerm('ls -la 的輸出',['$ ls -la','drwxr-xr-x  user  .','-rw-r--r--  user  .bashrc        ← 隱藏檔，加 -a 才看得到','-rw-r--r--  user  report.txt','','-l 顯示詳細資訊　　-a 全部列出（含隱藏檔）']),
+'os/服務管理':()=>fCols('systemctl 常用的五個動作',[['start','啟動'],['stop','停止'],['restart','重新啟動｜改設定後'],['status','看狀態'],['enable','開機｜自動啟動']]),
+'os/權限提升':()=>fTerm('sudo 的使用',['$ systemctl restart nginx','權限不足','$ sudo systemctl restart nginx','[sudo] 請輸入你的密碼：','（執行成功，系統記下是誰做的）']),
+'os/文字搜尋':()=>fTerm('grep 的使用',['$ grep -i error app.log','09:00:09 ERROR 連線逾時','09:12:44 Error 寫入失敗','','-i 不分大小寫　　-n 顯示行號　　-r 連子目錄一起找']),
+'os/行程管理':()=>fTerm('top 的輸出',['$ top','  PID  使用者   %CPU  %MEM  指令','  2314 app      97.3  12.1  java      ← 排最上面的吃最多','   812 www       1.2   3.4  nginx','   501 root      0.3   0.8  sshd']),
+'sec/最小權限':()=>fCols('依工作給權限',[['只查報表的人','唯讀'],['輸入資料的人','讀取、新增'],['系統管理員','管理｜另用專用帳號']],'只給做事需要的；調職、離職就收回'),
+'sec/弱點管理':()=>fCols('弱點掃描與滲透測試',[['弱點掃描','工具自動比對｜已知弱點清單'],['滲透測試','由人實際嘗試｜能打到多深']],'掃描定期做；重要系統再做滲透測試'),
+'db/資料表設計':()=>{const r=(y,c,cls)=>fB(60,y,130,30,c[0],cls)+fB(194,y,150,30,c[1],cls==='a'?'a':'')+fB(348,y,152,30,c[2],cls==='a'?'a':'');return fS(134,'主鍵讓每一筆資料都分得出來',r(4,['會員編號（主鍵）','姓名','生日'],'a')+r(38,['1001','王小明','1990-01-01'],'')+r(72,['1002','王小明','1985-06-15'],'')+fT(280,124,'同名同姓也分得出來，因為主鍵不會重複','n'));},
+'db/SQL 查詢':()=>fCols('查詢的三個部分',[['SELECT 姓名','要拿哪些欄位'],['FROM members','從哪張資料表'],['WHERE age &gt; 65','篩選哪幾筆']],'資料庫實際處理的順序：FROM → WHERE → SELECT'),
+'db/索引':()=>fCols('有沒有索引的差別',[['沒有索引','整張表｜從頭看到尾','w'],['有索引','像查目錄｜直接跳到位置']],'代價：佔空間，新增修改刪除會變慢'),
+'code/自動化':()=>fFlow('把重複的工作自動化',['固定、重複｜的工作','寫成腳本','排程｜自動執行','留紀錄｜失敗要通知']),
+'code/除錯':()=>fTerm('Python 的錯誤訊息',['Traceback (most recent call last):','  File "report.py", line 12, in &lt;module&gt;      ← 在哪一行','    f = open(path)','FileNotFoundError: /data/report.csv           ← 先看這行：什麼錯']),
+'code/測試環境':()=>fFlow('會改資料的腳本',['測試環境｜先跑','確認結果','備份｜正式資料','正式環境｜才跑']),
+'code/密碼與金鑰':()=>fCols('密碼放哪裡',[['程式碼','不寫密碼','w'],['環境變數、密碼管理服務','密碼放這裡'],['版本控制','不放含密碼的檔案','w']],'已經推上去的密碼，刪掉也沒用，要換掉'),
+'trouble/顯示問題':()=>fFlow('有電沒畫面的檢查順序',['螢幕電源｜有沒有開','訊號線｜有沒有鬆','輸入來源｜選對了沒','再查主機內｜記憶體、顯示卡'],'由外而內，由簡單到複雜',['','','','off']),
+'trouble/當機畫面':()=>fS(130,'當機畫面上的停止代碼','<rect x="0" y="0" width="560" height="130" rx="8" class="bsod"/><text x="24" y="44" class="t" style="font-size:34px">:(</text><text x="24" y="70" class="t">你的裝置發生問題，需要重新啟動。</text><text x="24" y="96" class="t" style="font-weight:700">停止代碼：DRIVER_IRQL_NOT_LESS_OR_EQUAL　　← 記下這個</text><text x="24" y="116" class="t">失敗的項目：xxxx.sys　　← 有的話也記下</text>'),
+'trouble/結案確認':()=>fFlow('結案前的確認',['處理完成','請使用者照｜平常方式做一次','確認沒問題','記錄並結案']),
+'svc/情緒處理':()=>fFlow('面對生氣的使用者',['先聽完｜不打斷','一句話｜表示理解','帶回問題｜「畫面現在顯示什麼？」'],'不急著解釋，也不急著反駁'),
+'svc/結案確認':()=>fFlow('結案前多問一句',['你覺得好了','請使用者確認','問還有沒有｜其他狀況','結案']),
+'svc/誠實回覆':()=>fCols('不確定的時候',[['硬著頭皮回答','答錯了對方照做｜信任感就沒了','w'],['說不確定','加上「我去查，｜幾點前回覆」']]),
+'gov/稽核':()=>fCols('被問到還沒做到的事項',[['據實說明','講現況｜提出改善規劃'],['補假紀錄','被發現比｜「沒做到」嚴重','w']]),
+'gov/存取權限':()=>fFlow('權限跟著人走',['到職｜給權限','調職｜調整權限','離職｜收回權限','定期清查｜主管確認'])});
 let LS=null;
 function learn(c,l,topic){const cards=(LEARN[c.id]||{})[l];if(!cards)return;const i=Math.max(0,cards.findIndex(x=>x[0]===topic));LS={c,l,i,cards};hub.hidden=true;hub.style.display='none';document.body.classList.add('inplay');play.hidden=false;lesson();scrollTo(0,0);}
 function lesson(){const s=LS,n=s.cards.length,end=s.i>=n,k=end?null:s.cards[s.i],lk=LINKS[s.c.id]||[],mo=MORE[s.c.id]||{};s.ck=s.ck||{};
