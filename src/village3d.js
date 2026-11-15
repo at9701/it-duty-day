@@ -138,13 +138,13 @@ window.initVillage3D=function(api){
  const TC={'系統與基礎設施':'#39d6ff','網路與通訊':'#4fe08a','資訊安全':'#ff7b6b','資料庫與資料平台':'#c79bff','軟體開發與整合':'#3fd6c8','IT 營運與治理':'#f2c14e'};
  const byTrack={};api.adv.forEach(c=>{(byTrack[c.track]=byTrack[c.track]||[]).push(c);});
  // 一位大師的座位：桌子、螢幕、椅子，大師站在桌子後面朝南
- function seat(c,x,z,idx){const g=new THREE.Group();g.position.set(x,0,z);H.add(g);const rcH=new THREE.Color(c.rc).getHex();
+ function seat(c,x,z,idx,up){const sy=3.25+(up?.95:0);const g=new THREE.Group();g.position.set(x,0,z);H.add(g);const rcH=new THREE.Color(c.rc).getHex();
   box(2,.8,.75,0x3b4b63,0,.4,.75,g);box(2.06,.06,.81,0x55677f,0,.83,.75,g);{const e=box(2.06,.05,.05,B(rcH),0,.6,1.14,g);e.castShadow=false;}
   mon(g,.5,.86,.75,0x16324a,Math.PI);box(.3,.03,.22,0xdfe6ee,-.45,.87,.8,g);cyl(.07,.06,.13,0xf4f1ea,-.85,.92,.6,g,10);
   box(.5,.08,.5,0x26313c,0,.48,-.75,g);box(.5,.55,.08,0x26313c,0,.8,-1,g);cyl(.05,.05,.46,0x5b6672,0,.24,-.75,g,8);
   const m=person(rcH,HAIR[(idx+3)%HAIR.length]);sc.remove(m);m.position.set(0,0,-.15);g.add(m);
-  const sign=label([c.name,c.npc],'#ffffff','#1c2a36',3.1);sign.position.set(OX+x,3.25,z);sc.add(sign);
-  blocks2.push([OX+x,z+.75,1.15]);stalls.push({c,x:OX+x,z,a:0,m,mk:null,adv:true,my:4.25,mw:1.7,fx:OX+x,fz:z+2.2});}
+  const sign=label([c.name,c.npc],'#ffffff','#1c2a36',3.1);sign.position.set(OX+x,sy,z);sc.add(sign);
+  blocks2.push([OX+x,z+.75,1.15]);stalls.push({c,x:OX+x,z,a:0,m,mk:null,adv:true,my:sy+1,mw:1.7,fx:OX+x,fz:z+2.2});}
  // 一間房間：地板、牆、門上的路線牌、裡面的擺設
  function room(track,x0,z0,x1,z1,door,seats){const col=new THREE.Color(TC[track]).getHex(),w=x1-x0,d=z1-z0,cx=(x0+x1)/2,cz=(z0+z1)/2,cs=byTrack[track]||[];
   box(w,.05,d,new THREE.Color(TC[track]).multiplyScalar(.2).getHex(),cx,.03,cz,H);box(w-1.4,.02,d-1.4,new THREE.Color(TC[track]).multiplyScalar(.3).getHex(),cx,.065,cz,H);
@@ -156,15 +156,15 @@ window.initVillage3D=function(api){
    io={out:[OX+xd+sgn*1.3,dz],in:[OX+xd-sgn*1.3,dz]};sx=xd;sz=dz;
    scr(H,cx,2.9,z0+.3,w-2.4,1.6,0x10283c);{const e=scr(H,cx,2.9,z0+.33,w-2.8,.08,col);anim.push(t=>{e.position.y=2.25+((t*.25)%1)*1.3;});}
    const ox=door==='e'?x0+.9:x1-.9;plant(ox,z0+1);plant(ox,z1-1);for(let k=0;k<3;k++){box(.8,2,.7,0x26313c,ox,1,cz-1.6+k*1.6,H);for(let j=0;j<5;j++){const dd=scr(H,ox+(door==='e'?.42:-.42),.4+j*.36,cz-1.6+k*1.6,.05,.08,j%2?0x4fe08a:col);dd.rotation.y=Math.PI/2;anim.push(t=>{dd.visible=Math.sin(t*(3+j)+k*2)>-.4;});}}
-   box(2.6,.5,1.1,0x3b4b63,cx+(door==='e'?1.2:-1.2),.25,cz,H);box(2.6,.08,1.1,0x55677f,cx+(door==='e'?1.2:-1.2),.54,cz,H);solid(cx+(door==='e'?1.2:-1.2)-1.4,cz-.65,cx+(door==='e'?1.2:-1.2)+1.4,cz+.65);}
-  const sg=label([track],TC[track],'#10202e',Math.max(3.4,track.length*.62));sg.position.set(OX+sx,3.6,sz);sc.add(sg);
-  rooms.push({x0:OX+x0,z0,x1:OX+x1,z1,out:io.out,in:io.in});cs.forEach((c,k)=>{const s=seats[k]||seats[seats.length-1];seat(c,s[0],s[1],stalls.length);});}
- room('網路與通訊',-13,-17.6,-6.5,-10,'s',[[-9.75,-14.6]]);
- room('資訊安全',-6.5,-17.6,0,-10,'s',[[-4.85,-14.6],[-1.65,-14.6]]);
- room('資料庫與資料平台',0,-17.6,6.5,-10,'s',[[3.25,-14.6]]);
- room('軟體開發與整合',6.5,-17.6,13,-10,'s',[[9.75,-14.6]]);
- room('系統與基礎設施',-22.6,-9,-13,8,'e',[[-20.4,-6],[-16.2,-6],[-20.4,3.6],[-16.2,3.6]]);
- room('IT 營運與治理',13,-9,22.6,8,'w',[[16.2,-6],[20.4,-6],[16.2,3.6],[20.4,3.6]]);
+   if(cs.length<=4){box(2.6,.5,1.1,0x3b4b63,cx+(door==='e'?1.2:-1.2),.25,cz,H);box(2.6,.08,1.1,0x55677f,cx+(door==='e'?1.2:-1.2),.54,cz,H);solid(cx+(door==='e'?1.2:-1.2)-1.4,cz-.65,cx+(door==='e'?1.2:-1.2)+1.4,cz+.65);}}
+  const sg=label([track],TC[track],'#10202e',Math.max(3.4,track.length*.62));sg.position.set(OX+sx,door==='s'?3.6:5.3,sz);sc.add(sg);
+  rooms.push({x0:OX+x0,z0,x1:OX+x1,z1,out:io.out,in:io.in});cs.forEach((c,k)=>{const s=seats[k]||seats[seats.length-1];seat(c,s[0],s[1],stalls.length,door==='s'&&cs.length>1&&k%2===1);});}
+ room('網路與通訊',-13,-17.6,-7.8,-10,'s',[[-11.65,-14.6],[-9.15,-14.6]]);
+ room('資訊安全',-7.8,-17.6,-.2,-10,'s',[[-6.5,-14.6],[-4,-14.6],[-1.5,-14.6]]);
+ room('資料庫與資料平台',-.2,-17.6,3,-10,'s',[[1.4,-14.6]]);
+ room('軟體開發與整合',3,-17.6,13,-10,'s',[[4.25,-14.6],[6.75,-14.6],[9.25,-14.6],[11.75,-14.6]]);
+ room('系統與基礎設施',-22.6,-9,-13,8,'e',[[-19.9,-6.4],[-15.9,-6.4],[-19.9,-.9],[-15.9,-.9],[-19.9,4.6],[-15.9,4.6]]);
+ room('IT 營運與治理',13,-9,22.6,8,'w',[[15.9,-6.4],[19.9,-6.4],[15.9,-.9],[19.9,-.9],[15.9,4.6],[19.9,4.6]]);
  // 四個角落不開放：後面是機櫃，前面是休息區
  [[-22.6,-17.6,-13,-9],[13,-17.6,22.6,-9]].forEach(q=>{solid(q[0],q[1],q[2],q[3]+.1);box(q[2]-q[0],.06,q[3]-q[1],0x121c2b,(q[0]+q[2])/2,.03,(q[1]+q[3])/2,H);for(let k=0;k<4;k++){const x=q[0]+1.4+k*2.2;box(1.2,2.8,1.4,0x1b2636,x,1.4,q[1]+2.2,H);for(let j=0;j<6;j++){const dd=scr(H,x,.5+j*.38,q[1]+2.92,.8,.05,j%3?0x2f86b8:0x4fe08a);anim.push(t=>{dd.visible=Math.sin(t*(2+j*.6)+k)>-.5;});}}box(q[2]-q[0],1,.3,0x33455c,(q[0]+q[2])/2,.5,q[3],H);});
  [[-22.6,8,-13,14.4],[13,8,22.6,14.4]].forEach(q=>{solid(q[0],q[1]-.1,q[2],q[3]);const cx=(q[0]+q[2])/2;box(q[2]-q[0],.06,q[3]-q[1],0x1f3147,cx,.03,(q[1]+q[3])/2,H);box(3.4,.45,1.1,0x3f6f8f,cx,.25,11,H);box(3.4,.6,.25,0x3f6f8f,cx,.6,11.5,H);box(1.2,.4,1.2,0x55677f,cx,.2,9.3,H);plant(cx-2.6,10.8);plant(cx+2.6,10.8);plant(q[0]+1,13.4);plant(q[2]-1,13.4);});
