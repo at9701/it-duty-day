@@ -103,7 +103,11 @@ pre{margin:0;background:#16212b;color:#d7e3ee;border-radius:10px;padding:12px 14
 .opt.right{border-color:var(--accent);background:#dcf3ea}.opt.wrong{border-color:var(--crit);background:#fbe6e3}.opt:disabled{cursor:default}
 .opt code,.q code,.why code{font-family:var(--mono);font-size:.92em;background:rgba(28,42,54,.08);border-radius:4px;padding:1px 5px}
 .why{border-left:5px solid var(--accent);background:var(--panel2);border-radius:8px;padding:10px 14px}
-.why.bad{border-color:var(--crit)}.why b{display:block;margin-bottom:2px}
+.why.bad{border-color:var(--crit)}
+.pts{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:8px;font-size:1.05em}.lesson .q{font-size:1.5em}
+.topics{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.topics button,.topics span{font:inherit;font-size:.88em;border:1px solid var(--line);background:var(--panel2);color:inherit;border-radius:999px;padding:4px 12px}.topics button{cursor:pointer}.topics button:hover{border-color:var(--accent)}.topics button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.links{margin:6px 0 4px;padding-left:1.3em}.links a{color:var(--accent)}
+.talk .les{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.talk .les span{font-weight:700}.talk .les button{font:inherit;border:1px solid var(--accent);background:transparent;color:var(--accent);border-radius:999px;padding:5px 14px;cursor:pointer}.talk .les button:hover{background:var(--accent);color:#fff}.why b{display:block;margin-bottom:2px}
 .btn{border:0;background:var(--accent);color:#fff;font:inherit;font-weight:700;border-radius:12px;padding:11px 20px;cursor:pointer;align-self:flex-start}
 .btn.ghost{background:var(--panel2);color:var(--fg);border:1px solid var(--line)}
 .row{display:flex;gap:10px;flex-wrap:wrap}
@@ -119,7 +123,7 @@ pre{margin:0;background:#16212b;color:#d7e3ee;border-radius:10px;padding:12px 14
 <div class="wrap">
  <header><a class="back" href="../">← 回首頁</a><h1>資訊職訓中心</h1><div class="sum"><span class="pill">基礎課程 <b id="sDone">0</b></span><span class="pill">星星 <b id="sStar">0</b></span><span class="pill">總分 <b id="sScore">0</b></span><button class="btn ghost hb" id="lsBtn" hidden>課程與說明</button><button class="btn ghost hb" id="fsBtn" hidden aria-label="全螢幕">⛶ 全螢幕</button><button class="btn ghost" id="snd" style="padding:4px 12px;border-radius:999px" aria-label="音效開關">🔊</button></div></header>
  <div id="hub" style="display:flex;flex-direction:column;gap:16px">
-  <p class="lead">中庭周圍是九間實習教室，九位師傅各教一門每個資訊人員都該會的基礎課；基礎課的初級考過，就能搭電梯到進階專科大樓，照六條專業路線找各科大師。技能等級代表通過知識測驗，不等於實作能力的認證。找師傅說話就能考試：一次 8 題、三條命，錯一題以內就算通過，每一項技能從初級一路考到專家。電腦比較舊的話，可以改用 <a href="2d/">2D 地圖版</a>，進度是共用的。</p>
+  <p class="lead">中庭周圍是九間實習教室，九位師傅各教一門每個資訊人員都該會的基礎課；基礎課的初級考過，就能搭電梯到進階專科大樓，照六條專業路線找各科大師。技能等級代表通過知識測驗，不等於實作能力的認證。找師傅說話可以先聽課（目前基礎課的初級有重點卡），再考試：一次 8 題、三條命，錯一題以內就算通過，每一項技能從初級一路考到專家。電腦比較舊的話，可以改用 <a href="2d/">2D 地圖版</a>，進度是共用的。</p>
   <div id="stage"></div>
   <div id="lists" style="display:flex;flex-direction:column;gap:16px">
    <button class="btn ghost" id="lsClose" hidden>關閉</button>
@@ -691,7 +695,7 @@ const DOMAINS=[
 ]]},
 {id:'db',ic:'🗄️',col:'#f0e6fa',name:'資料庫',desc:'SQL 基礎、交易、索引、備份和安全',ranks:['資料庫見習','資料管理員','DBA'],lv:[[
  {t:"資料表設計",q:'關於主鍵（Primary Key），哪一個敘述正確？',a:['值必須唯一，而且不能是 NULL','值可以重複，但不能是 NULL','值必須唯一，但可以是 NULL','同一張表可以設定很多個主鍵'],why:'主鍵用來唯一識別每一筆資料。一張表只有一個主鍵（可以由多個欄位組成）。'},
- {t:"SQL 查詢",q:'要從 patients 資料表取出 age 大於 65 的資料，哪一句 SQL 正確？',a:['SELECT * FROM patients WHERE age > 65;','SELECT patients WHERE age > 65;','GET * FROM patients IF age > 65;','FIND patients HAVING age > 65;'],why:'基本語法是 SELECT 欄位 FROM 資料表 WHERE 條件。'},
+ {t:"SQL 查詢",q:'要從 members 資料表取出 age 大於 65 的資料，哪一句 SQL 正確？',a:['SELECT * FROM members WHERE age > 65;','SELECT members WHERE age > 65;','GET * FROM members IF age > 65;','FIND members HAVING age > 65;'],why:'基本語法是 SELECT 欄位 FROM 資料表 WHERE 條件。'},
  {t:"資料異動安全",q:'執行 UPDATE 或 DELETE 之前，最重要的檢查是？',a:['確認有 WHERE 條件，並先用 SELECT 看會影響幾筆','先把資料庫主機重開機','先把其他使用者全部踢下線','不需要特別檢查，萬一執行錯了再用另一句 SQL 改回來'],why:'沒有 WHERE 的 UPDATE／DELETE 會動到整張表，這是最常見的資料事故。'},
  {t:"交易",q:'交易（Transaction）的 ACID 特性中，A 代表什麼？',a:['原子性：全部成功，或全部不做','可用性：系統隨時可以使用','授權：只有授權的人可以執行','自動化：系統會自動執行'],why:'Atomicity。另外三個是一致性、隔離性、持久性。'},
  {t:"索引",q:'在欄位上建立索引（Index），效果和代價是？',a:['查詢變快，但寫入變慢，也多佔空間','寫入變快，但查詢變慢，佔用空間減少','自動把資料壓縮','自動把資料加密'],why:'索引像書的目錄：找得快，但每次新增修改都要一起維護。'},
@@ -2237,10 +2241,126 @@ function openTalk(c){$('lists').classList.remove('open');sfx.talk();const t=tier
  const say=lk.length?'想走這一科，基礎要先夠。先去把「'+lk.map(x=>x.name).join('」「')+'」考過，再回來找我。':t<0?c.hi:t<3&&pool(c,t+1).length<NQ?TIER[t]+'過了，不錯。'+TIER[t+1]+'的題目我還在準備，好了再來找我。':t===3?'你已經是專家了，我沒什麼好教的，想複習隨時來。':TIER[t]+'過了，要不要挑戰'+TIER[t+1]+'？';
  const btn=[0,1,2,3].map(l=>{const has=pool(c,l).length>=NQ,open=!lk.length&&(l===0||rec(c.id,l-1).stars>=2),r=rec(c.id,l);
   return '<button data-l="'+l+'" '+(has&&open?'':'disabled')+'>'+TIER[l]+(has?(open?starsHTML(r.stars):'<span class="n">'+(lk.length?'🔒 未開放':'🔒 前一級先過')+'</span>'):'<span class="n">製作中</span>')+'</button>';}).join('');
- talk.innerHTML='<div class="box" role="dialog" aria-modal="true" aria-label="'+c.npc+'"><div class="who"><span class="face" style="background:'+c.col+'">'+c.ic+'</span><div style="min-width:0"><h2>'+c.npc+'</h2><small>'+c.name+'</small></div></div><p class="say">'+say+'</p><div class="ttl">'+(ttl?'你的技能等級：'+ttl:'通過初級，這項技能就會記上「初級」')+'</div><div class="tiers">'+btn+'</div><label class="prac"><input type="checkbox" id="prac">練習模式：不扣命、不計成績，可以放心看解說</label><div class="row"><button class="btn ghost" id="tClose">先不要</button></div></div>';
+ const les=lk.length?'':[0,1,2,3].filter(l=>(LEARN[c.id]||{})[l]).map(l=>'<button data-l="'+l+'">'+TIER[l]+'重點</button>').join('');
+ talk.innerHTML='<div class="box" role="dialog" aria-modal="true" aria-label="'+c.npc+'"><div class="who"><span class="face" style="background:'+c.col+'">'+c.ic+'</span><div style="min-width:0"><h2>'+c.npc+'</h2><small>'+c.name+'</small></div></div><p class="say">'+say+'</p><div class="ttl">'+(ttl?'你的技能等級：'+ttl:'通過初級，這項技能就會記上「初級」')+'</div><div class="tiers">'+btn+'</div>'+(les?'<div class="les"><span>📖 先聽課</span>'+les+'</div>':'')+'<label class="prac"><input type="checkbox" id="prac">練習模式：不扣命、不計成績，可以放心看解說</label><div class="row"><button class="btn ghost" id="tClose">先不要</button></div></div>';
  talk.hidden=false;talk.querySelectorAll('.tiers button').forEach(b=>b.onclick=()=>{const pr=$('prac').checked;closeTalk();start(c,+b.dataset.l,pr);});
+ talk.querySelectorAll('.les button').forEach(b=>b.onclick=()=>{closeTalk();learn(c,+b.dataset.l);});
  $('tClose').onclick=closeTalk;talk.onclick=e=>{if(e.target===talk)closeTalk();};(talk.querySelector('.tiers button:not(:disabled)')||$('tClose')).focus();}
 addEventListener('keydown',e=>{if(e.key==='Escape'&&!talk.hidden)closeTalk();});
+// ===== 聽課：重點卡 =====
+// LEARN[課程][級別] = [[主題, [重點…], 例子, 常見誤解]]，主題名稱和題目的主題標籤一致，考完才能從弱項點回來。
+const LEARN={
+hw:{0:[
+['記憶體',['記憶體（RAM）是電腦的「工作桌」，程式執行時的資料暫時放在這裡。','關機或斷電，記憶體裡的東西就消失；要留下來的資料要存到硬碟或 SSD。','記憶體不夠時，系統會拿硬碟當暫存，速度就會明顯變慢。'],'同時開很多分頁和程式之後電腦變很卡，工作管理員看到記憶體用到九成以上，就是桌子不夠大。','記憶體和儲存空間是兩回事。「硬碟還有 500 GB」不代表記憶體夠用。'],
+['儲存裝置',['傳統硬碟（HDD）靠碟片轉動和讀寫頭，SSD 是晶片，沒有會動的零件。','SSD 讀寫快、耐震、安靜；HDD 每 GB 比較便宜，適合放大量不常讀的資料。','兩種都會壞，重要資料一定要備份。'],'同一台舊電腦，把開機碟從 HDD 換成 SSD，開機時間常常從一兩分鐘縮到十幾秒。','SSD 不是不會壞，它壞的時候常常沒有預兆，一壞就整顆讀不到。'],
+['開機自我檢測',['電腦一開機會先做自我檢測（POST），檢查記憶體、顯示卡這些基本零件。','檢測沒過時畫面出不來，主機板會用嗶聲或燈號告訴你是哪一類問題。','連續嗶聲加上沒畫面，最常見是記憶體沒插好或接觸不良。'],'把記憶體拔下來，用橡皮擦輕擦金手指再插緊，很多「開機嗶嗶叫」就好了。','嗶聲的意思各家主機板不一樣，要查那一片主機板的說明，不要背一套通用的。'],
+['磁碟陣列',['RAID 是把多顆磁碟組在一起，換取容錯或速度。','RAID 1 是鏡射：兩顆寫一樣的內容，壞一顆資料還在。','RAID 5 至少要三顆，用同位元資料保護，最多可以壞一顆。','RAID 0 只求快，沒有容錯，壞一顆就全部沒了。'],'三顆 4 TB 做 RAID 5，可用空間大約是 8 TB，有一顆的容量拿去放同位元資料。','RAID 不是備份。誤刪、中毒、勒索軟體加密，陣列會把錯誤的結果同步寫到每一顆。'],
+['電力與 UPS',['不斷電系統（UPS）在停電或電壓不穩時，用電池短暫供電。','它的目的是讓設備撐過瞬間斷電，或爭取時間正常關機，不是讓你繼續用好幾個小時。','電池會老化，要定期測試和更換。'],'停電時 UPS 撐十分鐘，並且通知伺服器自動正常關機，資料才不會因為突然斷電而損壞。','UPS 接上去就不管是不行的，電池放了幾年沒換，真的停電時可能幾秒就沒電。'],
+['維修安全',['打開主機之前先關機，並且拔掉電源線。','碰零件之前先摸一下金屬機殼或戴防靜電手環，把身上的靜電放掉。','拆下來的螺絲和零件放好、做記號，裝回去才不會少。'],'換記憶體的順序：關機、拔電源線、按一下電源鍵放掉殘電、放靜電、再動手。','「只是換個小零件不用關機」是錯的，帶電插拔可能直接燒掉主機板。'],
+['散熱',['處理器和顯示卡運作時會發熱，靠風扇和散熱片把熱帶走。','灰塵堵住風扇或散熱孔，溫度就會上升，系統為了保護自己會降速或自動關機。','用很久的機器，散熱膏乾掉也會讓溫度變高。'],'用一陣子就自動關機、機殼很燙，打開一看風扇卡滿灰塵，清乾淨就恢復正常。','過熱關機是保護機制在動作，不是「電腦壞了要重灌」。'],
+['驅動程式',['驅動程式是作業系統和硬體之間的翻譯，讓系統知道怎麼使用這個裝置。','驅動沒裝或版本不對，裝置可能認不到、功能不完整或不穩定。','驅動程式要從原廠或系統更新取得。'],'印表機接上去卻印出亂碼，常常是裝到別的型號的驅動。','來路不明的「驅動更新工具」常常夾帶廣告或惡意程式，不要用。'],
+['更新管理',['修補程式最主要是修掉已知的安全漏洞，其次才是修錯誤和加功能。','漏洞公開之後攻擊者也看得到，愈晚更新風險愈高。','公司環境通常會先測試再分批派送，避免更新造成系統異常。'],'很多大規模中毒事件，被打的漏洞其實幾個月前就有修補程式，只是沒裝。','「現在用得好好的就不要更新」是最常見也最危險的想法。'],
+['執行環境',['很多程式要靠共用的執行環境才能跑，例如 .NET、Java、Visual C++ 可轉發套件。','錯誤訊息說缺少某個 DLL，通常是對應的執行環境沒裝或版本不對。','正確做法是從官方來源安裝對應版本的執行環境。'],'訊息說缺 <code>VCRUNTIME140.dll</code>，到微軟官網裝 Visual C++ 可轉發套件就能解決。','不要上網搜尋單一 DLL 檔下載來放，那是很常見的中毒管道。'],
+['軟體安裝規範',['公司電腦要裝什麼軟體，依公司規定申請，使用核可的來源。','軟體要有合法授權，個人版、免費版不一定可以用在公司。','自己亂裝的軟體沒人管更新，會變成安全漏洞。'],'想用一套方便的小工具，先查公司有沒有核可清單，沒有就走申請流程。','「免費的」不等於「公司可以用」，很多軟體的免費授權只限個人非商業用途。'],
+['相容性',['相容模式讓比較舊的程式，在新版 Windows 上用舊版的行為來執行。','它只是模擬一部分舊系統的行為，不是每個舊程式都救得回來。','真的不行，再考慮虛擬機或請廠商更新。'],'一套十年前的程式在新電腦上閃退，在內容裡把相容模式設成舊版 Windows 之後可以開。','相容模式不會讓舊程式變安全，舊程式該有的漏洞還是在。'],
+['瀏覽器問題',['「只有這台怪怪的、別台正常」，先往這台的瀏覽器本身找。','常見原因是快取存了舊的檔案，或擴充功能干擾。','先清快取、用無痕視窗或換一個瀏覽器比對。'],'內部系統改版後畫面跑掉，按 Ctrl+F5 強制重新整理就正常了。','不要一開始就懷疑伺服器壞了。別人都正常，問題多半在自己這一端。'],
+['作業系統架構',['32 位元系統最多只能用到大約 4 GB 的記憶體，64 位元可以用更多。','64 位元系統可以跑大部分 32 位元程式，反過來不行。','驅動程式的位元數要和作業系統一致。'],'電腦裝了 8 GB 記憶體，系統卻只顯示可用 3 點多 GB，就是裝到 32 位元的作業系統。','64 位元不代表「快兩倍」，主要差別是能用的記憶體變多。'],
+['軟體授權',['開源軟體是原始碼公開，可以依授權條款使用、修改和散布。','開源不等於沒有規則，不同授權條款的義務差很多。','免費軟體不一定開源，開源軟體也不一定免費提供支援。'],'Linux、Firefox 都是開源軟體；有些免費軟體看不到原始碼，就不算開源。','「開源就可以隨便拿來用在產品裡」是錯的，有些授權要求你也要公開修改過的程式碼。']]},
+os:{0:[
+['網路指令',['<code>ipconfig</code> 看基本的 IP 設定，<code>ipconfig /all</code> 多了 DNS、MAC 位址、DHCP 伺服器等完整資訊。','<code>ping</code> 測試連不連得到對方，<code>nslookup</code> 查名稱解析。','Linux 上對應的是 <code>ip addr</code>。'],'使用者說網路不通，請他執行 <code>ipconfig /all</code>，一眼就看得出有沒有拿到 IP、DNS 設成什麼。','只打 <code>ipconfig</code> 是看不到 DNS 和 MAC 的，要加 <code>/all</code>。'],
+['網域與驗證',['電腦加入網域後，帳號集中放在網域控制站（DC）管理。','使用者登入時，帳號密碼由網域控制站驗證，不是這台電腦自己驗。','好處是一組帳號可以登入公司裡的各台電腦，權限也能集中管理。'],'新人到職，資訊人員只要在網域開一個帳號，他就能登入公司任何一台加入網域的電腦。','本機帳號和網域帳號是兩套。本機的 Administrator 管不到網域。'],
+['群組原則',['群組原則（GPO）可以從中央統一設定大量電腦和使用者，例如密碼規則、桌面限制、軟體派送。','原則會定期自動套用；要立刻套用，在用戶端執行 <code>gpupdate /force</code>。','<code>gpresult /r</code> 可以看這台實際套用到哪些原則。'],'公司規定十分鐘沒動就鎖定螢幕，不用一台一台設，一條群組原則就全部生效。','改完原則不會馬上生效，沒等更新週期或沒下 <code>gpupdate</code> 就以為「設定沒用」。'],
+['事件紀錄',['Windows 的系統錯誤、服務啟動失敗、登入紀錄都記在「事件檢視器」。','常看的有三類：系統、應用程式、安全性。','查問題時先鎖定發生的時間，再看那個時間點前後的錯誤和警告。'],'某個服務每天早上起不來，到事件檢視器的系統紀錄裡找那個時間的錯誤，通常會寫出原因。','事件檢視器裡平常就有很多警告，不是每一條都跟你的問題有關，要對時間。'],
+['系統修復',['<code>sfc /scannow</code> 會掃描 Windows 的系統檔，發現損壞或被改過就還原成正確版本。','要用系統管理員身分執行。','它只修系統檔，不會動你的個人檔案和安裝的程式。'],'Windows 內建功能莫名其妙打不開，先跑一次 <code>sfc /scannow</code> 再決定下一步。','sfc 不是掃毒，也不是重灌，它解決不了硬碟壞軌或中毒的問題。'],
+['遠端桌面',['遠端桌面（RDP）預設使用 TCP 3389 連接埠。','它讓你從另一台電腦操作這台的桌面，方便遠端維護。','RDP 是很常被攻擊的服務，不要直接開放到網際網路。'],'在公司內部用遠端桌面連到伺服器做維護；在外面則要先連 VPN 再連。','把 3389 改成別的埠號不算防護，掃描工具一樣找得到。'],
+['檔案權限',['Windows 共用資料夾有兩層：共用權限和 NTFS 權限。從網路連進來時，兩者取比較嚴格的那一個。','Linux 權限用三組數字表示擁有者、群組、其他人；讀 4、寫 2、執行 1 相加。','<code>chmod 755</code> 是擁有者可讀寫執行（7），群組和其他人可讀可執行（5）。'],'共用權限給「完全控制」、NTFS 只給「讀取」，使用者從網路進來就只能讀。','權限不是愈大愈方便。為了省事設成 777 或 Everyone 完全控制，等於沒有權限管理。'],
+['檔案指令',['<code>ls</code> 列出檔案；<code>-l</code> 顯示詳細資訊，<code>-a</code> 連隱藏檔一起列，常合起來寫成 <code>ls -la</code>。','Linux 的隱藏檔是檔名以「.」開頭的檔案。','<code>cd</code> 切換目錄，<code>pwd</code> 看現在在哪個目錄。'],'找不到設定檔 <code>.bashrc</code>，用 <code>ls -la</code> 就看到了，因為它是隱藏檔。','Linux 指令和檔名有分大小寫，<code>LS</code> 和 <code>ls</code> 不一樣。'],
+['日誌',['<code>tail -f 檔名</code> 會持續顯示檔案新增加的內容，適合盯著正在寫入的 log。','<code>tail -n 100</code> 只看最後 100 行；<code>less</code> 可以上下翻頁慢慢看。','系統日誌多半放在 <code>/var/log</code>。'],'重現問題的時候，另開一個視窗跑 <code>tail -f app.log</code>，錯誤一出來馬上看得到。','不要用 <code>cat</code> 去開很大的 log 檔，畫面會被洗掉，也看不到後續新增的內容。'],
+['服務管理',['使用 systemd 的系統用 <code>systemctl</code> 管理服務。','常用的有 <code>start</code>、<code>stop</code>、<code>restart</code>、<code>status</code>；<code>enable</code> 是設定開機自動啟動。','服務起不來，先看 <code>systemctl status</code> 和 <code>journalctl -u 服務名稱</code>。'],'改完網站設定檔，執行 <code>systemctl restart nginx</code> 讓新設定生效。','<code>start</code> 只是這一次啟動。沒有 <code>enable</code>，重開機之後服務不會自己起來。'],
+['磁碟空間',['<code>df -h</code> 看每個磁碟分割區的總量、已用和剩餘空間，<code>-h</code> 是用好讀的單位顯示。','<code>du -sh 目錄</code> 看某個目錄佔了多少空間。','磁碟滿了會造成服務寫不進資料而異常。'],'網站突然出錯，<code>df -h</code> 一看根目錄用到 100%，原來是 log 把磁碟寫滿了。','<code>df</code> 是看整個分割區，<code>du</code> 是看目錄，兩個用途不同，別搞混。'],
+['權限提升',['<code>sudo</code> 讓有授權的使用者，暫時用管理員（root）權限執行一個指令。','誰可以用 sudo、可以執行哪些指令，都可以設定，而且會留下紀錄。','平常用一般帳號，需要時才 sudo，可以減少誤操作的傷害。'],'一般帳號要重啟服務，執行 <code>sudo systemctl restart nginx</code>，輸入自己的密碼即可。','不要因為方便就一直用 root 登入做事，打錯一個指令的後果會大很多。'],
+['文字搜尋',['<code>grep 關鍵字 檔名</code> 會把含有關鍵字的那幾行找出來。','<code>-i</code> 不分大小寫，<code>-n</code> 顯示行號，<code>-r</code> 連子目錄一起找。','可以和其他指令用管線串起來，例如 <code>tail -f app.log | grep error</code>。'],'幾十萬行的 log 裡只想看錯誤，執行 <code>grep error app.log</code> 就只剩相關的行。','grep 預設有分大小寫，找 <code>error</code> 找不到 <code>ERROR</code>，要加 <code>-i</code>。'],
+['行程管理',['<code>top</code> 即時顯示各個行程使用 CPU 和記憶體的狀況，預設依 CPU 用量排序。','<code>ps aux</code> 列出當下所有行程的快照。','<code>kill 行程編號</code> 可以結束一個行程。'],'主機突然變慢，執行 <code>top</code>，排在最上面的那個行程就是吃最多 CPU 的。','看到用量高不要馬上砍掉，先確認它是什麼、為什麼高，砍錯可能讓服務中斷。']]},
+net:{0:[
+['IP 與子網路',['IP 位址分成「網路」和「主機」兩部分，子網路遮罩用來劃分這條界線。','<code>/24</code> 表示前 24 個位元是網路部分，寫成遮罩就是 255.255.255.0。','同一個子網路的電腦可以直接互通，不同子網路要經過閘道。'],'192.168.1.10/24 和 192.168.1.200/24 在同一個網段；192.168.2.10 就不是。','IP 設對但遮罩設錯，會出現「有些連得到、有些連不到」的怪現象。'],
+['DNS',['DNS 把好記的名稱（例如網址）轉換成電腦用的 IP 位址。','用 IP 連得到、用名稱連不到，問題多半出在 DNS。','<code>nslookup 名稱</code> 可以查這個名稱解析成什麼。'],'ping 伺服器的 IP 會通，但輸入伺服器名稱就說找不到，先查 DNS 設定和 DNS 伺服器。','「網路斷了」和「DNS 壞了」從使用者看起來很像，要用 IP 測一次才分得出來。'],
+['DHCP',['DHCP 會自動分配 IP 位址、子網路遮罩、預設閘道和 DNS 給電腦。','Windows 電腦拿不到 DHCP 配發的位址時，會自己設成 169.254.x.x。','所以看到 169.254 開頭，代表它沒有連到 DHCP 伺服器。'],'電腦 IP 變成 169.254.10.5，先檢查網路線、交換器埠，再看 DHCP 伺服器有沒有正常。','169.254 不是「有拿到 IP」，那是電腦找不到 DHCP 時自己填的，通常上不了網。'],
+['交換器',['交換器在同一個區域網路裡，依照 MAC 位址把資料送到正確的埠。','它會記住每個埠後面接了哪些 MAC 位址。','跨不同網段的轉送是路由器的工作，依據的是 IP 位址。'],'兩台在同一個辦公室網段的電腦互傳檔案，資料只經過交換器，不用經過路由器。','交換器看 MAC、路由器看 IP，這兩個常常被講反。'],
+['路由與閘道',['預設閘道是電腦要連到「其他網段」時，把資料交出去的那個出口。','閘道沒設或設錯，同網段還是連得到，但出不了這個網段。','閘道通常是路由器或三層交換器的位址。'],'同辦公室的印表機印得出來，但外部網站全部打不開，先看預設閘道。','閘道的位址必須和電腦在同一個網段，不然電腦根本找不到它。'],
+['連接埠與協定',['一台主機上有很多服務，用連接埠號碼來區分。','常見的有 HTTP 80、HTTPS 443、DNS 53、SSH 22、遠端桌面 3389。','HTTPS 是加密過的 HTTP，傳輸內容不會被中途看到。'],'防火牆要讓外面連得到公司網站，要開放的是 443。','連接埠有開不代表服務正常，連接埠沒開則一定連不到，兩件事要分開確認。']]},
+sec:{0:[
+['資安基本觀念',['資訊安全有三個基本要素，合稱 CIA。','機密性：只有該看的人看得到。','完整性：資料沒有被不當竄改。','可用性：需要的時候用得到。'],'資料外洩傷到機密性，資料被偷改傷到完整性，系統被打掛傷到可用性。','資安不只是「不要被偷看」。系統停擺、資料被改錯，一樣是資安事件。'],
+['釣魚與社交工程',['社交工程是利用人的信任、好奇或緊張來騙取資料或誘使操作，不靠技術破解。','釣魚信常見的特徵是製造急迫感，要求你馬上點連結或開附件。','不要點信裡的連結，自己另外開官方網站或打電話查證，並依規定通報。'],'收到「帳號異常，請立即重設密碼」的信，不點連結，自己輸入官方網址登入確認，再把信通報給資安窗口。','寄件者名稱可以造假。看起來像主管或資訊單位寄的，不代表就是真的。'],
+['多因素驗證',['驗證身分的因素分三種：你知道的（密碼）、你持有的（手機、金鑰）、你本身的（指紋、臉）。','多因素驗證是同時用兩種以上不同種類的因素。','即使密碼外洩，對方沒有第二個因素還是進不來。'],'輸入密碼之後，還要在手機的驗證器上按確認，這就是兩個因素。','密碼加上另一組密碼不算多因素，因為兩個都是「你知道的」。'],
+['勒索軟體',['勒索軟體會把檔案加密，再要求付錢換解密金鑰。','懷疑中了，第一步是把這台電腦從網路隔離：拔網路線、關 Wi-Fi，避免擴散。','接著馬上通報，不要自己重灌或刪檔，證據要留給調查用。'],'發現檔案副檔名被改、桌面出現勒索訊息，先拔網路線，再打電話通報資安窗口。','先關機或重灌都不對。關機可能毀掉記憶體裡的證據，重灌則是把線索全部清光。'],
+['最小權限',['最小權限原則：只給完成工作所需要的最低權限，不多給。','權限愈大，帳號被盜用或誤操作時的損害就愈大。','工作內容變了、人離職了，權限要跟著調整或收回。'],'只需要查報表的人給唯讀權限，不要因為方便就給管理員。','「先給大一點，之後再收」通常就不會收了，多出來的權限會一直留著。'],
+['弱點管理',['弱點掃描是用工具自動找出已知的弱點，範圍廣、速度快。','滲透測試是由人模擬攻擊者，實際嘗試利用弱點，看能打到多深。','兩者互補：掃描適合定期做，滲透測試適合重要系統做深度驗證。'],'弱點掃描報告列出某台主機少了修補程式；滲透測試則會實際試試看能不能藉此拿到權限。','掃描報告沒有高風險，不代表系統安全，它只找得到工具認得的已知弱點。'],
+['備份',['3-2-1 原則：至少 3 份資料、放在 2 種不同的媒體、其中 1 份放在異地。','備份要定期做還原測試，確定真的救得回來。','至少一份備份要離線或無法被竄改，才不會跟著被勒索軟體加密。'],'正式資料一份、機房的備份設備一份、另一份放到異地或雲端。','沒測過還原的備份不算備份，真的要用時才發現檔案壞了的例子很多。']]},
+db:{0:[
+['資料表設計',['主鍵（Primary Key）用來唯一識別資料表裡的每一筆資料。','主鍵的值不能重複，也不能是空值（NULL）。','一張資料表只有一個主鍵，但主鍵可以由多個欄位組成。'],'會員資料表用「會員編號」當主鍵，就算兩個人同名同姓也分得出來。','不要拿會變動的欄位（例如姓名、電話）當主鍵，之後要改會牽動很多地方。'],
+['SQL 查詢',['<code>SELECT 欄位 FROM 資料表 WHERE 條件</code> 是查詢的基本句型。','<code>WHERE</code> 用來篩選符合條件的資料列。','<code>JOIN</code> 依照關聯欄位，把兩張資料表合在一起查。'],'<code>SELECT * FROM members WHERE age &gt; 65</code> 取出 65 歲以上的會員。','JOIN 忘了寫關聯條件，兩張表會全部互相配對，結果筆數暴增。'],
+['資料異動安全',['執行 <code>UPDATE</code> 或 <code>DELETE</code> 之前，先確認 <code>WHERE</code> 條件對不對。','沒有 <code>WHERE</code> 的話，整張資料表都會被改掉或刪掉。','先用同樣的條件 <code>SELECT</code> 一次，確認筆數和內容再動手，並且先備份或用交易包起來。'],'想刪一筆測試資料，先 <code>SELECT</code> 確認只有一筆，再把 <code>SELECT *</code> 換成 <code>DELETE</code>。','「我只是改一筆」是最常聽到的事故開場白，少打一個條件就是整張表。'],
+['交易',['交易把多個資料異動包成一組，確保資料前後一致。','ACID 是交易的四個特性：不可分割性（Atomicity）、一致性、隔離性、持久性。','A 的意思是整組動作要嘛全部成功，要嘛全部不做，不會只做一半。'],'轉帳時「甲扣款」和「乙入帳」放在同一個交易，其中一步失敗就整組復原。','交易沒有提交（COMMIT）之前，其他人看不到你的修改，連線斷了也會被復原。'],
+['索引',['索引像書的目錄，讓資料庫不用整張表掃過一遍就能找到資料。','好處是查詢變快；代價是佔空間，而且新增、修改、刪除時要多維護索引，會變慢。','所以索引要建在常用來查詢或關聯的欄位，不是愈多愈好。'],'訂單資料表常常用「客戶編號」查詢，在這個欄位建索引後，查詢從幾秒變成瞬間。','每個欄位都建索引，查詢不見得變快，寫入一定變慢。'],
+['SQL 注入',['SQL 注入是攻擊者把惡意的 SQL 片段塞進輸入欄位，讓程式執行到不該執行的指令。','最有效的防範是參數化查詢，把使用者輸入當成資料，不是指令的一部分。','另外搭配輸入檢查，以及資料庫帳號只給必要權限。'],'登入欄位輸入 <code>\' OR \'1\'=\'1</code> 就能登入，代表程式是直接把輸入字串接進 SQL。','只靠過濾特殊字元不夠，總有沒想到的寫法；要從寫法上根本避免字串拼接。'],
+['備份還原',['完整備份是備份全部資料。','差異備份是備份「上一次完整備份之後」所有變動的資料。','還原時需要最近一次完整備份，加上最新的一份差異備份。'],'週日做完整備份、每天做差異備份。週三壞掉時，還原週日的完整備份再加週二的差異備份。','差異備份和增量備份不一樣。增量備份還原時，要把每一份依序全部套回去。']]},
+code:{0:[
+['自動化',['固定、重複、規則清楚的工作，最適合寫成腳本交給電腦做。','腳本可以搭配排程，在指定時間自動執行。','自動化之後要留下執行紀錄，失敗時要有人知道。'],'每天早上複製報表到另一個資料夾，寫成腳本加上排程，就不用再手動做。','自動化不是寫完就沒事了。來源檔案沒產生、路徑改了，腳本都要能發現並通知。'],
+['程式基礎',['變數用來存放資料，之後可以拿出來用或修改。','<code>if</code> 是條件判斷：條件成立才執行某一段程式。','迴圈是把同一段程式重複執行很多次。','讀程式時由上往下、一行一行跟著變數的值走。'],'<code>if 剩餘空間 &lt; 10:</code> 接著寄出警告信，就是「空間不夠才通知」。','<code>=</code> 是把值放進變數，<code>==</code> 才是比較兩邊是否相等，新手很常寫錯。'],
+['除錯',['錯誤訊息裡最重要的是「錯誤類型」和「發生在哪一行」。','Python 的錯誤訊息要看最後幾行，那裡才是真正的原因。','看懂訊息之後，再回到那一行檢查變數的值。'],'訊息最後一行寫 <code>FileNotFoundError</code> 和一個路徑，就知道是檔案路徑不對。','看到一大串紅字不要直接關掉重跑。訊息通常已經把答案告訴你了。'],
+['測試環境',['會改資料的腳本，第一次一定在測試環境跑。','測試環境的資料壞了可以重來，正式環境不行。','沒有測試環境時，至少先備份，並用少量資料或只讀不寫的模式試跑。'],'批次改檔名的腳本，先複製一個資料夾出來試，確認結果正確再對正式資料夾執行。','「這支很簡單不會錯」正是最容易出事的時候，邏輯對但路徑打錯一樣會毀資料。'],
+['版本控制',['版本控制會記錄檔案每一次的修改：誰改的、什麼時候、改了什麼。','改壞了可以回到之前的版本，也可以比較兩個版本差在哪裡。','多人一起改同一份程式時，可以合併彼此的修改。'],'腳本改完之後反而不能跑，用 Git 看一下和上一版差在哪，馬上找到改錯的那一行。','把檔名存成「最終版」「最終版2」不是版本控制，過一陣子沒有人分得出哪個才是對的。'],
+['密碼與金鑰',['帳號密碼和金鑰不要直接寫在程式碼裡。','要放在程式以外的地方，例如環境變數、權限受限的設定檔，或專門的密碼管理服務。','含有密碼的檔案不要放進版本控制。'],'腳本從環境變數讀取資料庫密碼，程式碼本身分享給同事也不會洩漏密碼。','密碼一旦推上版本控制，就算之後刪掉，歷史紀錄裡還是查得到，必須換掉密碼。'],
+['腳本安全',['腳本裡用到變數的地方，要想一下「如果它是空的會怎樣」。','刪除類的指令尤其危險：路徑變數是空的，可能會刪到上一層甚至根目錄。','執行前先檢查變數有沒有值，路徑對不對，不對就停下來。'],'<code>rm -rf "$DIR"/*</code> 如果 <code>DIR</code> 是空的，就變成 <code>rm -rf /*</code>，會從根目錄開始刪。','「平常都有值」不代表永遠有值。設定檔讀不到、打錯變數名稱，它就是空的。']]},
+trouble:{0:[
+['問診與分類',['先問清楚現象，再判斷是哪一類問題，不要一聽就動手。','「開不了機」可能是沒電、有電沒畫面、有畫面但進不了系統，三種方向完全不同。','追問「在這之前有沒有改過什麼、裝過什麼、發生過什麼」，最容易找到線索。'],'使用者說昨天還好好的，一問才知道昨天下班前裝了一個新軟體。','使用者講的是他的理解，不一定是事實。「開不了機」常常其實是「螢幕沒亮」。'],
+['顯示問題',['主機有電、風扇在轉但沒畫面，先從最簡單、最外面的地方查起。','檢查螢幕有沒有開、電源燈亮不亮、訊號線有沒有鬆、輸入來源選對了沒。','外面都確認沒問題，再往主機裡面的記憶體、顯示卡查。'],'沒畫面的案子，很大一部分是螢幕訊號線鬆了，或螢幕切到別的輸入來源。','不要一開始就拆主機。由外而內、由簡單到複雜，才不會白忙。'],
+['開機問題',['<code>No bootable device</code> 表示電腦找不到可以開機的磁碟。','可能是開機順序被改、磁碟的線鬆了、磁碟故障，或插著不能開機的隨身碟。','先拔掉外接裝置、進 BIOS 看有沒有認到磁碟。'],'電腦插著隨身碟開機就出現這個訊息，拔掉之後正常開機。','看到這個訊息不要馬上重灌。如果是磁碟快壞了，應該先救資料。'],
+['變因控制',['排除問題時一次只改一個地方，改完就測試。','這樣才知道是哪一個改動讓問題解決，或讓問題變得更糟。','改了沒效果就改回去，再試下一個。'],'網路不通時先只換網路線測試；沒好就換回來，再試換交換器的埠。','同時改三個地方然後好了，等於不知道原因，下次遇到一樣不會修。'],
+['效能問題',['電腦變慢，先看資源用在哪裡：CPU、記憶體、磁碟、網路。','Windows 用工作管理員，Linux 用 <code>top</code>，找出是哪個程式佔用最多。','再問是「突然變慢」還是「愈來愈慢」，兩種的原因方向不同。'],'工作管理員顯示磁碟使用率一直是 100%，往下看是某個程式在大量讀寫。','「慢」不要直接解讀成要加記憶體或換電腦，要先看數據。'],
+['當機畫面',['藍底白字的當機畫面（BSOD）上有停止代碼，有時還有出問題的檔案名稱。','處理之前先把停止代碼記下來或拍照，它是找原因最重要的線索。','再回想當機前做了什麼，例如剛更新驅動程式或裝了新硬體。'],'停止代碼旁邊顯示某個驅動檔案的名稱，把那個驅動更新或回復到前一版就解決了。','重開機之後畫面就消失了。沒記下代碼，只能等它再當一次。'],
+['結案確認',['處理完之後，請使用者實際操作一次，確認問題真的解決。','確認的是使用者原本要做的那件事，不是你自己測的那一項。','最後把原因和處理方式記錄下來，下次有人遇到可以參考。'],'印表機修好後，請使用者從他平常用的那個程式印一張，確認沒問題再結案。','「我這邊測是好的」不等於使用者那邊好了，沒確認就結案很容易被重開一次。']]},
+svc:{0:[
+['問診',['使用者的描述通常很模糊，要用具體的問題把現象問出來。','先問：看到什麼畫面或訊息、什麼時候開始、做了什麼動作之後發生。','再問影響範圍：只有他、還是旁邊的人也一樣。'],'「電腦怪怪的」追問之後，其實是「開某個系統時會跳出錯誤訊息」。','不要用自己的猜測代替發問，也不要一開始就問使用者聽不懂的技術問題。'],
+['進度回報',['一時解決不了，要主動告訴使用者現在的狀況。','說清楚三件事：目前查到哪裡、接下來要做什麼、大概什麼時候會再回覆。','時間到了就算還沒解決，也要回報一次。'],'「目前確認不是您電腦的問題，我要再查伺服器那邊，下午三點前跟您回報。」','「我再看看」然後就沒消息，是使用者最不滿意的情況，比修不好還糟。'],
+['交接',['交接要讓接手的人不用再問你，就能繼續處理。','內容要有：問題現象、已經做過什麼、目前的判斷、下一步要做什麼、使用者的聯絡方式。','已經試過但沒用的方法也要寫，免得對方重做一次。'],'「已換過網路線和交換器埠都沒改善，懷疑是網路卡，明天要帶備品去換，使用者分機某某某。」','只寫「某某的電腦有問題，還沒好」等於沒交接。'],
+['向上報告',['對不懂技術的主管，先講結論和影響，再講原因和處理。','用對方關心的角度講：影響多少人、多久、現在恢復了沒、接下來要做什麼。','技術細節留到對方問的時候再說。'],'「今天上午九點到九點四十，報表系統無法使用，影響約五十人，現在已恢復。原因是磁碟空間不足，已清理並加上監控。」','從技術細節開始講，主管聽了三分鐘還不知道事情嚴不嚴重。'],
+['情緒處理',['使用者生氣時，先讓他把話講完，不要急著解釋或反駁。','用一句話讓對方知道你有聽到他的困擾，再把話題帶回問題本身。','對方氣的通常是事情沒辦法做，不是針對你個人。'],'「造成您沒辦法作業真的很抱歉，我現在馬上幫您看，請問畫面上目前顯示什麼？」','一開口就說「這不是我們的問題」，即使是事實，也只會讓場面更僵。'],
+['結案確認',['你覺得修好了，不代表使用者的問題解決了。','結案之前請使用者確認，並問一下還有沒有其他狀況。','確認之後再結案，並留下處理紀錄。'],'「我這邊已經處理好了，麻煩您再開一次試試看，沒問題的話我就結案。」','沒確認就結案，使用者發現沒好會覺得被敷衍，還要再報修一次。'],
+['誠實回覆',['不確定的事就說不確定，不要用猜的回答。','同時告訴對方你會去查，以及什麼時候回覆。','答錯比晚一點回答的代價高，對方可能照著錯的資訊去做。'],'「這個我不確定，不想給您錯的答案。我查一下，今天下班前回覆您。」','怕被覺得不專業而硬答，之後被發現答錯，信任感損失更大。'],
+['通報',['可能影響很多人的異常，一發現就要通報，不用等查出原因。','先報現象和影響範圍，原因查到再補。','主管愈早知道，愈能調度人力和對外說明。'],'發現多個單位同時回報系統登不進去，立刻通報主管「疑似大範圍異常，原因確認中」。','想等查清楚再報，結果主管是從別的單位口中才知道，這是最糟的狀況。']]},
+gov:{0:[
+['資通安全管理法',['《資通安全管理法》規範的對象是公務機關，以及特定非公務機關。','特定非公務機關包括關鍵基礎設施提供者、公營事業和政府捐助的財團法人。','受規範的機關要訂定資通安全維護計畫，並依責任等級辦理應辦事項。'],'能源、水資源、通訊傳播、交通、金融、緊急救援與醫院等領域的關鍵基礎設施提供者，都可能被指定為特定非公務機關。','這部法不是只管政府機關，被指定的民間單位同樣要遵守。'],
+['事件通報',['知道發生資通安全事件後，要在一小時內依規定方式通報。','資通安全事件依嚴重程度分成四級，第四級最嚴重。','通報之後還要在規定時限內完成損害控制或復原，並提出調查與改善報告。'],'晚上十點確認主機遭入侵，十一點前就要完成通報，不能等到隔天上班。','「先查清楚再通報」是錯的。通報時限是從「知悉」事件開始算，不是從查完開始算。'],
+['個人資料保護法',['病歷、醫療、基因、性生活、健康檢查和犯罪前科，屬於特種個人資料。','特種個人資料原則上不得蒐集、處理或利用，只有法律明定的例外情形才可以。','一般個人資料的蒐集，也要有特定目的並且符合法定要件。'],'辦活動時想順便收集參加者的健康狀況，這屬於特種個資，沒有法定依據就不能收。','「當事人自己願意給」不代表怎麼用都可以，利用仍然要在特定目的的範圍內。'],
+['ISO 27001',['ISO 27001 是資訊安全管理系統（ISMS）的國際標準。','它規範的是一套管理制度：辨識風險、選擇控制措施、持續檢討改善。','組織可以請第三方驗證機構稽核，通過後取得證書。'],'公司導入 ISO 27001，會盤點資訊資產、做風險評鑑、訂定管理程序，並定期內部稽核。','拿到證書不代表不會出事，它證明的是有一套在運作的管理制度。'],
+['風險管理',['風險處理有四種方式：降低、移轉、避免、接受。','降低是加上控制措施；移轉是交給保險或委外；避免是乾脆不做那件事。','接受是評估後認為風險在可容忍範圍內，並由有權限的人核可。'],'舊系統無法修補：加上網路隔離是降低，直接汰換是避免，主管簽核後繼續使用是接受。','「接受風險」不是放著不管，它需要有評估、有核可、有紀錄。'],
+['稽核',['稽核是確認實際做法有沒有符合規定，並找出可以改善的地方。','被問到還沒做到的事項，要據實說明現況，並提出改善的規劃。','受稽核時提供的資料和說法要真實，要有紀錄可以佐證。'],'「這一項目前還沒做到，我們預計下一季完成，這是目前的規劃。」','為了過關而臨時補假紀錄或說已經做了，被發現會比「沒做到」嚴重得多。'],
+['存取權限',['帳號和權限會隨著人員調動、離職、專案結束而不再需要。','沒有定期清查，這些多出來的帳號和權限會一直留著，成為被濫用的入口。','清查時由主管確認每個人的權限是否仍然需要，不需要的就收回。'],'每半年把系統帳號清單交給各單位主管確認，把離職人員和已調職人員的權限移除。','有權限不代表可以隨便看。存取資料必須是職務上有需要。']]}};
+// 延伸閱讀：每門課的外部資源（連結可能失效，站內重點卡要能獨立讀懂）
+const LINKS={
+hw:[['Microsoft Learn：Windows 用戶端管理','https://learn.microsoft.com/zh-tw/windows/client-management/']],
+os:[['Microsoft Learn：Windows Server 文件','https://learn.microsoft.com/zh-tw/windows-server/'],['Linux man-pages（指令說明）','https://man7.org/linux/man-pages/']],
+net:[['Cisco Networking Academy 免費課程','https://www.netacad.com/'],['Cloudflare 學習中心（中文）','https://www.cloudflare.com/zh-tw/learning/']],
+sec:[['TWCERT/CC 台灣電腦網路危機處理暨協調中心','https://www.twcert.org.tw/'],['數位發展部資通安全署','https://moda.gov.tw/ACS/'],['iPAS 資訊安全工程師能力鑑定','https://www.ipas.org.tw/']],
+db:[['PostgreSQL 官方教學','https://www.postgresql.org/docs/current/tutorial.html'],['OWASP：SQL Injection 防範','https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html']],
+code:[['Python 官方教學（繁體中文）','https://docs.python.org/zh-tw/3/tutorial/'],['Pro Git（繁體中文）','https://git-scm.com/book/zh-tw/v2']],
+trouble:[['Microsoft Learn：Windows 用戶端疑難排解','https://learn.microsoft.com/zh-tw/troubleshoot/windows-client/welcome-windows-client']],
+svc:[],
+gov:[['全國法規資料庫：資通安全管理法','https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0030297'],['全國法規資料庫：個人資料保護法','https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=I0050021'],['數位發展部資通安全署','https://moda.gov.tw/ACS/']]};
+let LS=null;
+function learn(c,l,topic){const cards=(LEARN[c.id]||{})[l];if(!cards)return;const i=Math.max(0,cards.findIndex(x=>x[0]===topic));LS={c,l,i,cards};hub.hidden=true;hub.style.display='none';document.body.classList.add('inplay');play.hidden=false;lesson();scrollTo(0,0);}
+function lesson(){const s=LS,n=s.cards.length,end=s.i>=n,k=end?null:s.cards[s.i],lk=LINKS[s.c.id]||[];
+ play.innerHTML='<div class="bar"><span class="name">'+s.c.ic+' '+s.c.name+'・'+TIER[s.l]+'・聽課</span><span class="combo">'+(end?'':'第 '+(s.i+1)+'／'+n+' 張')+'</span></div><div class="prog"><i style="width:'+(Math.min(s.i,n)/n*100)+'%"></i></div>'+
+  '<div class="qcard lesson">'+(end?'<span class="qno">'+s.c.npc+'</span><p class="q">這一級的重點講完了</p><div>先用練習模式試試，不扣命、不計成績；有把握再正式考。</div>'+(lk.length?'<div><b>延伸閱讀</b><ul class="links">'+lk.map(x=>'<li><a href="'+x[1]+'" target="_blank" rel="noopener">'+x[0]+'</a></li>').join('')+'</ul><small class="note">外部網站，連結可能異動。</small></div>':'')
+   :'<span class="qno">'+s.c.npc+'的重點卡</span><p class="q">'+k[0]+'</p><ul class="pts">'+k[1].map(p=>'<li>'+p+'</li>').join('')+'</ul><div class="why"><b>舉個例子</b>'+k[2]+'</div><div class="why bad"><b>常見誤解</b>'+k[3]+'</div>')+
+  '<div class="topics">'+s.cards.map((x,j)=>'<button data-j="'+j+'"'+(j===s.i?' class="on" aria-current="true"':'')+'>'+x[0]+'</button>').join('')+'</div>'+
+  '<div class="row">'+(s.i>0?'<button class="btn ghost" id="lPrev">上一張</button>':'')+(end?'<button class="btn" id="lPrac">開始練習</button><button class="btn ghost" id="lExam">正式考試</button>':'<button class="btn" id="lNext">'+(s.i===n-1?'講完了':'下一張')+'</button>')+'<button class="btn ghost" id="lHome">回職訓中心</button></div></div>';
+ const go=j=>{s.i=j;lesson();scrollTo(0,0);};play.querySelectorAll('.topics button').forEach(b=>b.onclick=()=>go(+b.dataset.j));
+ if($('lPrev'))$('lPrev').onclick=()=>go(s.i-1);if($('lNext')){$('lNext').onclick=()=>go(s.i+1);$('lNext').focus();}
+ if($('lPrac')){$('lPrac').onclick=()=>start(s.c,s.l,true);$('lExam').onclick=()=>start(s.c,s.l,false);$('lPrac').focus();}
+ $('lHome').onclick=goHub;}
+function goHub(){play.hidden=true;document.body.classList.remove('inplay');hub.hidden=false;hub.style.display='flex';renderHub();scrollTo(0,0);}
 // ===== 作答 =====
 const shuf=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
 let G=null;
@@ -2258,12 +2378,12 @@ function answer(o,btn,opts,q){const g=G;[...$('opts').children].forEach((b,k)=>{
 function finish(){const g=G,n=g.qs.length,dead=g.lives<=0;const stars=dead?0:g.right===n?3:g.right>=n-1?2:1;
  const before=tierOf(g.d);if(!g.practice){SAVE[g.d.id]=SAVE[g.d.id]||{};const old=rec(g.d.id,g.l);SAVE[g.d.id][g.l]={stars:Math.max(old.stars,stars),best:Math.max(old.best,dead?0:g.score)};save();}(dead?sfx.lose:sfx.win)();
  const up=tierOf(g.d)>before,pass=stars>=2;
- const weak=[...new Set(g.miss.map(q=>q.t).filter(Boolean))];
+ const weak=[...new Set(g.miss.map(q=>q.t).filter(Boolean))],hasL=(LEARN[g.d.id]||{})[g.l];
  const head=g.practice?'練習結束':dead?'三條命用完了，這次沒過':pass?(up?'通過！技能升到「'+titleOf(g.d)+'」':'通過！'):'考完了，但錯超過一題，這一級還不算通過';
- play.innerHTML='<div class="qcard"><span class="qno">'+g.d.ic+' '+g.d.name+'・'+TIER[g.l]+'　'+g.d.npc+'</span><p class="q">'+head+'</p>'+(g.practice?'':'<div class="big">'+'★'.repeat(stars)+'<i>'+'★'.repeat(3-stars)+'</i></div>')+'<div>答對 '+g.right+'／'+n+' 題'+(g.practice?'　<span class="note">練習不計成績</span>':'　分數 '+g.score.toLocaleString())+'</div>'+(up&&!g.practice?'<div class="note">技能等級代表通過這一級的知識測驗，不等於實作能力的認證。</div>':'')+(weak.length?'<div><b>這次比較弱的主題</b>：'+weak.join('、')+'</div>':'')+
+ play.innerHTML='<div class="qcard"><span class="qno">'+g.d.ic+' '+g.d.name+'・'+TIER[g.l]+'　'+g.d.npc+'</span><p class="q">'+head+'</p>'+(g.practice?'':'<div class="big">'+'★'.repeat(stars)+'<i>'+'★'.repeat(3-stars)+'</i></div>')+'<div>答對 '+g.right+'／'+n+' 題'+(g.practice?'　<span class="note">練習不計成績</span>':'　分數 '+g.score.toLocaleString())+'</div>'+(up&&!g.practice?'<div class="note">技能等級代表通過這一級的知識測驗，不等於實作能力的認證。</div>':'')+(weak.length?'<div><b>這次比較弱的主題</b>'+(hasL?'（點了回去看重點）':'')+'<div class="topics">'+weak.map(w=>hasL&&hasL.some(x=>x[0]===w)?'<button data-w="'+w+'">'+w+'</button>':'<span>'+w+'</span>').join('')+'</div></div>':'')+
   (g.miss.length?'<div><b>答錯的題目</b>'+g.miss.map(q=>'<div class="miss">'+q.q+'<small>正確答案：'+q.a[0]+'</small><small>'+q.why+'</small></div>').join('')+'</div>':'')+
   '<div class="row"><button class="btn" id="again">'+(g.practice?'再練一次':'再考一次')+'</button><button class="btn ghost" id="home">回職訓中心</button></div></div>';
- $('again').onclick=()=>start(g.d,g.l,g.practice);$('home').onclick=()=>{play.hidden=true;document.body.classList.remove('inplay');hub.hidden=false;hub.style.display='flex';renderHub();scrollTo(0,0);};}
+ $('again').onclick=()=>start(g.d,g.l,g.practice);$('home').onclick=goHub;play.querySelectorAll('.topics button').forEach(b=>b.onclick=()=>learn(g.d,g.l,b.dataset.w));}
 if(window.initVillage3D){document.body.classList.add('full');const ls=$('lists'),lead=document.querySelector('#hub .lead');ls.insertBefore(lead,ls.children[1]);
  ['lsBtn','fsBtn','lsClose'].forEach(i=>$(i).hidden=false);$('lsBtn').onclick=()=>ls.classList.toggle('open');$('lsClose').onclick=()=>ls.classList.remove('open');
  $('fsBtn').onclick=()=>{const d=document;if(d.fullscreenElement)d.exitFullscreen();else if(d.documentElement.requestFullscreen)d.documentElement.requestFullscreen().catch(()=>{});};
