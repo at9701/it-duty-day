@@ -107,6 +107,16 @@ pre{margin:0;background:#16212b;color:#d7e3ee;border-radius:10px;padding:12px 14
 .pts{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:8px;font-size:1.05em}.lesson .q{font-size:1.5em}
 .topics{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.topics button,.topics span{font:inherit;font-size:.88em;border:1px solid var(--line);background:var(--panel2);color:inherit;border-radius:999px;padding:4px 12px}.topics button{cursor:pointer}.topics button:hover{border-color:var(--accent)}.topics button.on{background:var(--accent);border-color:var(--accent);color:#fff}
 .links{margin:6px 0 4px;padding-left:1.3em}.links a{color:var(--accent)}
+.key{border:2px solid var(--accent);border-radius:12px;padding:10px 14px;font-size:1.12em;font-weight:700;line-height:1.5}.key b{display:block;font-size:.72em;font-weight:700;color:var(--accent);letter-spacing:.06em;margin-bottom:2px}
+.why.deep{border-color:var(--info)}
+.figw{overflow-x:auto;border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--panel)}.fig{display:block;width:100%;min-width:500px;max-width:640px;height:auto;margin:0 auto;font-family:inherit}
+.fig rect{fill:var(--panel2);stroke:var(--line);stroke-width:1.5}.fig rect.a{fill:var(--accent);stroke:var(--accent)}.fig rect.w{fill:var(--crit);stroke:var(--crit)}.fig rect.off{fill:none;stroke-dasharray:4 3;stroke:var(--muted)}.fig rect.frame{fill:none;stroke:var(--muted);stroke-dasharray:6 4}
+.fig text{font-size:13px;fill:var(--fg)}.fig text.a,.fig text.w{fill:#fff;font-weight:700}.fig text.off,.fig text.n{fill:var(--muted)}.fig text.n{font-size:12px}.fig text.h{font-weight:700}.fig text.big{font-size:26px;font-weight:800;fill:var(--accent)}.fig text.big2{font-size:16px;font-weight:800;fill:var(--accent)}.fig text.c{font-family:var(--mono);font-size:12px}.fig text.sm{font-size:11px}.fig text.sm2{font-size:11px;fill:#fff}
+.fig line,.fig path.back{stroke:var(--muted);stroke-width:1.6;fill:none}.fig marker path{fill:var(--muted)}
+.chk{border-top:2px dashed var(--line);padding-top:14px;display:flex;flex-direction:column;gap:8px}.chk p{margin:0;font-weight:700;font-size:1.05em}.chk .opts{display:flex;flex-direction:column;gap:8px}.chk .note{font-size:.85em;color:var(--muted)}
+.topics button.ok{border-color:var(--accent)}.topics button.ok::before{content:"✓ "}.topics button.no{border-color:var(--crit)}.topics button.no::before{content:"✕ "}
+.recap{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}.recap li{display:grid;grid-template-columns:minmax(7em,auto) 1fr;gap:10px;align-items:baseline;border-bottom:1px solid var(--line);padding:6px 0}.recap button{font:inherit;font-weight:700;text-align:left;background:none;border:0;color:var(--accent);cursor:pointer;padding:0}.recap li.no button{color:var(--crit)}.recap li.ok button::after{content:" ✓"}.recap li.no button::after{content:" ✕"}
+@media(max-width:520px){.recap li{grid-template-columns:1fr;gap:2px}}
 .talk .les{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.talk .les span{font-weight:700}.talk .les button{font:inherit;border:1px solid var(--accent);background:transparent;color:var(--accent);border-radius:999px;padding:5px 14px;cursor:pointer}.talk .les button:hover{background:var(--accent);color:#fff}.why b{display:block;margin-bottom:2px}
 .btn{border:0;background:var(--accent);color:#fff;font:inherit;font-weight:700;border-radius:12px;padding:11px 20px;cursor:pointer;align-self:flex-start}
 .btn.ghost{background:var(--panel2);color:var(--fg);border:1px solid var(--line)}
@@ -2348,17 +2358,168 @@ code:[['Python 官方教學（繁體中文）','https://docs.python.org/zh-tw/3/
 trouble:[['Microsoft Learn：Windows 用戶端疑難排解','https://learn.microsoft.com/zh-tw/troubleshoot/windows-client/welcome-windows-client']],
 svc:[],
 gov:[['全國法規資料庫：資通安全管理法','https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0030297'],['資通安全署：關鍵基礎設施資安防護','https://moda.gov.tw/ACS/operations/ciip/650'],['全國法規資料庫：個人資料保護法','https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=I0050021'],['數位發展部資通安全署','https://moda.gov.tw/ACS/']]};
+// 重點卡的加深內容：MORE[課程][主題] = [為什麼（原理說明）, 記憶點（一句話）]
+const MORE={
+hw:{
+'記憶體':['處理器只能直接處理放在記憶體裡的資料。硬碟雖然容量大，但讀寫速度比記憶體慢很多，所以程式要先從硬碟載入到記憶體才能跑。記憶體是靠通電維持資料的，電一斷就全部清空。','記憶體是工作桌，硬碟是檔案櫃；桌子斷電就清空。'],
+'儲存裝置':['HDD 要等碟片轉到位置、讀寫頭移過去才能讀，這個機械動作就是慢的原因，也是怕摔的原因。SSD 直接用電訊號讀寫晶片，沒有等待時間。','HDD 會轉所以慢又怕摔，SSD 是晶片所以快；兩個都要備份。'],
+'開機自我檢測':['作業系統還沒載入之前，電腦沒辦法在螢幕上顯示詳細訊息，所以主機板只能用最原始的方式（嗶聲、燈號）回報。記憶體是開機最早用到的零件之一，它有問題就什麼都出不來。','沒畫面又嗶嗶叫，先重插記憶體。'],
+'磁碟陣列':['RAID 1 是同一份資料寫兩次，所以壞一顆還有另一顆。RAID 5 是把資料分散到各顆，另外算出一份「同位元」；任何一顆壞了，都可以用剩下的資料加同位元算回來，但同時壞兩顆就算不回來了。','RAID 1 兩顆鏡射，RAID 5 至少三顆壞一顆沒事；RAID 不是備份。'],
+'電力與 UPS':['電腦在寫入資料的瞬間斷電，檔案可能只寫了一半而損壞。UPS 平常讓市電通過並幫電池充電，一偵測到斷電就在極短時間內切換成電池供電，讓設備感覺不到中斷。','UPS 是用來撐過去和好好關機，不是讓你繼續上班。'],
+'維修安全':['人體走動摩擦就會帶靜電，自己感覺不到的電壓就足以打壞晶片。電源線沒拔時，主機板上仍有待機電力，插拔零件可能短路。','關機、拔線、放靜電，三步做完才動手。'],
+'散熱':['晶片溫度太高會運算出錯甚至燒毀，所以內建保護機制：先降速減少發熱，還是太熱就直接斷電。灰塵像棉被一樣蓋住散熱片，熱就散不出去。','突然關機先摸機殼、看風扇，清灰塵比重灌有用。'],
+'驅動程式':['每一家廠商的硬體做法都不一樣，作業系統不可能認得全世界的裝置，所以由廠商寫一支「說明書程式」告訴系統怎麼跟它溝通，這就是驅動程式。','驅動是硬體的翻譯，型號要對、來源要原廠。'],
+'更新管理':['修補程式一發布，攻擊者就能比對更新前後的差異，反推出漏洞在哪裡，接著去打還沒更新的電腦。所以修補程式公開之後，沒更新的機器反而更危險。','修補一公開，沒更新的就變成目標。'],
+'執行環境':['很多程式都會用到同樣的基本功能，與其每支程式各帶一份，不如大家共用一套，這套共用的東西就是執行環境。程式啟動時找不到它，就會說缺少某個 DLL。','缺 DLL 就裝官方的執行環境，不要上網抓單一 DLL。'],
+'軟體安裝規範':['公司要對電腦上的軟體負責：授權合不合法、有沒有漏洞、誰來更新。沒有經過申請的軟體，這三件事都沒有人管。','公司電腦裝軟體：先申請、用核可來源、看清楚授權。'],
+'相容性':['新版 Windows 的某些行為和舊版不同，舊程式照舊的方式做事就會出錯。相容模式是讓系統在這支程式面前「假裝」成舊版，回答它預期的答案。','相容模式是讓 Windows 假裝成舊版，能救一部分，不會變安全。'],
+'瀏覽器問題':['瀏覽器為了加快速度，會把網頁的檔案存一份在本機（快取）。網站改版後，如果瀏覽器還在用舊的那一份，畫面就會跑掉。擴充功能則會修改網頁內容，也可能造成異常。','只有這台怪：清快取、開無痕、換瀏覽器比對。'],
+'作業系統架構':['32 位元表示位址只有 32 個位元可以用，能標示的記憶體位置最多就是 2 的 32 次方，大約 4 GB。超過的記憶體，系統根本沒有號碼可以指到它。','32 位元最多用到約 4 GB；64 位元可以跑 32 位元程式，反過來不行。'],
+'軟體授權':['「免費」講的是價錢，「開源」講的是能不能看到並修改原始碼，兩件事各自獨立。開源授權還分寬鬆型和有「傳染性」的類型，後者要求你修改後也要公開。','免費講價錢，開源講原始碼；開源也有授權條款要遵守。']},
+os:{
+'網路指令':['排除網路問題時要知道四件事：IP、遮罩、閘道、DNS。只打 ipconfig 會少掉 DNS 和 DHCP 的資訊，而這兩項正好是很常出問題的地方。','查網路設定打 <code>ipconfig /all</code>，要看 DNS 一定要加 /all。'],
+'網域與驗證':['如果每台電腦各自管理帳號，一百台電腦就要建一百次，改密碼也要改一百次。網域把帳號集中放在網域控制站，每台電腦登入時都去問它「這個人的帳號密碼對不對」。','加入網域後，帳號由網域控制站驗證，一組帳號到處登入。'],
+'群組原則':['電腦開機和使用者登入時，會去網域控制站領取適用的原則並套用；之後每隔一段時間再自動檢查一次。所以改完原則要等下一次檢查才會生效，除非手動叫它馬上去領。','群組原則一次管全部；要馬上生效打 <code>gpupdate /force</code>。'],
+'事件紀錄':['系統和服務出問題時，當下通常沒有人在看螢幕，所以它們會把發生的事寫進事件紀錄。事後要查原因，就是回來讀這份「黑盒子」。','Windows 出事先看事件檢視器，用發生時間去對。'],
+'系統修復':['Windows 留有一份系統檔的正確版本。sfc 把目前的系統檔逐一和正確版本比對，不一樣就換回來，所以它只處理系統檔，不會碰你的資料。','系統檔壞了用 <code>sfc /scannow</code>，它不是掃毒也不是重灌。'],
+'遠端桌面':['遠端桌面等於把這台電腦的鍵盤、滑鼠和螢幕延伸到網路上。只要連得到 3389 又猜得到帳號密碼，就能完全操作這台電腦，所以攻擊者會不停掃描這個埠。','遠端桌面是 3389，絕不直接開到網際網路，要走 VPN。'],
+'檔案權限':['Windows 從網路存取共用資料夾，要先過「共用權限」這道門，再過「NTFS 權限」這道門，兩道都要通過，所以結果是比較嚴格的那個。Linux 的 7、5、5 則是把讀 4、寫 2、執行 1 加起來：7 是 4+2+1，5 是 4+1。','讀 4 寫 2 執行 1，加起來就是權限數字；Windows 兩層權限取嚴格的。'],
+'檔案指令':['Linux 把檔名以「.」開頭的檔案當成隱藏檔，多半是設定檔，平常不顯示以免畫面太亂。<code>-a</code> 是 all 的意思，<code>-l</code> 是 long（詳細）的意思。','<code>ls -la</code>：l 看詳細，a 看全部含隱藏檔。'],
+'日誌':['log 檔會一直往後面增加新的內容。一般的看法只會顯示打開當下的內容；<code>tail -f</code> 的 f 是 follow，會停在檔案尾端，一有新的行就立刻印出來。','盯 log 用 <code>tail -f</code>，f 就是 follow 跟著看。'],
+'服務管理':['服務是在背景持續執行的程式，沒有視窗可以關。設定檔通常只在服務啟動時讀一次，所以改了設定要重新啟動，服務才會讀到新的內容。','改完設定要 <code>systemctl restart</code>；要開機自動啟動要 <code>enable</code>。'],
+'磁碟空間':['程式執行時需要寫入 log、暫存檔和資料。磁碟滿了寫不進去，程式就會出現各種看起來不相干的錯誤，所以服務異常時檢查磁碟空間是基本動作。','<code>df -h</code> 看磁碟還剩多少，<code>du -sh</code> 看是誰佔的。'],
+'權限提升':['root 可以做任何事，包括刪掉整個系統，而且不會多問一句。平常用一般帳號，等於多一層保護：真的需要時才用 sudo 明確表示「這一行我要用管理員權限」，系統也會記下是誰做的。','平常用一般帳號，需要時才 <code>sudo</code>，而且會留紀錄。'],
+'文字搜尋':['log 檔動輒幾十萬行，用眼睛找不可能。grep 會一行一行檢查，只把含有關鍵字的行印出來，等於幫你做篩選。','大檔案找關鍵字用 <code>grep</code>，不分大小寫加 <code>-i</code>。'],
+'行程管理':['每個執行中的程式都是一個行程，會佔用 CPU 和記憶體。主機變慢時，通常是某一個行程佔掉大部分資源，<code>top</code> 會把它排在最上面。','主機慢先打 <code>top</code>，最上面那個就是吃最多的。']},
+net:{
+'IP 與子網路':['IP 位址像「路名加門牌」。遮罩告訴電腦前面多少位元是路名（網路）、後面多少是門牌（主機）。電腦要傳資料時先比對路名：一樣就直接送，不一樣就交給閘道。','/24 就是前三段是網路、最後一段是主機，遮罩 255.255.255.0。'],
+'DNS':['電腦之間其實只認 IP 位址，名稱是給人看的。每次你輸入名稱，電腦都要先問 DNS 伺服器「這個名稱的 IP 是多少」，問不到就不知道要連去哪裡。','用 IP 會通、用名稱不通，就是 DNS。'],
+'DHCP':['電腦開機時還沒有 IP，會先對整個網段廣播「誰可以給我位址」。DHCP 伺服器聽到就回覆一組設定。如果一直沒人回，Windows 會自己挑一個 169.254 開頭的位址先頂著用。','看到 169.254 開頭，就是沒找到 DHCP 伺服器。'],
+'交換器':['每張網路卡都有一個獨一無二的 MAC 位址。交換器會記下「哪個 MAC 接在哪個埠」，收到資料時查這張表，只送到目的地所在的那個埠，不會吵到其他人。','交換器看 MAC 管同網段，路由器看 IP 管跨網段。'],
+'路由與閘道':['電腦只知道怎麼把資料送給同一個網段的鄰居。目的地不在同網段時，它不知道路怎麼走，就一律交給預設閘道，由閘道負責往外轉送。','同網段會通、對外不通，先看預設閘道。'],
+'連接埠與協定':['IP 位址把資料送到正確的主機，但一台主機上同時有很多服務。連接埠就像大樓裡的門牌號碼，讓資料送到正確的那個服務。','HTTP 80、HTTPS 443、DNS 53、SSH 22、遠端桌面 3389。']},
+sec:{
+'資安基本觀念':['所有資安措施都是在保護這三件事的其中一件以上。分析一個事件或設計一項控制時，用 CIA 逐一檢查，可以避免只顧到「不被偷看」而漏掉其他兩項。','CIA：機密性不被偷看、完整性不被亂改、可用性要用時能用。'],
+'釣魚與社交工程':['人在緊張或趕時間的時候，會跳過平常的判斷。攻擊者刻意製造「不馬上處理就會出事」的壓力，就是要你來不及想。所以愈急的信，愈要停下來查證。','愈急愈要停：不點信裡的連結，自己另外查證，然後通報。'],
+'多因素驗證':['密碼可能被猜到、被側錄或在別的網站外洩。攻擊者要同時取得你的密碼和你手上的手機，難度高很多。兩個因素要不同種類才有意義，否則一次外洩就兩個都沒了。','多因素是不同「種類」：知道的、持有的、本身的，任兩種。'],
+'勒索軟體':['勒索軟體會沿著網路去加密其他電腦和共用資料夾，所以每多連線一分鐘，受害範圍就可能擴大。拔掉網路可以立刻切斷它的擴散路徑。保留現場則是為了之後查出入侵管道。','中勒索：先斷網、再通報、不關機不重灌。'],
+'最小權限':['帳號被盜或人員操作失誤時，能造成多大的損害，取決於這個帳號有多少權限。權限愈小，出事時的影響範圍就愈小。','只給做事需要的最低權限，用不到就收回。'],
+'弱點管理':['弱點掃描是拿一份「已知弱點清單」逐一比對，快但只找得到清單上有的。滲透測試是由人思考怎麼把幾個小問題串起來打進去，能發現工具看不出來的路徑。','掃描是機器比對清單，滲透測試是人實際打打看。'],
+'備份':['3 份是防單一份損壞；2 種媒體是防同一類設備同時故障；1 份異地是防火災、淹水或整個機房被勒索軟體加密。每一條都對應一種會把資料全部帶走的災難。','3 份資料、2 種媒體、1 份異地；沒測過還原不算備份。']},
+db:{
+'資料表設計':['資料表之間靠主鍵互相指認，例如訂單記的是「會員編號」而不是會員姓名。如果主鍵會重複或會變動，其他資料表就不知道指的是哪一筆。','主鍵：唯一、不可空、不要會變。'],
+'SQL 查詢':['資料庫執行查詢時，是先決定從哪張表拿（FROM），再篩選哪些列（WHERE），最後才決定顯示哪些欄位（SELECT）。照這個順序想，比較不會寫錯。','SELECT 拿欄位，FROM 哪張表，WHERE 篩哪幾筆。'],
+'資料異動安全':['資料庫不會問「你確定嗎」，指令一送出就執行。少了 WHERE，資料庫的理解就是「每一筆都要改」。先用 SELECT 驗證條件，是在動手前唯一的確認機會。','UPDATE、DELETE 之前，先用同樣的 WHERE 去 SELECT 一次。'],
+'交易':['很多作業要改好幾筆資料才算完成，中途如果當機，就會停在「改了一半」的狀態。交易讓資料庫把這幾步當成一個整體，沒有全部完成就全部退回。','交易就是全有或全無，不會只做一半。'],
+'索引':['沒有索引時，資料庫要把整張表從頭看到尾才能找到資料。索引是另外維護的一份排好序的清單，可以很快跳到正確位置；但每次資料異動，這份清單也要跟著更新。','索引讓查詢變快、寫入變慢，只建在常查的欄位。'],
+'SQL 注入':['程式如果把使用者輸入的文字直接接進 SQL 字串，資料庫分不出哪些是程式原本的指令、哪些是使用者打的字。參數化查詢是先把指令的結構固定下來，輸入只能填進預留的位置當資料。','防 SQL 注入靠參數化查詢，不要用字串拼接。'],
+'備份還原':['每天都做完整備份太花時間和空間，所以平日只備份「有變動的部分」。差異備份每次都是跟上一次完整備份比，所以愈後面愈大，但還原時只需要兩份。','還原差異備份：最近一次完整 + 最新一份差異。']},
+code:{
+'自動化':['人做重複的事會累、會漏、會打錯，電腦不會。把步驟寫成腳本，每次執行的動作都一樣，還能留下紀錄。判斷標準是：這件事是不是每次做法都相同。','固定、重複、規則清楚的事交給腳本，而且要留紀錄。'],
+'程式基礎':['再複雜的程式，都是由三種結構組成：一行接一行執行、依條件決定做不做、重複做很多次。看不懂程式時，拿紙筆記下每個變數現在的值，一行一行往下走。','程式三件事：照順序、看條件、重複做。'],
+'除錯':['錯誤訊息是程式在告訴你它卡在哪裡。Python 會把一路呼叫的過程列出來，最底下才是真正出錯的地方和原因，所以要從最後面往回讀。','錯誤訊息看最後一行：什麼錯、在哪一行。'],
+'測試環境':['程式的邏輯正確，不代表對這一份資料執行的結果正確：路徑、權限、資料格式都可能和你想的不一樣。測試環境讓你在不會造成損失的地方先發現這些差異。','會改資料的腳本，第一次絕不在正式環境跑。'],
+'版本控制':['版本控制系統把每一次修改都存成一個可以回去的時間點，並記下是誰、為什麼改。出問題時不用猜，直接比對兩個版本之間的差異。','每次修改都有紀錄，改壞了可以回到上一版。'],
+'密碼與金鑰':['程式碼會被複製、分享、放進版本控制，看得到程式碼的人遠比應該知道密碼的人多。把密碼從程式碼分離出來，才能分別控管這兩樣東西。','密碼不寫在程式碼裡，也不放進版本控制。'],
+'腳本安全':['腳本執行時，變數會被換成它的值再執行。變數是空的，換完之後那一段就消失了，指令的意思可能完全改變。刪除指令遇到這種情況，後果最嚴重。','刪除指令裡有變數，先檢查它是不是空的。']},
+trouble:{
+'問診與分類':['同一句「開不了機」，背後可能是電源、螢幕、硬碟或作業系統四種完全不同的問題。先花一分鐘把現象問清楚並分類，可以省下往錯誤方向查的一小時。','先問清楚現象再分類，也問「之前改過什麼」。'],
+'顯示問題':['排除問題要從最容易檢查、最常發生的地方開始。線材鬆脫和螢幕設定的發生機率，遠高於主機板或顯示卡故障，而且十秒就能確認。','有電沒畫面：先看螢幕和線，再開主機。'],
+'開機問題':['電腦自我檢測完成後，會依照開機順序一個一個找有沒有可以開機的磁碟。全部找完都沒有，就顯示這個訊息。所以原因不外乎：順序錯了、磁碟沒接好、磁碟壞了。','找不到開機裝置：拔外接、看 BIOS 有沒有認到磁碟。'],
+'變因控制':['這和做實驗一樣：一次改兩個以上的條件，就無法判斷結果是哪一個造成的。一次只改一項，問題好了就知道原因，沒好就能確定排除這一項。','一次只改一個地方，改完就測。'],
+'效能問題':['電腦慢一定是某一項資源不夠用：CPU、記憶體、磁碟或網路。看數據找出是哪一項滿了、是誰用掉的，才能對症處理，否則加錯資源也不會變快。','電腦慢先看數據：CPU、記憶體、磁碟、網路是誰滿了。'],
+'當機畫面':['Windows 遇到無法繼續的嚴重錯誤時，會主動停止以免資料損壞，並把原因用停止代碼顯示出來。這個代碼直接指出問題的類別，比任何猜測都準。','藍白畫面先記下停止代碼再做別的。'],
+'結案確認':['你測試的方式和使用者實際的用法不一定相同，可能你修好了其中一個原因，但他的操作路徑還會遇到另一個。只有請他照平常的方式做一次，才算驗證。','修好後請使用者自己操作一次，再結案。']},
+svc:{
+'問診':['使用者不知道哪些資訊對你有用，只會說出他的感覺。你要用問題引導他說出「看到什麼、何時開始、做了什麼」這三項可以拿來判斷的事實。','問三件事：看到什麼、什麼時候開始、做了什麼之後。'],
+'進度回報':['等待的人最難受的是「不知道現在怎樣」。即使問題還沒解決，讓對方知道有人在處理、下一步是什麼、何時會再聯絡，他就能安排自己的工作。','沒解決也要回報：查到哪、接下來做什麼、何時再回覆。'],
+'交接':['交接的目的是讓事情不會因為換人而中斷或重來。檢驗方式很簡單：接手的人看完之後，能不能不打電話問你就直接繼續做。','交接要寫到對方不用再問你：現象、做過什麼、下一步。'],
+'向上報告':['主管要根據你的報告做決定，例如要不要對外說明、要不要調人力。他需要先知道「多嚴重、好了沒」，這些放在最前面，他才能在一開始就抓到重點。','對主管先講結論和影響，技術細節最後。'],
+'情緒處理':['人在情緒高漲時聽不進解釋，任何說明都會被當成推託。先讓對方覺得被聽到，情緒降下來之後，才有辦法一起處理問題。','先聽完、先同理，再處理問題；不急著解釋。'],
+'結案確認':['案件有沒有解決，是以使用者能不能完成他要做的事為準，不是以你做了什麼為準。多問一句確認，可以避免同一個問題被報修兩次。','你覺得好了不算，使用者確認才算。'],
+'誠實回覆':['使用者會依照你說的去做。你說錯了，他可能做出錯誤的決定或白花時間，之後也會懷疑你說的每一句話。「我不確定，我去查」反而讓人覺得可靠。','不確定就說不確定，並說何時回覆。'],
+'通報':['大範圍異常的處理需要協調很多人，愈早啟動損失愈小。主管不需要你先有答案，他需要的是儘早知道有這件事，才來得及調度和對外說明。','影響很多人的異常，先通報現象，原因後補。']},
+gov:{
+'資通安全管理法':['有些單位一旦資通系統出問題，會影響整個社會的運作，例如電力、通訊、金融、醫療。這部法律要求這類單位必須有制度地管理資安，而不是出事才處理。','資安法管公務機關和特定非公務機關，不是只管政府。'],
+'事件通報':['資安事件可能同時發生在很多單位。主管機關愈早收到通報，就愈能判斷是不是大規模攻擊，並提醒其他單位防範。所以時限是從「知道」開始算，不等你查清楚。','知悉後一小時內通報，四級裡第四級最嚴重。'],
+'個人資料保護法':['這幾類資料一旦外洩，可能讓當事人受到歧視或難以回復的傷害，而且無法像密碼一樣「換一組」。所以法律把規則倒過來：原則上不能碰，有明確依據才可以。','特種個資六類：病歷、醫療、基因、性生活、健康檢查、犯罪前科，原則禁止。'],
+'ISO 27001':['標準要求的不是「買了哪些設備」，而是組織有沒有持續做這個循環：找出風險、決定怎麼處理、執行、檢查有沒有效、再改善。證書證明的是這個循環有在運作。','ISO 27001 是資安「管理制度」的標準，可以被驗證。'],
+'風險管理':['風險不可能降到零，資源也有限，所以每一項風險都要做選擇。四種處理方式剛好涵蓋所有可能：想辦法變小、讓別人分擔、乾脆不做、或是評估後承擔。','風險四選一：降低、移轉、避免、接受；接受要有人核可。'],
+'稽核':['稽核的價值在於找出制度和實際之間的落差。如果受稽核的一方把落差藏起來，問題不會消失，只是變成沒有人知道也沒有人改善的風險。','稽核照實回答，沒做到就說現況和改善規劃。'],
+'存取權限':['給權限的時候通常有人申請、有人核准；但人員調動或離職時，往往沒有人記得去收回。時間一久，系統裡就累積很多沒人在用、卻還能登入的帳號。','權限要定期清查，人走了、調職了就收回。']}};
+// 示意圖：FIG['課程/主題'] 回傳一段 SVG
+const fT=(x,y,s,c,a)=>String(s).split('｜').map((t,i,r)=>'<text x="'+x+'" y="'+(y+(i-(r.length-1)/2)*17)+'" text-anchor="'+(a||'middle')+'" class="'+(c||'')+'">'+t+'</text>').join('');
+const fB=(x,y,w,h,s,c)=>'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="8" class="'+(c||'')+'"/>'+fT(x+w/2,y+h/2+5,s,c);
+const fA=(x1,y1,x2,y2)=>'<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" marker-end="url(#fa)"/>';
+const fS=(h,label,inner)=>'<svg class="fig" viewBox="0 0 560 '+h+'" role="img" aria-label="'+label+'"><defs><marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z"/></marker></defs>'+inner+'</svg>';
+const fFlow=(label,items,note,cls)=>{const n=items.length,gap=22,w=(560-gap*(n-1))/n;return fS(note?112:72,label,items.map((s,i)=>fB(i*(w+gap),8,w,56,s,(cls&&cls[i])||(i===n-1?'a':''))+(i?fA((i-1)*(w+gap)+w+2,36,i*(w+gap)-3,36):'')).join('')+(note?fT(280,98,note,'n'):''));};
+const fCols=(label,items,note)=>{const n=items.length,gap=14,w=(560-gap*(n-1))/n;return fS(note?134:100,label,items.map((it,i)=>fB(i*(w+gap),6,w,34,it[0],it[2]||'a')+fB(i*(w+gap),46,w,50,it[1],'')).join('')+(note?fT(280,122,note,'n'):''));};
+const FIG={
+'hw/記憶體':()=>fS(120,'記憶體與儲存裝置的關係',fB(20,14,200,70,'記憶體（工作桌）｜快・斷電就清空','a')+fB(340,14,200,70,'硬碟／SSD（檔案櫃）｜較慢・關機還在','')+fA(338,36,224,36)+fA(222,64,336,64)+fT(280,28,'開啟檔案','n')+fT(280,82,'存檔','n')+fT(280,110,'處理器只能直接處理放在工作桌上的資料','n')),
+'hw/磁碟陣列':()=>{const d=(x,cs)=>cs.map((c,i)=>fB(x,34+i*26,56,22,c,c==='同位'?'w':'')).join('')+fT(x+28,26,'磁碟','n');return fS(150,'RAID 1 與 RAID 5 的資料擺放',fT(90,12,'RAID 1 鏡射','h')+d(30,['甲','乙','丙'])+d(100,['甲','乙','丙'])+fT(93,132,'兩顆內容相同，壞一顆沒事','n')+fT(400,12,'RAID 5（至少三顆）','h')+d(300,['甲1','乙1','同位'])+d(372,['甲2','同位','丙1'])+d(444,['同位','乙2','丙2'])+fT(400,132,'壞任何一顆，用其餘的加同位元算回來','n'));},
+'hw/開機自我檢測':()=>fFlow('開機流程',['按下電源','自我檢測｜（POST）','找開機磁碟','載入｜作業系統'],'自我檢測沒過：沒畫面，用嗶聲或燈號回報',['','w','','a']),
+'hw/電力與 UPS':()=>fFlow('UPS 的運作',['市電正常｜電池充電','停電｜瞬間切換電池','撐幾分鐘','通知設備｜正常關機']),
+'os/檔案權限':()=>{const g=(x,n,bits,sum)=>fT(x+66,14,n,'h')+['讀 4','寫 2','執行 1'].map((s,i)=>fB(x+i*46,24,42,34,s,bits[i]?'a':'off')).join('')+fT(x+66,80,sum,'big');return fS(112,'chmod 755 的意思',g(20,'擁有者',[1,1,1],'7')+g(210,'群組',[1,0,1],'5')+g(400,'其他人',[1,0,1],'5')+fT(280,106,'亮的數字加起來：4+2+1=7，4+1=5','n'));},
+'os/群組原則':()=>fFlow('群組原則的套用',['在網域控制站｜設定原則','電腦定期｜自動領取','全部電腦｜套用相同設定'],'要立刻生效：在用戶端執行 gpupdate /force'),
+'os/網域與驗證':()=>fFlow('網域登入的驗證',['使用者在任何一台｜輸入帳號密碼','電腦去問｜網域控制站','驗證通過｜允許登入']),
+'net/IP 與子網路':()=>fS(120,'IP 位址的網路部分與主機部分',fB(20,24,390,40,'192 . 168 . 1','a')+fB(416,24,124,40,'. 10','')+fT(215,14,'網路部分（前 24 位元）','h')+fT(478,14,'主機部分','h')+fB(20,72,390,34,'255 . 255 . 255','off')+fB(416,72,124,34,'. 0','off')+fT(280,118,'/24 的遮罩：255 的部分是網路，0 的部分是主機','n')),
+'net/DNS':()=>fFlow('DNS 名稱解析',['輸入名稱','問 DNS 伺服器｜「IP 是多少？」','得到 IP 位址','連到伺服器'],'用 IP 連得到、用名稱連不到 → 卡在第二步'),
+'net/DHCP':()=>fS(150,'DHCP 配發位址',fB(0,8,150,56,'電腦廣播｜「誰能給我 IP？」','')+fA(152,36,202,36)+fB(205,8,150,56,'DHCP 伺服器｜回覆','')+fA(357,36,407,36)+fB(410,8,150,56,'拿到 IP、遮罩｜閘道、DNS','a')+fA(75,66,75,92)+fB(0,95,320,44,'一直沒人回覆 → 自己設成 169.254.x.x','w')),
+'net/交換器':()=>fS(124,'交換器與路由器的分工',fB(0,10,90,36,'電腦甲','')+fB(0,72,90,36,'電腦乙','')+fA(92,28,148,50)+fA(92,90,148,66)+fB(150,36,110,46,'交換器｜看 MAC','a')+fA(262,59,318,59)+fB(320,36,110,46,'路由器｜看 IP','a')+fA(432,59,468,59)+fB(470,36,90,46,'其他｜網段','')+fT(130,120,'同網段：交換器直接送','n')+fT(420,120,'跨網段：經過路由器','n')),
+'net/路由與閘道':()=>fS(124,'預設閘道是對外的出口',fB(0,10,90,36,'電腦甲','')+fB(0,72,90,36,'印表機','')+fA(92,28,148,50)+fA(92,90,148,66)+fB(150,36,110,46,'交換器','')+fA(262,59,318,59)+fB(320,36,110,46,'預設閘道','a')+fA(432,59,468,59)+fB(470,36,90,46,'外部｜網路','')+fT(130,120,'同網段不需要閘道','n')+fT(420,120,'要出去一定經過閘道','n')),
+'net/連接埠與協定':()=>fCols('常見連接埠',[['22','SSH'],['53','DNS'],['80','HTTP'],['443','HTTPS｜（加密）'],['3389','遠端桌面']],'同一台主機，用連接埠分辨是哪個服務'),
+'sec/資安基本觀念':()=>fCols('資安三要素 CIA',[['機密性','只有該看的人｜看得到'],['完整性','資料沒有｜被亂改'],['可用性','要用的時候｜用得到']]),
+'sec/多因素驗證':()=>fCols('驗證的三種因素',[['你知道的','密碼、PIN 碼'],['你持有的','手機、實體金鑰'],['你本身的','指紋、臉']],'要用到兩「種」以上才算多因素；兩組密碼不算'),
+'sec/勒索軟體':()=>fFlow('疑似中勒索軟體的處理順序',['隔離｜拔網路線','立刻通報','保留現場｜不關機不重灌','依指示處理'],null,['w','a','','']),
+'sec/釣魚與社交工程':()=>fFlow('收到可疑信件',['不點連結｜不開附件','自己另開官方網站｜或打電話查證','通報｜資安窗口']),
+'sec/備份':()=>fS(134,'3-2-1 備份原則',fB(0,8,170,50,'正式資料','')+fB(195,8,170,50,'備份一｜機房備份設備','a')+fB(390,8,170,50,'備份二｜異地或雲端','a')+fT(85,82,'3 份資料','big2')+fT(280,82,'2 種媒體','big2')+fT(475,82,'1 份異地','big2')+fT(280,118,'至少一份離線或無法竄改，並定期測試還原','n')),
+'db/資料異動安全':()=>fFlow('修改資料前的三步',['先 SELECT｜確認筆數','備份或｜開啟交易','再 UPDATE｜／DELETE'],'沒有 WHERE = 整張資料表'),
+'db/交易':()=>fS(134,'交易：全有或全無',fB(20,10,160,44,'甲帳戶 −1000','')+fB(20,62,160,44,'乙帳戶 +1000','')+'<rect x="8" y="2" width="184" height="112" rx="10" class="frame"/>'+fT(100,130,'同一個交易','n')+fA(194,40,300,34)+fA(194,76,300,90)+fB(304,10,236,44,'兩步都成功 → 提交','a')+fB(304,70,236,44,'任一步失敗 → 全部復原','w')),
+'db/備份還原':()=>{const d=['日','一','二','三'];return fS(134,'完整備份加差異備份的還原',d.map((s,i)=>fT(70+i*140,14,'週'+s,'h')+(i<3?fB(10+i*140,24,120,46,i?'差異備份':'完整備份',i===0||i===2?'a':'off'):fB(10+i*140,24,120,46,'故障','w'))).join('')+fT(280,96,'還原 ＝ 週日的完整備份 ＋ 週二的差異備份','big2')+fT(280,122,'差異備份每次都是跟「上一次完整備份」比','n'));},
+'db/SQL 注入':()=>fS(124,'字串拼接與參數化查詢',fB(0,8,270,44,'字串拼接：輸入變成指令的一部分','w')+fB(290,8,270,44,'參數化：輸入只能當資料','a')+fT(135,76,'"... WHERE name = \'" + 輸入 + "\'"','c')+fT(425,76,'"... WHERE name = ?"','c')+fT(135,104,'輸入裡的引號會改變指令','n')+fT(425,104,'指令結構先固定，再填入值','n')),
+'code/程式基礎':()=>fCols('程式的三種結構',[['順序','一行接一行｜往下執行'],['條件','成立才做｜（if）'],['迴圈','重複做很多次｜（for／while）']]),
+'code/版本控制':()=>fS(110,'版本控制可以回到之前的版本',['第一版','第二版','第三版｜（改壞了）'].map((s,i)=>fB(i*190,10,150,50,s,i===2?'w':i===1?'a':'')+(i?fA((i-1)*190+152,35,i*190-3,35):'')).join('')+'<path d="M455,64 Q360,104 270,66" class="back" marker-end="url(#fa)"/>'+fT(362,104,'比對差異，回到第二版','n')),
+'code/腳本安全':()=>fS(112,'空變數讓刪除指令變危險',fB(0,8,270,40,'DIR = /data/tmp','a')+fB(290,8,270,40,'DIR 是空的','w')+fT(135,72,'rm -rf /data/tmp/*','c')+fT(425,72,'rm -rf /*','c')+fT(135,100,'只刪暫存資料夾','n')+fT(425,100,'從根目錄開始刪','n')),
+'trouble/問診與分類':()=>fS(124,'「開不了機」的三種方向',fB(190,4,180,36,'「開不了機」','')+fA(240,42,100,68)+fA(280,42,280,68)+fA(320,42,460,68)+fB(10,70,170,48,'完全沒電｜→ 電源、插座','a')+fB(195,70,170,48,'有電沒畫面｜→ 螢幕、線、記憶體','a')+fB(380,70,170,48,'有畫面進不了系統｜→ 磁碟、作業系統','a')),
+'trouble/開機問題':()=>fFlow('找不到開機裝置時的位置',['按下電源','自我檢測','找開機磁碟｜✕ 卡在這裡','載入｜作業系統'],'檢查：外接裝置、開機順序、磁碟有沒有被認到',['','','w','off']),
+'trouble/變因控制':()=>fFlow('一次只改一項',['改一個地方','測試','沒好：改回去｜再試下一個'],'同時改三個，好了也不知道是哪一個'),
+'trouble/效能問題':()=>fCols('電腦慢先看四種資源',[['CPU','誰在運算'],['記憶體','誰佔最多'],['磁碟','誰在讀寫'],['網路','誰在傳輸']],'用工作管理員或 top 找出是哪一項滿了'),
+'svc/問診':()=>fCols('問出三個事實',[['看到什麼','畫面、訊息｜是什麼'],['何時開始','今天？｜更新之後？'],['做了什麼','哪個動作｜之後發生']],'再問：只有你，還是旁邊的人也一樣？'),
+'svc/進度回報':()=>fFlow('回報進度的三句話',['目前查到哪','接下來要做什麼','何時再回覆'],'時間到了還沒解決，也要回報一次'),
+'svc/向上報告':()=>fFlow('對主管報告的順序',['結論｜好了沒','影響｜多少人多久','原因','處理與｜後續'],null,['a','a','','']),
+'svc/交接':()=>fCols('交接要有的五項',[['現象','發生什麼'],['做過的','含沒效的'],['判斷','目前懷疑'],['下一步','要做什麼'],['聯絡','找誰']]),
+'svc/通報':()=>fFlow('大範圍異常的通報',['發現多人｜同時異常','立刻通報｜現象與範圍','邊查邊補｜原因'],'不用等查清楚才報',['','a','']),
+'gov/事件通報':()=>fS(134,'資通安全事件的處理時限',fB(0,10,110,56,'知悉事件','')+fA(112,38,146,38)+fB(149,10,120,56,'1 小時內｜通報','a')+fA(271,38,305,38)+fB(308,10,122,56,'完成損害控制｜或復原','')+fA(432,38,446,38)+fB(449,10,111,56,'1 個月內｜送交報告','')+fT(369,86,'第一、二級：72 小時內','n')+fT(369,106,'重大事件：36 小時內','n')+fT(104,96,'時限從「知悉」起算','h')),
+'gov/風險管理':()=>fCols('風險處理的四種方式',[['降低','加上｜控制措施'],['移轉','保險｜或委外'],['避免','不做｜那件事'],['接受','評估後承擔｜須核可']]),
+'gov/資通安全管理法':()=>fS(124,'資通安全管理法的適用對象',fB(0,8,170,50,'公務機關','a')+fB(190,8,370,50,'特定非公務機關','a')+['關鍵基礎設施｜提供者','公營事業','特定｜財團法人','受政府控制｜的事業、｜團體或機構'].map((s,i)=>fB(190+i*93.5,68,89.5,52,s,'sm')).join('')),
+'gov/個人資料保護法':()=>fCols('特種個人資料六類',[['病歷',''],['醫療',''],['基因',''],['性生活',''],['健康檢查',''],['犯罪前科','']].map(x=>[x[0],'原則｜禁止']),'有法律明定的例外情形才可以蒐集、處理或利用'),
+'gov/ISO 27001':()=>fFlow('管理制度的循環',['辨識風險','選擇｜控制措施','執行','檢查與｜改善'],'做完一輪再回到第一步，持續循環'),
+'os/日誌':()=>fS(100,'tail -f 會跟著檔案尾端',fB(0,8,330,24,'09:00:01 啟動完成','off')+fB(0,36,330,24,'09:00:05 使用者登入','off')+fB(0,64,330,24,'09:00:09 ERROR 連線逾時　← 新的一行','w')+fT(450,34,'tail -f','big2')+fT(450,62,'有新的行｜就立刻顯示','n')),
+'os/磁碟空間':()=>fS(96,'df 與 du 的差別',fB(0,8,270,40,'df -h：整個分割區還剩多少','a')+fB(290,8,270,40,'du -sh：這個目錄佔了多少','a')+'<rect x="0" y="60" width="270" height="20" rx="6" class="off"/><rect x="0" y="60" width="250" height="20" rx="6" class="w"/>'+fT(135,75,'已用 93%','sm2')+fT(425,75,'/var/log　38G','c'))};
 let LS=null;
 function learn(c,l,topic){const cards=(LEARN[c.id]||{})[l];if(!cards)return;const i=Math.max(0,cards.findIndex(x=>x[0]===topic));LS={c,l,i,cards};hub.hidden=true;hub.style.display='none';document.body.classList.add('inplay');play.hidden=false;lesson();scrollTo(0,0);}
-function lesson(){const s=LS,n=s.cards.length,end=s.i>=n,k=end?null:s.cards[s.i],lk=LINKS[s.c.id]||[];
- play.innerHTML='<div class="bar"><span class="name">'+s.c.ic+' '+s.c.name+'・'+TIER[s.l]+'・聽課</span><span class="combo">'+(end?'':'第 '+(s.i+1)+'／'+n+' 張')+'</span></div><div class="prog"><i style="width:'+(Math.min(s.i,n)/n*100)+'%"></i></div>'+
-  '<div class="qcard lesson">'+(end?'<span class="qno">'+s.c.npc+'</span><p class="q">這一級的重點講完了</p><div>先用練習模式試試，不扣命、不計成績；有把握再正式考。</div>'+(lk.length?'<div><b>延伸閱讀</b><ul class="links">'+lk.map(x=>'<li><a href="'+x[1]+'" target="_blank" rel="noopener">'+x[0]+'</a></li>').join('')+'</ul><small class="note">外部網站，連結可能異動。</small></div>':'')
-   :'<span class="qno">'+s.c.npc+'的重點卡</span><p class="q">'+k[0]+'</p><ul class="pts">'+k[1].map(p=>'<li>'+p+'</li>').join('')+'</ul><div class="why"><b>舉個例子</b>'+k[2]+'</div><div class="why bad"><b>常見誤解</b>'+k[3]+'</div>')+
-  '<div class="topics">'+s.cards.map((x,j)=>'<button data-j="'+j+'"'+(j===s.i?' class="on" aria-current="true"':'')+'>'+x[0]+'</button>').join('')+'</div>'+
-  '<div class="row">'+(s.i>0?'<button class="btn ghost" id="lPrev">上一張</button>':'')+(end?'<button class="btn" id="lPrac">開始練習</button><button class="btn ghost" id="lExam">正式考試</button>':'<button class="btn" id="lNext">'+(s.i===n-1?'講完了':'下一張')+'</button>')+'<button class="btn ghost" id="lHome">回職訓中心</button></div></div>';
- const go=j=>{s.i=j;lesson();scrollTo(0,0);};play.querySelectorAll('.topics button').forEach(b=>b.onclick=()=>go(+b.dataset.j));
- if($('lPrev'))$('lPrev').onclick=()=>go(s.i-1);if($('lNext')){$('lNext').onclick=()=>go(s.i+1);$('lNext').focus();}
- if($('lPrac')){$('lPrac').onclick=()=>start(s.c,s.l,true);$('lExam').onclick=()=>start(s.c,s.l,false);$('lPrac').focus();}
+function lesson(){const s=LS,n=s.cards.length,end=s.i>=n,k=end?null:s.cards[s.i],lk=LINKS[s.c.id]||[],mo=MORE[s.c.id]||{};s.ck=s.ck||{};
+ let body;
+ if(end){const st=j=>s.ck[j]&&s.ck[j].pick!==undefined?(s.ck[j].ok?'ok':'no'):'';const wrong=s.cards.map((x,j)=>j).filter(j=>st(j)==='no');
+  body='<span class="qno">'+s.c.npc+'</span><p class="q">一頁複習</p><div>把每張卡濃縮成一句話。蓋住右邊，看主題能不能自己講出來。</div>'+
+   (wrong.length?'<div class="why bad"><b>剛剛答錯的主題</b>建議再看一次：<div class="topics">'+wrong.map(j=>'<button data-j="'+j+'">'+s.cards[j][0]+'</button>').join('')+'</div></div>':'')+
+   '<ul class="recap">'+s.cards.map((x,j)=>'<li class="'+st(j)+'"><button data-j="'+j+'">'+x[0]+'</button><span>'+((mo[x[0]]||[])[1]||'')+'</span></li>').join('')+'</ul>'+
+   '<div>先用練習模式試試，不扣命、不計成績；有把握再正式考。</div>'+(lk.length?'<div><b>延伸閱讀</b><ul class="links">'+lk.map(x=>'<li><a href="'+x[1]+'" target="_blank" rel="noopener">'+x[0]+'</a></li>').join('')+'</ul><small class="note">外部網站，連結可能異動。</small></div>':'');
+ }else{const m=mo[k[0]]||[],fig=FIG[s.c.id+'/'+k[0]];
+  if(!s.ck[s.i]){const qs=pool(s.c,s.l).filter(q=>q.t===k[0]);if(qs.length){const q=qs[Math.floor(Math.random()*qs.length)];s.ck[s.i]={q,opts:shuf(q.a.map((t,z)=>({t,ok:z===0})))};}}
+  const ck=s.ck[s.i];
+  body='<span class="qno">'+s.c.npc+'的重點卡</span><p class="q">'+k[0]+'</p>'+(m[1]?'<div class="key"><b>記住這句</b>'+m[1]+'</div>':'')+
+   '<ul class="pts">'+k[1].map(p=>'<li>'+p+'</li>').join('')+'</ul>'+(fig?'<div class="figw">'+fig()+'</div>':'')+
+   (m[0]?'<div class="why deep"><b>為什麼是這樣</b>'+m[0]+'</div>':'')+'<div class="why"><b>舉個例子</b>'+k[2]+'</div><div class="why bad"><b>常見誤解</b>'+k[3]+'</div>'+
+   (ck?'<div class="chk"><b>✍️ 馬上考一題</b><span class="note">先不看上面，憑記憶回答，記得比較牢。</span><p>'+ck.q.q+'</p>'+(ck.q.code?'<pre>'+ck.q.code+'</pre>':'')+'<div class="opts">'+ck.opts.map((o,z)=>'<button class="opt'+(ck.pick!==undefined?(o.ok?' right':z===ck.pick?' wrong':''):'')+'" data-z="'+z+'"'+(ck.pick!==undefined?' disabled':'')+'>'+o.t+'</button>').join('')+'</div>'+(ck.pick!==undefined?'<div class="why'+(ck.ok?'':' bad')+'"><b>'+(ck.ok?'答對了':'再記一次')+'</b>'+ck.q.why+'</div>':'')+'</div>':'');}
+ play.innerHTML='<div class="bar"><span class="name">'+s.c.ic+' '+s.c.name+'・'+TIER[s.l]+'・聽課</span><span class="combo">'+(end?'複習':'第 '+(s.i+1)+'／'+n+' 張')+'</span></div><div class="prog"><i style="width:'+(Math.min(s.i,n)/n*100)+'%"></i></div>'+
+  '<div class="qcard lesson">'+body+
+  '<div class="topics nav">'+s.cards.map((x,j)=>'<button data-j="'+j+'" class="'+(j===s.i?'on ':'')+(s.ck[j]&&s.ck[j].pick!==undefined?(s.ck[j].ok?'ok':'no'):'')+'"'+(j===s.i?' aria-current="true"':'')+'>'+x[0]+'</button>').join('')+'</div>'+
+  '<div class="row">'+(s.i>0?'<button class="btn ghost" id="lPrev">上一張</button>':'')+(end?'<button class="btn" id="lPrac">開始練習</button><button class="btn ghost" id="lExam">正式考試</button>':'<button class="btn" id="lNext">'+(s.i===n-1?'看複習':'下一張')+'</button>')+'<button class="btn ghost" id="lHome">回職訓中心</button></div></div>';
+ const go=j=>{s.i=j;lesson();scrollTo(0,0);};play.querySelectorAll('[data-j]').forEach(b=>b.onclick=()=>go(+b.dataset.j));
+ play.querySelectorAll('.chk .opt').forEach(b=>b.onclick=()=>{const ck=s.ck[s.i];ck.pick=+b.dataset.z;ck.ok=ck.opts[ck.pick].ok;const y=scrollY;lesson();scrollTo(0,y);});
+ if($('lPrev'))$('lPrev').onclick=()=>go(s.i-1);if($('lNext'))$('lNext').onclick=()=>go(s.i+1);
+ if($('lPrac')){$('lPrac').onclick=()=>start(s.c,s.l,true);$('lExam').onclick=()=>start(s.c,s.l,false);}
  $('lHome').onclick=goHub;}
 function goHub(){play.hidden=true;document.body.classList.remove('inplay');hub.hidden=false;hub.style.display='flex';renderHub();scrollTo(0,0);}
 // ===== 作答 =====
