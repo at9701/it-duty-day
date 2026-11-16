@@ -164,9 +164,9 @@ window.initVillage3D=function(api){
  host.innerHTML='<span class="how">WASD／方向鍵或點地板走路，靠近師傅或傳送點按 E</span><button class="btn tip" id="v3tip" hidden></button><button class="btn gfx" id="v3gfx" title="切換畫質"></button>';
  const tip=document.getElementById('v3tip');
  let R;try{R=new THREE.WebGLRenderer({antialias:true});}catch(e){host.className='';host.innerHTML='<p class="lead">這台電腦開不了 3D，請改用 2D 版。</p>';return;}
- // 畫質：2 高、1 中（解析度封頂、陰影每 4 格更新一次）、0 低（解析度再降、關陰影）；太慢會自動往下降
+ // 畫質：2 高、1 中（陰影每 4 格更新一次）、0 低（關陰影）。這裡慢多半是物件多不是像素多，所以不降解析度，字才不會糊；太慢會自動往下降
  let GQ=2;try{const v=localStorage.getItem('ittrain_gfx');GQ=v==='low'?0:v==='mid'?1:2}catch(e){}const GQN=['低','中','高'];let gfxLock=false,sun=null,fN=0,fAcc=0;
- const gfxPR=()=>Math.min(GQ===2?1.5:1,devicePixelRatio||1,[1000,1500,1e9][GQ]/Math.max(1,host.clientWidth||innerWidth));
+ const gfxPR=()=>Math.min(GQ===2?2:1.25,Math.max(1,devicePixelRatio||1));
  R.setPixelRatio(gfxPR());R.shadowMap.enabled=true;
  host.insertBefore(R.domElement,host.firstChild);
  const sc=new THREE.Scene();sc.background=new THREE.Color(0x0e1626);sc.fog=new THREE.Fog(0x0e1626,48,100);
@@ -186,9 +186,9 @@ window.initVillage3D=function(api){
   rr();x.fillStyle=holo?'rgba(10,22,40,.86)':bg;x.fill();if(holo){x.lineWidth=5;x.strokeStyle='#39d6ff';x.stroke();}
   x.fillStyle=holo?'#eaf8ff':fg;x.textAlign='center';x.textBaseline='middle';
   const fit=(t,wt,px)=>{do{x.font=wt+' '+px+'px "PingFang TC","Microsoft JhengHei","Noto Sans TC",sans-serif';px-=2;}while(x.measureText(t).width>476&&px>18);};
-  if(lines.length>1){fit(lines[0],700,64);x.fillText(lines[0],256,62);x.fillStyle=holo?'#7fdcff':fg;fit(lines[1],400,42);x.fillText(lines[1],256,130);}
-  else{x.font='700 60px "PingFang TC","Microsoft JhengHei","Noto Sans TC",sans-serif';x.fillText(lines[0],256,58);}
-  const t=new THREE.CanvasTexture(cv);const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t,depthWrite:false}));sp.scale.set(w,w*cv.height/512,1);return sp;}
+  if(lines.length>1){fit(lines[0],700,72);x.fillText(lines[0],256,60);x.fillStyle=holo?'#a8e8ff':fg;fit(lines[1],500,52);x.fillText(lines[1],256,130);}
+  else{x.font='700 68px "PingFang TC","Microsoft JhengHei","Noto Sans TC",sans-serif';x.fillText(lines[0],256,58);}
+  const t=new THREE.CanvasTexture(cv);t.anisotropy=8;const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t,depthWrite:false}));w*=1.22;sp.scale.set(w,w*cv.height/512,1);return sp;}// 牌子放大兩成，字才看得清楚
  // 地面：深色機房地板、發光的線路
  const anim=[];const B=c=>new THREE.MeshBasicMaterial({color:c});const CY=0x39d6ff;
  const glow=(g,y)=>{const o=new THREE.Mesh(g,B(CY));o.rotation.x=-Math.PI/2;o.position.y=y;sc.add(o);return o;};
@@ -449,7 +449,7 @@ window.initVillage3D=function(api){
    box(.5,.08,.5,0x26313c,0,.48,-.75,sg);box(.5,.55,.08,0x26313c,0,.8,-1,sg);cyl(.05,.05,.46,0x5b6672,0,.24,-.75,sg,8);
    const m=person(rcH,HAIR[(i+k+3)%HAIR.length]);sc.remove(m);m.position.set(0,0,-.15);sg.add(m);
    spr(z,[c.name,c.npc],'#ffffff','#1c2a36',3.6,x,3.05,zz);
-   z.blocks.push([z.ox+x,zz+.75,1.15]);stalls.push({c,x:z.ox+x,z:zz,lx:x,a:0,m,mk:null,adv:true,my:4.05,mw:1.8,zi:2+k,zg:g,fx:z.ox+x,fz:zz+2.2});});
+   z.blocks.push([z.ox+x,zz+.75,1.15]);stalls.push({c,x:z.ox+x,z:zz,lx:x,a:0,m,mk:null,adv:true,my:4.32,mw:1.8,zi:2+k,zg:g,fx:z.ox+x,fz:zz+2.2});});
   pad(z,0,5.6,0xf2c14e,['回傳送大廳'],'回傳送大廳',1);});
  BZ=-1;
  let zone=0;
