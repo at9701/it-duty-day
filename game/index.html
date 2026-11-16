@@ -887,6 +887,9 @@ const TRAITS={none:{name:'普通',desc:'做了幾年，不快不慢。沒有學�
 function hasSkill(a,d){return a.skills&&a.skills.has(d);}
 function skillMult(a,t){let m=1;if(hasSkill(a,domOf(t)))m*=1.3;if(a.trait==='rookie')m*=0.8;if(a.trait==='caffeine'&&a===S.player&&buffMult()<=1)m*=0.95;return m;}
 const SKILL={};
+// 選做法：點一下是「選起來」，再點一次或按確定才算數，點錯可以先改
+function armPick(box,list,bt){const fn=bt.onclick;bt.onclick=()=>{if(bt.disabled)return;if(bt._sel){fn();return;}list.querySelectorAll('button').forEach(x=>{x._sel=false;x.style.outline='';});bt._sel=true;bt.style.outline='3px solid var(--accent)';
+ let ok=box.querySelector('.pickOk');if(!ok){ok=document.createElement('button');ok.className='pickOk primary';ok.style.cssText='margin-top:10px;width:100%';box.appendChild(ok);}ok.textContent='確定這樣做（點錯可以先改選別的）';ok.onclick=()=>{ok.remove();fn();};};}
 function openProc(t){if(t.notReally){t.notReally=false;t.prog=t.dur-2;S.procN++;S.procOk++;toast(['到現場一看：插頭根本沒插。他說「我以為有插」。','到現場：訊號線接在另一台螢幕上。「我剛剛有拔啊」。','到現場：插頭被清潔推車撞得半鬆，插緊就好。'][Math.floor(rnd()*3)]+' 2 分鐘搞定。');S.lessons.push({task:t,q:'電話教他重接，他說弄了還是不行',txt:'相信他弄了',note:'到現場才發現根本沒插。這種事電話裡聽不出來。',best:'叫他邊講邊做：「你現在手有摸到那條線嗎？」',bestNote:'電話教要一步一步問，不要只問「弄了嗎」。',sev:1});beginWork(t);return;}
  const pr=procOf(t);if(!pr){beginWork(t);return;}S.paused=true;const d=document.getElementById('dlg'),b=document.getElementById('dlgBox');d.hidden=false;
  const expert=hasSkill(S.player,pr.dom);let hint=expert;const steps=[];
@@ -897,7 +900,7 @@ function openProc(t){if(t.notReally){t.notReally=false;t.prog=t.dur-2;S.procN++;
    bt.onclick=()=>{S.procN++;{const bo=st.opts.find(x=>x[1]===1)||['','','','',''];(S.decisions=S.decisions||[]).push({tm:S.time,room:locName(t.room),title:t.title,q:st.q.replace(/\{room\}/g,t.room.name),txt,o,note,best:bo[0],bestNote:bo[4]});}let extra=0;if(!S.env.spare&&txt.includes('備機'))extra+=20;if(!S.env.vendor&&txt.includes('廠商')&&o!==1)extra+=30;if(extra){t.prog-=extra;toast((txt.includes('備機')?'沒有備機庫存，先去倉庫找':'沒有維護合約，廠商慢慢來')+'（+'+extra+' 分）');}
    const best=st.opts.find(o=>o[1]===1);addFav(t.room,o===1?2:o===2?-1:-6);if(o===1){S.procOk++;}else{if(o===0)S.procBad++;t.prog-=pen*(S.player.trait==='vet'?0.7:1);applyFlags(f,t,txt);S.lessons.push({task:t,q:st.q.replace(/\{room\}/g,t.room.name),txt,note,best:best?best[0]:'',bestNote:best?best[4]:'',sev:o===0?2:1});}
     const go=()=>{if(o===1&&next&&pr[next]){hint=expert;render(next);}else{d.hidden=true;S.paused=false;beginWork(t);}};
-    showFb(b,h.textContent,{o,txt,note,pen,best:o===1?null:best,more:o===1&&next&&pr[next]},go);};list.appendChild(bt);});
+    showFb(b,h.textContent,{o,txt,note,pen,best:o===1?null:best,more:o===1&&next&&pr[next]},go);};armPick(b,list,bt);list.appendChild(bt);});
   if(S.role==='duty'&&S.shiftKeyUsed==='day'&&!t.bossHint&&pr.dom==='sec'&&!hint){const ab=document.createElement('button');ab.textContent='打給主任請示（+20 分，照他說的做）';ab.onclick=()=>{askBoss(t);hint=true;render(key);};list.appendChild(ab);}
   if(S.player.trait==='rookie'&&!hint){const ask=document.createElement('button');ask.textContent='打給學長問一下（+5 分）';ask.onclick=()=>{t.prog-=5;S.asked++;hint=true;render(key);};list.appendChild(ask);}
   b.appendChild(list);};
@@ -969,7 +972,7 @@ function openGuide(t){const P=S.player;if(P.phone||P.guide||P.transit)return;con
  const list=document.createElement('div');list.className='list';const unit=0.45+guideP(t);const expert=hasSkill(S.player,domOf(t));
  g.opts.forEach(([txt,p0,min,note,f])=>{const pp=Math.min(.95,p0*unit*(expert?1.2:1)*(S.player.trait==='talk'?1.2:1)*(S.player.trait==='rookie'?0.8:1));const bt=document.createElement('button');bt.style.textAlign='left';bt.textContent=txt+'　'+(pp>0?Math.round(pp*100)+'%':'—')+' · '+min+' 分';
   bt.onclick=()=>{if(txt===REBOOT&&!t.saidRebooted&&rnd()<0.4){t.saidRebooted=true;S.time+=1;S.phoneMin+=1;p.textContent='對方：「我早就重開過了啦，還是一樣。」（+1 分）';bt.disabled=true;bt.textContent='你先重開機看看。　— 他重開過了';return;}
-   d.hidden=true;S.paused=false;if(f){applyFlags(f,t,txt);const best=g.opts.reduce((a,b)=>b[1]>a[1]?b:a);S.lessons.push({task:t,q:'電話教：'+g.say,txt,note,best:best[0],bestNote:best[3],sev:2});}if(P.busy)cancelBusy(P);P.path=[];P.steps=[];t.assignee=P;t.guided=true;P.guide={task:t,remain:min,p:pp,note,txt};if(txt===REBOOT)S.reboots++;toast('你：'+txt);};list.appendChild(bt);});
+   d.hidden=true;S.paused=false;if(f){applyFlags(f,t,txt);const best=g.opts.reduce((a,b)=>b[1]>a[1]?b:a);S.lessons.push({task:t,q:'電話教：'+g.say,txt,note,best:best[0],bestNote:best[3],sev:2});}if(P.busy)cancelBusy(P);P.path=[];P.steps=[];t.assignee=P;t.guided=true;P.guide={task:t,remain:min,p:pp,note,txt};if(txt===REBOOT)S.reboots++;toast('你：'+txt);};armPick(b,list,bt);list.appendChild(bt);});
  const c=document.createElement('button');c.textContent='算了，我過去';c.onclick=()=>{openETA(t,()=>goTo(P,siteOf(t)));};list.appendChild(c);b.appendChild(list);}
 // 對方問「要多久？」：你報的時間會被記住
 function etaGuess(t){const st=siteOf(t);const P=S.player;let m=0;if(st.b!==P.b)m+=12;m+=Math.abs(st.f-P.f)*1.5;m+=Math.abs(st.x-P.x)/8;return Math.round(m+2);}
@@ -1380,7 +1383,7 @@ function blMult(){let m=1;S.buffs.forEach(b=>{if(S.time<b.until)m*=b.bl;});retur
 const canWork=(t,a)=>{const r=roomAt(a);return r===t.room||(t.remote&&S.allowRemote&&r===OFFICE);};
 const GUIDE_P={ward:0.5,er:0.35,opd:0.55,reg:0.6,cashier:0.6,lobby:0.6,acct:0.7,hr:0.7,ga:0.7,pr:0.7,edu:0.7,meet:0.5,exec:0.2,vp:0.2};
 const guideP=t=>{if(t.tri||t.src==='sched'||t.src==='alert'||t.kind==='backup')return 0;const id=t.room.base||t.room.id;return GUIDE_P[id]||0;};
-const canGuide=t=>S.allowGuide&&guideP(t)>0&&!t.guided&&!t.assignee;
+const canGuide=t=>S.allowGuide&&guideP(t)>0&&!t.guided&&!t.assignee&&roomAt(S.player)!==t.room;// 人已經在現場就不用電話教了
 const siteOf=t=>(t.remote&&S.allowRemote)?{b:'A',f:2,x:OFFICE.x+3,y:OFFICE.y+1}:{b:t.room.b,f:t.room.f,x:t.sx,y:t.sy};
 function toast(s){const el=document.getElementById('toast');el.textContent=s;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2800);}
 
@@ -1462,7 +1465,7 @@ function pull(h,min,why){if(h.busy)cancelBusy(h);h.path=[];h.steps=[];S.tasks.fo
 
 // ---------- body ----------
 function tickBody(dtMin){const P=S.player;if(P._gowned&&roomAt(P)!==P._gowned)P._gowned=null;
- if(S.wc>0){S.wc-=dtMin;if(S.wc<=0){S.wc=0;S.bladder=0;S.wcCount++;toast('爽');}}else S.bladder=Math.min(130,S.bladder+dtMin*(100/150)*blMult()*(P.trait==='fit'?0.8:1)*(P.trait==='caffeine'?1.3:1));
+ if(S.wc>0){S.wc-=dtMin;if(S.wc<=0){S.wc=0;S.bladder=0;S.wcCount++;toast('爽');}}else S.bladder=Math.min(130,S.bladder+dtMin*(100/200)*blMult()*(P.trait==='fit'?0.8:1)*(P.trait==='caffeine'?1.3:1));
  P.spd=(S.bladder>=100?2.5:5)*(P.trait==='fit'?1.25:1);
  if(S.bladder>=100&&!S._bl){S._bl=true;toast('快憋不住了，走路都夾著');}if(S.bladder<100)S._bl=false;
  if(S.buying>0&&!P.phone){if(moving(P)){S.buying=0;S._buy=null;toast('排一半就走了，白排');}else{S.buying-=dtMin;if(S.buying<=0){S.buying=0;const it=S._buy;S._buy=null;
@@ -1498,7 +1501,7 @@ let last=0;const cv=document.getElementById('c');let cx=cv.getContext('2d');cons
 function fitCanvas(){const dpr=Math.min(3,window.devicePixelRatio||1);const cssW=cv.clientWidth||LW;const k=Math.max(1,cssW*dpr/LW);const w=Math.round(LW*k),h=Math.round(LH*k);if(cv.width!==w||cv.height!==h){cv.width=w;cv.height=h;}SCALE=k;}
 window.addEventListener('resize',fitCanvas);
 function loop(ts){requestAnimationFrame(loop);if(!S||S.over)return;const dt=Math.min(0.05,(ts-last)/1000||0);last=ts;if(S.paused)return;
- const dtMin=dt*0.5*S.speed;S.time+=dtMin;const P=S.player;
+ const dtMin=dt*0.36*S.speed;S.time+=dtMin;const P=S.player;
  if(P.gown>0){P.gown-=dtMin;S.waitMin+=dtMin;if(P.gown<=0){P.gown=0;toast('換好了，進去。');}}
  else if(S.meeting>0){}
  else if(P.guide){tickGuide(dtMin);}
