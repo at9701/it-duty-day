@@ -44,20 +44,26 @@ a='<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.j
 assert out.count(a)==1
 out=out.replace(a,'<script>/* three.js r128 (MIT) 內嵌 */\n'+three+'\n</script>')
 assert 'cdnjs' not in out and 'googleapis' not in out
+# 來訪人數：只在正式站（github.io）計數，同一個瀏覽器一天只算一次；首頁負責顯示
+VIS="<script>/* 來訪人數 */(function(){try{if(!/github\\.io$/.test(location.hostname))return;var d=new Date().toISOString().slice(0,10);if(localStorage.getItem('itduty_visit')===d)return;localStorage.setItem('itduty_visit',d);fetch('https://abacus.jasoncameron.dev/hit/at9701-it-duty-day/visits').catch(function(){});}catch(e){}})();</script>"
+def wr(path,html):
+    i=html.rfind('</body>')  # 只動檔尾那一個；程式字串裡也有 </body>
+    html=html[:i]+VIS+'\n'+html[i:] if i>=0 and len(html)-i<40 else html+'\n'+VIS+'\n'
+    open(path,'w',encoding='utf-8').write(html)
 # 7. 輸出：index.html（首頁）、game/index.html（3D）、2d/index.html（2D）、train/index.html（專業訓練）
 H='<p class="hint">一班大概 15 到 30 分鐘。下面選一選，按「下一步」。</p>'
 assert out.count(H)==1 and src.count(H)==1
 for d in ('game','2d','train'): os.makedirs(os.path.join(ROOT,d),exist_ok=True)
-open(os.path.join(ROOT,'game','index.html'),'w',encoding='utf-8').write(out.replace(H,H[:-4]+'電腦比較舊、跑不動的話，可以改玩 <a href="../2d/" style="color:var(--accent)">2D 版</a>。<a href="../" style="color:var(--accent)">回首頁</a></p>'))
+wr(os.path.join(ROOT,'game','index.html'),out.replace(H,H[:-4]+'電腦比較舊、跑不動的話，可以改玩 <a href="../2d/" style="color:var(--accent)">2D 版</a>。<a href="../" style="color:var(--accent)">回首頁</a></p>'))
 open(os.path.join(ROOT,'index.html'),'w',encoding='utf-8').write(open('landing.html',encoding='utf-8').read())
 tr=open('train.html',encoding='utf-8').read()
 assert tr.count('<!--V3D-->')==1 and tr.count('{{HOME}}')==1 and tr.count('{{ALT}}')==1
 os.makedirs(os.path.join(ROOT,'train','2d'),exist_ok=True)
 # 專業訓練：train/ 是 3D 訓練村（內嵌 three.js），train/2d/ 是 2D 地圖版
 t3=tr.replace('<!--V3D-->','<script>/* three.js r128 (MIT) 內嵌 */\n'+three+'\n</script>\n<script>\n'+open('village3d.js',encoding='utf-8').read()+'</script>').replace('{{HOME}}','../').replace('{{ALT}}','電腦比較舊的話，可以改用 <a href="2d/">2D 地圖版</a>，進度是共用的。')
-open(os.path.join(ROOT,'train','index.html'),'w',encoding='utf-8').write(t3)
-open(os.path.join(ROOT,'train','2d','index.html'),'w',encoding='utf-8').write(tr.replace('<!--V3D-->','').replace('{{HOME}}','../../').replace('{{ALT}}','想在中心裡走動可以用 <a href="../">3D 版</a>，進度是共用的。'))
-open(os.path.join(ROOT,'2d','index.html'),'w',encoding='utf-8').write(open('head2d.html',encoding='utf-8').read()+src.replace(H,H[:-4]+'想看立體的醫院可以玩 <a href="../game/" style="color:var(--accent)">3D 版</a>。<a href="../" style="color:var(--accent)">回首頁</a></p>'))
+wr(os.path.join(ROOT,'train','index.html'),t3)
+wr(os.path.join(ROOT,'train','2d','index.html'),tr.replace('<!--V3D-->','').replace('{{HOME}}','../../').replace('{{ALT}}','想在中心裡走動可以用 <a href="../">3D 版</a>，進度是共用的。'))
+wr(os.path.join(ROOT,'2d','index.html'),open('head2d.html',encoding='utf-8').read()+src.replace(H,H[:-4]+'想看立體的醫院可以玩 <a href="../game/" style="color:var(--accent)">3D 版</a>。<a href="../" style="color:var(--accent)">回首頁</a></p>'))
 if '--train' in sys.argv: open(sys.argv[sys.argv.index('--train')+1],'w',encoding='utf-8').write(t3.replace('<a class="back" href="../">← 回首頁</a>','').replace('電腦比較舊的話，可以改用 <a href="2d/">2D 地圖版</a>，進度是共用的。',''))
 # 選用：--plain 路徑，輸出不含 2D 連結的單檔 3D 版
 if '--plain' in sys.argv: open(sys.argv[sys.argv.index('--plain')+1],'w',encoding='utf-8').write(out)

@@ -58,8 +58,12 @@ a.btn:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
     <div class="row"><a class="btn" href="train/">進職訓中心</a><a class="btn ghost" href="train/2d/">2D 版（舊電腦用）</a><span class="prog" id="prog"></span></div></div>
   </section>
  </div>
+ <p id="visits" hidden style="text-align:center;margin:28px 0 8px;font-size:14px;opacity:.75">來訪人數 <b id="visitN" style="font-variant-numeric:tabular-nums"></b></p>
 </div>
 <script>
+// 來訪人數：只在正式站計數，同一個瀏覽器一天只算一次；計數服務連不上就不顯示
+(function(){try{if(!/github\.io$/.test(location.hostname))return;const d=new Date().toISOString().slice(0,10),seen=localStorage.getItem('itduty_visit')===d;if(!seen)localStorage.setItem('itduty_visit',d);
+ fetch('https://abacus.jasoncameron.dev/'+(seen?'get':'hit')+'/at9701-it-duty-day/visits').then(r=>r.json()).then(j=>{if(typeof j.value!=='number')return;document.getElementById('visitN').textContent=j.value.toLocaleString('zh-TW');document.getElementById('visits').hidden=false;}).catch(()=>{});}catch(e){}})();
 try{const s=JSON.parse(localStorage.getItem('ittrain_v1')||'{}');let n=0;for(const d in s)for(const l in s[d])n+=s[d][l].stars||0;if(n)document.getElementById('prog').innerHTML='你目前有 <b>★ '+n+'</b> 顆星';}catch(e){}
 </script>
 </body>

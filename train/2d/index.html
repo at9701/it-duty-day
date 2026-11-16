@@ -3662,5 +3662,6 @@ if(window.initVillage3D){document.body.classList.add('full');const ls=$('lists')
 if(window.initVillage3D)initVillage3D({courses:COURSES,adv:ADV,locked:c=>lockedBy(c).length>0,talk:openTalk,tier:tierOf,TIER,busy:()=>!talk.hidden||hub.hidden||$('lists').classList.contains('open')});else build2D();
 renderHub();
 </script>
+<script>/* 來訪人數 */(function(){try{if(!/github\.io$/.test(location.hostname))return;var d=new Date().toISOString().slice(0,10);if(localStorage.getItem('itduty_visit')===d)return;localStorage.setItem('itduty_visit',d);fetch('https://abacus.jasoncameron.dev/hit/at9701-it-duty-day/visits').catch(function(){});}catch(e){}})();</script>
 </body>
 </html>
