@@ -1011,9 +1011,8 @@ function tickSfx(now){if(now-_sfxT<400)return;_sfxT=now;const nr=ringing().lengt
  const set=e=>{const r=joy.getBoundingClientRect();let x=(e.clientX-r.left-r.width/2)/(r.width/2),y=(e.clientY-r.top-r.height/2)/(r.height/2);const m=Math.hypot(x,y);if(m>1){x/=m;y/=m;}knob.style.transform='translate('+(x*26)+'px,'+(y*26)+'px)';jv=m<0.25?null:{x,y};};
  joy.addEventListener('pointerdown',e=>{joy.setPointerCapture(e.pointerId);set(e);e.preventDefault();});joy.addEventListener('pointermove',e=>{if(e.buttons||e.pointerType==='touch')set(e);});
  const end=()=>{jv=null;knob.style.transform='';};joy.addEventListener('pointerup',end);joy.addEventListener('pointercancel',end);
- setInterval(()=>{if(!jv||!S||S.over||S.paused)return;const P=S.player;if(moving(P)||P.phone||P.guide||P.transit||S.wc>0)return;
-  const wx=Math.cos(yaw)*jv.x+Math.sin(yaw)*jv.y,wz=-Math.sin(yaw)*jv.x+Math.cos(yaw)*jv.y;const dx=Math.abs(wx)>=Math.abs(wz)?Math.sign(wx):0,dy=dx?0:Math.sign(wz);const nx=P.x+dx,ny=P.y+dy;
-  if(walk(P.key,nx,ny)){if(P.busy)cancelBusy(P);S.view=null;P.steps=[{type:'walk',x:nx,y:ny}];nextStep(P);}},70);}
+ const rot=(x,y)=>{const wx=Math.cos(yaw)*x+Math.sin(yaw)*y,wz=-Math.sin(yaw)*x+Math.cos(yaw)*y;const dx=Math.abs(wx)>=Math.abs(wz)?Math.sign(wx):0;return [dx,dx?0:Math.sign(wz)];};
+ window.joyDir=()=>jv?rot(jv.x,jv.y):null;window.dirXform=m=>rot(m[0],m[1]);}// 方向跟著鏡頭轉；連續走由 stepActor 接手
 // ---------- 新手引導 ----------
 const COACH=[[null,'歡迎來值班','電話和工單會一直進來，撐到下班為止。先花 20 秒看一下怎麼操作。'],
  ['#dkTasks','工單都在這裡','點「工單」看全部的單，按「處理」人就會自己走過去。紅色的是急件。'],

@@ -1287,8 +1287,15 @@ function nextStep(a){a.path=[];while(a.steps.length){const s=a.steps[0];
  if(s.type==='walk'){if(a.x===s.x&&a.y===s.y){a.steps.shift();continue;}const p=bfs(a.key,a.x,a.y,s.x,s.y);if(!p){a.steps.shift();continue;}a.path=p;return;}
  if(s.type==='transit'){a.steps.shift();a.transit={remain:s.dur,label:s.label,to:s.to};return;}}
  onArrive(a);}
-function stepActor(a,dt){if(a.transit)return;const SPD=(a.spd||5)*0.55*S.speed;if(!a.path.length){a.px=a.py=0;return;}const [nx,ny]=a.path[0];const dx=nx-a.x,dy=ny-a.y;a.px+=dx*SPD*dt;a.py+=dy*SPD*dt;
- if(Math.abs(a.px)>=1||Math.abs(a.py)>=1){a.x=nx;a.y=ny;a.px=a.py=0;a.path.shift();if(!a.path.length){a.steps.shift();if(!a.npc)nextStep(a);}}}
+// 按住方向鍵（或搖桿）連續走：不靠鍵盤的自動重複，每走完一格就在同一幀接下一格
+const HELD=[],KDIR={arrowup:[0,-1],arrowdown:[0,1],arrowleft:[-1,0],arrowright:[1,0],w:[0,-1],s:[0,1],a:[-1,0],d:[1,0]};
+function wantDir(){if(window.joyDir){const j=window.joyDir();if(j)return j;}if(!HELD.length)return null;const m=KDIR[HELD[HELD.length-1]];return window.dirXform?window.dirXform(m):m;}
+function keyStep(P){const m=wantDir();if(!m||P.phone||P.guide||P.transit||S.wc>0)return false;const nx=P.x+m[0],ny=P.y+m[1];if(!walk(P.key,nx,ny))return false;if(P.busy)cancelBusy(P);S.view=null;P.steps=[{type:'walk',x:nx,y:ny}];nextStep(P);return P.path.length>0;}
+function stepActor(a,dt){if(a.transit)return;const SPD=(a.spd||5)*0.55*S.speed;if(!a.path.length&&!(a===S.player&&keyStep(a))){a.px=a.py=0;return;}
+ // 走超過一格的零頭帶到下一格，不然每過一格就頓一下
+ let mv=SPD*dt,guard=0;while(mv>0&&a.path.length&&!a.transit&&guard++<8){const [nx,ny]=a.path[0];const dx=nx-a.x,dy=ny-a.y;const need=(dx||dy)?1-Math.max(Math.abs(a.px),Math.abs(a.py)):0;
+  if(mv<need){a.px+=dx*mv;a.py+=dy*mv;break;}
+  mv-=need;a.x=nx;a.y=ny;a.px=a.py=0;a.path.shift();if(!a.path.length){a.steps.shift();if(!a.npc)nextStep(a);if(a===S.player&&!a.path.length&&!a.transit)keyStep(a);}}}
 function tickTransit(a,dtMin){if(!a.transit)return;a.transit.remain-=dtMin;if(a===S.player)S.transitMin+=dtMin;if(a.transit.remain<=0){const to=a.transit.to;a.b=to.b;a.f=to.f;a.key=fkey(to.b,to.f);a.x=to.x;a.y=to.y;a.px=a.py=0;a.transit=null;nextStep(a);}}
 function onArrive(a){if(a===S.player){const rr=roomAt(a);if(rr&&rr.base==='or'&&!a._gowned){a._gowned=rr;a.gown=8;toast('進開刀房要換無菌衣、戴帽子口罩：8 分鐘');}}
  if(a===S.player){if(G(a.key)[a.y][a.x]===7){toast('到廁所了，上面按「上廁所」');}const r=roomAt(a);if(r){const here=visible().filter(t=>canWork(t,a)&&!t.assignee);if(here.length)toast('到 '+locName(r)+' 了，下面按「處理」');}}else helperArrive(a);}
@@ -1670,8 +1677,8 @@ cv.addEventListener('click',e=>{if(!S||S.over)return;const P=S.player;if(P.phone
 const _next=nextStep;nextStep=function(a){while(a.steps.length&&a.steps[0].type==='pick'){const s=a.steps.shift();if(a===S.player)openFloorPick(s.mode);}_next(a);};
 window.addEventListener('keydown',e=>{if(!S||S.over||S.paused)return;
  if(e.key===' '||e.key==='Enter'){const P=S.player;if(P.phone||P.guide||P.transit||S.wc>0)return;const t=visible().filter(t=>canWork(t,P)&&(!t.assignee||t.assignee===P)).sort((a,b)=>(a.kind==='prio'?0:1)-(b.kind==='prio'?0:1))[0];if(t){e.preventDefault();startWork(t,P);}return;}
- const m={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0],w:[0,-1],s:[0,1],a:[-1,0],d:[1,0]}[e.key];if(!m)return;e.preventDefault();
- const P=S.player;if(moving(P)||P.phone||P.guide||S.wc>0)return;const nx=P.x+m[0],ny=P.y+m[1];if(walk(P.key,nx,ny)){if(P.busy)cancelBusy(P);S.view=null;P.steps=[{type:'walk',x:nx,y:ny}];nextStep(P);}});
+ const k=e.key.toLowerCase();if(!KDIR[k]||e.ctrlKey||e.metaKey||e.altKey)return;e.preventDefault();const i=HELD.indexOf(k);if(i>=0)HELD.splice(i,1);HELD.push(k);});
+window.addEventListener('keyup',e=>{const i=HELD.indexOf((e.key||'').toLowerCase());if(i>=0)HELD.splice(i,1);});window.addEventListener('blur',()=>{HELD.length=0;});
 document.querySelectorAll('#spd button').forEach(b=>b.onclick=()=>{if(S)S.speed=+b.dataset.s;document.querySelectorAll('#spd button').forEach(x=>x.classList.toggle('on',x===b));});
 const UNIT_HINT={ward:'護理站：給藥車、WiFi、帳號鎖',icu:'加護病房：中央監視站當機最急',lab:'檢驗科：儀器傳 LIS，先分儀器還是電腦',pharmacy:'藥局：包藥機電腦、藥袋印表機',dialysis:'洗腎室：透析機資料傳輸',rehab:'復健科',nuc:'核醫',endo:'內視鏡室',research:'研究部：會帶奇怪的設備來',qa:'品管中心',sw:'社工室',ic:'感控室',nutrition:'營養科',lib:'圖書館',boardroom:'大會議室：主管都在裡面',office:'你的位子、分機在這',server:'備份、巡檢、告警都在這',canteen:'',ga:'總務：空調、電力、廠商都找他們',meet:'主任開會的地方',pr:'公關室：官網、媒體',edu:'教學部：教室電腦、投影',acct:'會計室：報稅軟體、Excel',hr:'人事室：共享資料夾、新人帳號',exec:'院長室：什麼都最急',vp:'副院長室',er:'急診：檢傷台、掃描槍、病床電腦，等不了',reg:'掛號櫃台：讀卡機',opd:'門診：一排診間，HIS 慢就全層',xray:'X光：工作站＋儀器，要先分清楚',report:'放射報告室：報告工作站、列印',mri:'MRI：影像傳 PACS',ct:'CT',cath:'心導管室：手術中黑掉最急',or:'開刀房',lobby:'大廳：叫號螢幕、咖啡店',cashier:'批價櫃台：印表機',ward2:'護理站：給藥車、WiFi、帳號鎖',ward3:'護理站',ward4:'護理站',ward5:'護理站',seven:'小七：吃的、提神的、乖乖',buffet:'自助餐',bento:'便當店',noodle:'麵店',tea:'手搖飲',cafe:'咖啡店'};
 function openMap(){if(!S)buildWorld(diffKey);const d=document.getElementById('dlg'),b=document.getElementById('dlgBox');const wasPaused=S?S.paused:true;if(S)S.paused=true;d.hidden=false;b.innerHTML='';
