@@ -6,17 +6,19 @@ window.BLK3={};// key -> Set(tile) 家具擋住的格子，walk() 會看
 (function(){
 const canvas=document.getElementById('gl');
 // 畫質：高＝圓潤造型（人物、家具倒角、柔和陰影）；低＝原本的積木造型，給舊電腦用
-let HQ=true;try{HQ=localStorage.getItem('itduty_gfx')!=='low'}catch(e){}
+// GQ：2 高（全解析度、柔和陰影）、1 中（解析度封頂 1600、一般陰影）、0 低（解析度封頂 1100、關陰影、積木造型）
+let GQ=2;try{const v=localStorage.getItem('itduty_gfx');GQ=v==='low'?0:v==='mid'?1:2}catch(e){}let HQ=GQ>0;
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});
-renderer.setPixelRatio(Math.min(1.25,window.devicePixelRatio||1));renderer.shadowMap.enabled=true;renderer.shadowMap.type=HQ?THREE.PCFSoftShadowMap:THREE.PCFShadowMap;renderer.shadowMap.autoUpdate=false;
+const gfxPR=()=>Math.min(GQ===2?1.25:1,window.devicePixelRatio||1,[1100,1600,1e9][GQ]/Math.max(1,innerWidth));
+renderer.setPixelRatio(gfxPR());renderer.shadowMap.enabled=true;renderer.shadowMap.type=GQ===2?THREE.PCFSoftShadowMap:THREE.PCFShadowMap;renderer.shadowMap.autoUpdate=false;
 renderer.outputEncoding=THREE.sRGBEncoding;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=0.92;
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x0b0e14);scene.fog=new THREE.Fog(0x0b0e14,34,60);
 const camera=new THREE.PerspectiveCamera(42,1,0.1,200);
 const hemi=new THREE.HemisphereLight(0xfff3e2,0xb9a58c,0.75);scene.add(hemi);
-const sun=new THREE.DirectionalLight(0xffe6c2,0.95);sun.position.set(14,22,10);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-32;sun.shadow.camera.right=32;sun.shadow.camera.top=24;sun.shadow.camera.bottom=-24;sun.shadow.camera.near=1;sun.shadow.camera.far=60;sun.shadow.bias=-0.0008;scene.add(sun);sun.target.position.set(24,0,9);scene.add(sun.target);
+const sun=new THREE.DirectionalLight(0xffe6c2,0.95);sun.position.set(14,22,10);sun.castShadow=GQ>0;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-32;sun.shadow.camera.right=32;sun.shadow.camera.top=24;sun.shadow.camera.bottom=-24;sun.shadow.camera.near=1;sun.shadow.camera.far=60;sun.shadow.bias=-0.0008;scene.add(sun);sun.target.position.set(24,0,9);scene.add(sun.target);
 const amb=new THREE.AmbientLight(0xffffff,0.25);scene.add(amb);
 const ground=new THREE.Mesh(new THREE.PlaneGeometry(400,400),new THREE.MeshLambertMaterial({color:0x2a3546}));ground.rotation.x=-Math.PI/2;ground.position.set(24,-0.08,9);scene.add(ground);
-function resize(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();extCam.aspect=w/h;extCam.updateProjectionMatrix();}
+function resize(){const w=innerWidth,h=innerHeight;renderer.setPixelRatio(gfxPR());renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();extCam.aspect=w/h;extCam.updateProjectionMatrix();}
 // ---------- 共用素材 ----------
 const geo=new THREE.BoxGeometry(1,1,1);
 const RGEO=(()=>{const g=new THREE.BoxGeometry(1,1,1,2,2,2),P=g.attributes.position,N=g.attributes.normal,r=0.1,v=new THREE.Vector3(),c=new THREE.Vector3();
@@ -866,7 +868,7 @@ window.addEventListener('keydown',e=>{if(!S||S.over||S.paused)return;if(e.key!==
 function hitTask(t){const P=S.player;if(P.phone||P.guide||S.wc>0||P.transit||S.meeting>0)return;if(t.assignee&&t.assignee!==P)return;S.view=null;if(canWork(t,P))startWork(t,P);else goTo(P,siteOf(t));}
 window.hitTask3d=hitTask;
 // ---------- 每幀 ----------
-let lastT=0;const fpsHist=[];let degraded=0;
+let lastT=0;const fpsHist=[];let gfxLock=false;
 function tickActors(key,now){const F=FLOORS[key];const list=[...(F.npcs||[]),...S.helpers,S.player].filter(a=>!(a.away>0||a.transit||a.key!==key));const seen=new Set();
  list.forEach(a=>{const e=actorG(a);seen.add(a);e.g.visible=true;const wx=a.x+a.px+0.5,wz=a.y+a.py+0.5;const walking=a.path.length>0;
   if(walking&&a.path[0]){const dx=a.path[0][0]-a.x,dy=a.path[0][1]-a.y;const tgt=Math.atan2(dx,dy);let d=tgt-e.ang;while(d>Math.PI)d-=Math.PI*2;while(d<-Math.PI)d+=Math.PI*2;e.ang+=d*0.25;}
@@ -922,7 +924,7 @@ function draw3d(){const now=performance.now();if(!S){renderExterior(now);return;
  document.getElementById('transit').hidden=!P.transit||!!S.view;if(P.transit&&!S.view)document.getElementById('transit').textContent=P.transit.label+'\n'+Math.ceil(P.transit.remain)+' 分';
  renderer.render(scene,camera);
  // fps 監看：太慢就降
- const dt=now-lastT;lastT=now;if(dt>0&&dt<500){fpsHist.push(1000/dt);if(fpsHist.length>90){const avg=fpsHist.reduce((a,b)=>a+b)/fpsHist.length;fpsHist.length=0;const fn=document.getElementById('fpsNote');fn.hidden=false;fn.textContent=Math.round(avg)+' fps';if(avg<30&&degraded===0){degraded=1;renderer.setPixelRatio(1);toast('畫面偏慢，已降低解析度');}else if(avg<24&&degraded===1){degraded=2;renderer.shadowMap.enabled=false;toast('已關閉陰影換流暢');}}}}
+ const dt=now-lastT;lastT=now;if(dt>0&&dt<500){fpsHist.push(1000/dt);if(fpsHist.length>(fpsHist[0]<20?30:90)){const avg=fpsHist.reduce((a,b)=>a+b)/fpsHist.length;fpsHist.length=0;const fn=document.getElementById('fpsNote');fn.hidden=false;fn.textContent=Math.round(avg)+' fps';if(avg<27&&GQ>0&&!gfxLock){setGfx(GQ-1);toast('畫面偏慢，畫質自動降為「'+GQN[GQ]+'」');}}}}
 window.draw3d=draw3d;
 // ---------- 開場：院區外觀 ----------
 const extScene=new THREE.Scene();extScene.background=new THREE.Color(0xa9cdea);extScene.fog=new THREE.Fog(0xa9cdea,70,170);
@@ -983,8 +985,12 @@ function goUrgent(){if(!S||S.over||S.paused)return;const P=S.player;if(P.phone||
  const ts=visible().filter(t=>!t.assignee||t.assignee===P).sort((a,b)=>((a.kind==='prio'?0:1)-(b.kind==='prio'?0:1))||((a.t+a.pat)-(b.t+b.pat)));
  if(!ts.length){toast('現在沒有等你處理的工單');return;}const t=ts[0];toast('帶你去：'+locName(t.room)+'・'+t.title);hitTask(t);}
 document.getElementById('dkNext').onclick=goUrgent;
-{const gb=document.getElementById('gfx');const ui=()=>{gb.textContent=HQ?'畫質：高':'畫質：低';};ui();gb.onclick=()=>{HQ=!HQ;try{localStorage.setItem('itduty_gfx',HQ?'high':'low')}catch(e){}ui();renderer.shadowMap.type=HQ?THREE.PCFSoftShadowMap:THREE.PCFShadowMap;scene.traverse(o=>{if(o.material&&o.material.isMaterial)o.material.needsUpdate=true;});
-  for(const [a,e] of AG){scene.remove(e.g);e.g.traverse(o=>{if(o.geometry&&o.geometry!==BLOBGEO)o.geometry.dispose();});}AG.clear();curKey=null;toast(HQ?'畫質：高（圓潤造型）':'畫質：低（積木造型，比較順）');};}
+const GQN=['低','中','高'];
+function setGfx(q){const was=HQ;GQ=q;HQ=GQ>0;try{localStorage.setItem('itduty_gfx',['low','mid','high'][GQ])}catch(e){}document.getElementById('gfx').textContent='畫質：'+GQN[GQ];
+ renderer.shadowMap.type=GQ===2?THREE.PCFSoftShadowMap:THREE.PCFShadowMap;sun.castShadow=GQ>0;scene.traverse(o=>{if(o.material&&o.material.isMaterial)o.material.needsUpdate=true;});renderer.shadowMap.needsUpdate=true;resize();fpsHist.length=0;
+ if(was!==HQ){for(const [a,e] of AG){scene.remove(e.g);e.g.traverse(o=>{if(o.geometry&&o.geometry!==BLOBGEO)o.geometry.dispose();});}AG.clear();curKey=null;}}
+{const gb=document.getElementById('gfx');gb.textContent='畫質：'+GQN[GQ];gb.onclick=()=>{gfxLock=true;setGfx((GQ+2)%3);toast(['畫質：低（解析度降低、關陰影、積木造型，最順）','畫質：中（解析度降低、一般陰影）','畫質：高（全解析度、柔和陰影）'][GQ]);};}
+window.__gfx=()=>({GQ,pr:renderer.getPixelRatio(),calls:renderer.info.render.calls,tris:renderer.info.render.triangles});
 window.addEventListener('keydown',e=>{if(e.key==='f'||e.key==='F'){if(e.target&&/INPUT|TEXTAREA/.test(e.target.tagName))return;goUrgent();}});
 // ---------- 音效（合成音，不用載檔案） ----------
 let AC=null,mute=false;try{mute=localStorage.getItem('itduty_mute')==='1'}catch(e){}

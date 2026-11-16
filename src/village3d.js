@@ -1,15 +1,18 @@
 // 3D 職訓中心：中庭周圍九間主題實習教室，後面是還沒開的進階專科大樓。WASD／方向鍵或點地板走路，靠近師傅或傳送點按 E 說話。
 window.initVillage3D=function(api){
  const host=document.getElementById('stage');host.className='v3d';
- host.innerHTML='<span class="how">WASD／方向鍵或點地板走路，靠近師傅或傳送點按 E</span><button class="btn tip" id="v3tip" hidden></button>';
+ host.innerHTML='<span class="how">WASD／方向鍵或點地板走路，靠近師傅或傳送點按 E</span><button class="btn tip" id="v3tip" hidden></button><button class="btn gfx" id="v3gfx" title="切換畫質"></button>';
  const tip=document.getElementById('v3tip');
  let R;try{R=new THREE.WebGLRenderer({antialias:true});}catch(e){host.className='';host.innerHTML='<p class="lead">這台電腦開不了 3D，請改用 2D 版。</p>';return;}
- R.setPixelRatio(Math.min(devicePixelRatio||1,1.5));R.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;
+ // 畫質：2 高、1 中（解析度封頂、陰影每 4 格更新一次）、0 低（解析度再降、關陰影）；太慢會自動往下降
+ let GQ=2;try{const v=localStorage.getItem('ittrain_gfx');GQ=v==='low'?0:v==='mid'?1:2}catch(e){}const GQN=['低','中','高'];let gfxLock=false,sun=null,fN=0,fAcc=0;
+ const gfxPR=()=>Math.min(GQ===2?1.5:1,devicePixelRatio||1,[1000,1500,1e9][GQ]/Math.max(1,host.clientWidth||innerWidth));
+ R.setPixelRatio(gfxPR());R.shadowMap.enabled=true;
  host.insertBefore(R.domElement,host.firstChild);
  const sc=new THREE.Scene();sc.background=new THREE.Color(0x0e1626);sc.fog=new THREE.Fog(0x0e1626,48,100);
  const cam=new THREE.PerspectiveCamera(36,16/9,.5,200);
  sc.add(new THREE.HemisphereLight(0xcfe6ff,0x1a2740,.78));
- const sun=new THREE.DirectionalLight(0xdfeaff,.6);sun.position.set(14,30,16);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);
+ sun=new THREE.DirectionalLight(0xdfeaff,.6);sun.position.set(14,30,16);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);
  const s=sun.shadow.camera;s.left=-30;s.right=30;s.top=30;s.bottom=-30;s.far=90;sc.add(sun);
  const mats={};const M=c=>mats[c]||(mats[c]=new THREE.MeshLambertMaterial({color:c}));
  const add=(g,m,x,y,z,p)=>{const o=new THREE.Mesh(g,typeof m==='object'?m:M(m));o.position.set(x,y,z);o.castShadow=o.receiveShadow=true;(p||sc).add(o);return o;};
@@ -328,8 +331,14 @@ window.initVillage3D=function(api){
   if(zone===0){const fx=px*.6,fz=pz*.55-5.5;cam.position.set(fx,29,fz+29);cam.lookAt(fx,1,fz);}
   else if(zone===1){const fx=z.ox+px*.4,fz=pz*.4-2;cam.position.set(fx,22,fz+21);cam.lookAt(fx,1,fz);}
   else{const fx=z.ox+px*.5,fz=pz*.5-2;cam.position.set(fx,21,fz+18);cam.lookAt(fx,1.2,fz);}}
- function size(){const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;R.setSize(w,h,false);cam.aspect=w/h;cam.fov=w/h<1.1?52:38;cam.updateProjectionMatrix();}
+ function size(){const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;R.setPixelRatio(gfxPR());R.setSize(w,h,false);cam.aspect=w/h;cam.fov=w/h<1.1?52:38;cam.updateProjectionMatrix();}
  if(window.ResizeObserver)new ResizeObserver(size).observe(host);addEventListener('resize',size);size();
- let last=performance.now();(function loop(now){requestAnimationFrame(loop);const dt=Math.min(.05,(now-last)/1000);last=now;if(!host.clientWidth)return;if(!api.busy())step(dt);R.render(sc,cam);})(last);
+ function setGfx(q){GQ=q;try{localStorage.setItem('ittrain_gfx',['low','mid','high'][GQ])}catch(e){}document.getElementById('v3gfx').textContent='畫質：'+GQN[GQ];
+  R.shadowMap.type=GQ===2?THREE.PCFSoftShadowMap:THREE.PCFShadowMap;R.shadowMap.autoUpdate=GQ===2;sun.castShadow=GQ>0;sc.traverse(o=>{if(o.material&&o.material.isMaterial)o.material.needsUpdate=true;});R.shadowMap.needsUpdate=true;size();fN=0;fAcc=0;}
+ document.getElementById('v3gfx').onclick=()=>{gfxLock=true;setGfx((GQ+2)%3);};
+ setGfx(GQ);
+ let last=performance.now(),fr=0;(function loop(now){requestAnimationFrame(loop);const raw=now-last,dt=Math.min(.05,raw/1000);last=now;if(!host.clientWidth)return;if(!api.busy())step(dt);if(GQ===1&&(++fr&3)===0)R.shadowMap.needsUpdate=true;R.render(sc,cam);
+  if(raw>0&&raw<500&&!document.hidden){fAcc+=raw;if(++fN>=(fAcc/fN>50?30:90)){const avg=1000*fN/fAcc;fN=0;fAcc=0;if(avg<27&&GQ>0&&!gfxLock)setGfx(GQ-1);}}})(last);
+ window.v3dGfx=()=>({GQ,pr:R.getPixelRatio(),calls:R.info.render.calls,tris:R.info.render.triangles});
  window.v3dState=()=>({x:me.position.x,z:me.position.z,zone,zname:Z[zone].name,near:near&&near.c.id,lift:nearL&&nearL.txt,pads:Z[zone].pads.map(p=>[p.x,p.z,p.to])});window.v3dGo=id=>{const s=stalls.find(q=>q.c.id===id),v=new THREE.Vector3(s.x,1,s.z).project(cam),b=R.domElement.getBoundingClientRect();return[b.left+(v.x+1)/2*b.width,b.top+(1-v.y)/2*b.height];};window.v3dRide=to=>ride({to:to===undefined?(zone?0:1):to});
 };
