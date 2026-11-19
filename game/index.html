@@ -1795,6 +1795,8 @@ let genderKey='m',playerLook=null;
 function drawPreview(){const pc=document.getElementById('pv'),c2=pc.getContext('2d');c2.clearRect(0,0,48,48);const saveCx=cx;cx=c2;const fake={x:0.25,y:0.45,px:0,py:0,path:[],g:genderKey,look:playerLook,name:'',color:'#5fd3a6',dir:'d'};try{sprite(fake);}catch(e){}cx=saveCx;}
 document.getElementById('reroll').onclick=()=>{seed=Date.now()&0x7fffffff;const o={};randomLook(o);playerLook=o.look;drawPreview();};document.querySelectorAll('#genderSeg button[data-g]').forEach(b=>b.onclick=()=>{genderKey=b.dataset.g;document.querySelectorAll('#genderSeg button[data-g]').forEach(x=>x.classList.toggle('on',x===b));drawPreview();});
 document.getElementById('reroll').onclick=()=>{seed=Date.now()&0x7fffffff;const o={};randomLook(o);playerLook=o.look;drawPreview();};
+// 一開始就先定好造型：預覽看到什麼，進遊戲就是什麼（以前沒按「換個造型」的話，進遊戲會另外抽一個）
+{const o={};randomLook(o);playerLook=o.look;try{drawPreview();}catch(e){}}
 const pickedSkills=new Set();let traitKey='none';
 (function(){const sg=document.getElementById('skillSeg');for(const k in SKILLS){const b=document.createElement('button');b.textContent=SKILLS[k].name;b.title=SKILLS[k].desc;b.onclick=()=>{if(pickedSkills.has(k))pickedSkills.delete(k);else if(pickedSkills.size<2)pickedSkills.add(k);else return;b.classList.toggle('on',pickedSkills.has(k));document.getElementById('skillHint').textContent=pickedSkills.size?[...pickedSkills].map(x=>SKILLS[x].name+'：'+SKILLS[x].desc).join('　'):'熟的那塊做起來快三成，選做法的時候對的那個會標 ★，電話教人也比較教得會。同事熟什麼是隨機的。';};sg.appendChild(b);}
  const tg=document.getElementById('traitSeg');for(const k in TRAITS){const b=document.createElement('button');b.textContent=TRAITS[k].name;b.classList.toggle('on',k==='none');b.onclick=()=>{traitKey=k;[...tg.children].forEach(x=>x.classList.toggle('on',x===b));document.getElementById('traitHint').textContent=TRAITS[k].desc;};tg.appendChild(b);}})();
@@ -2693,6 +2695,15 @@ function person2(a){const lk=a.look||{shirt:a.color,hair:'#2b2b2b',skin:'#f1d3b3
  const L1=limb(-0.1,0,leg()),L2=limb(0.1,0,leg()),A1=limb(-0.28,0.46,arm()),A2=limb(0.28,0.46,arm());
  g.userData.limbs=[L1,L2,A1,A2];g.position.y=0.3;g.userData.actor=a;return g;}
 function legs(g,sw){const L=g.userData.limbs;if(!L)return;L[0].rotation.x=sw;L[1].rotation.x=-sw;L[2].rotation.x=-sw*0.8;L[3].rotation.x=sw*0.8;}
+
+// 開始畫面的造型預覽改用遊戲裡同一個立體模型，選到什麼進遊戲就是什麼
+{let pvR=null,pvS=null,pvC=null,pvG=null;const pv3=()=>{try{let pc=document.getElementById('pv');if(!pc)return;
+  if(!pvR){const nc=document.createElement('canvas');nc.id='pv';nc.width=nc.height=220;nc.style.cssText='width:110px;height:110px;background:#dfe7ee;border:1px solid var(--line);border-radius:8px';pc.replaceWith(nc);
+   pvR=new THREE.WebGLRenderer({canvas:nc,antialias:true,alpha:true});pvS=new THREE.Scene();pvS.add(new THREE.HemisphereLight(0xffffff,0xb9a58c,1.0));const d=new THREE.DirectionalLight(0xffffff,0.7);d.position.set(2,4,5);pvS.add(d);
+   pvC=new THREE.PerspectiveCamera(30,1,0.1,20);pvC.position.set(1.0,1.2,3.4);pvC.lookAt(0,0.74,0);}
+  if(pvG){pvS.remove(pvG);pvG.traverse(o=>{if(o.geometry&&o.geometry!==BLOBGEO)o.geometry.dispose();});}
+  pvG=person({g:genderKey,look:playerLook,color:'#5fd3a6',name:''});pvS.add(pvG);pvR.render(pvS,pvC);}catch(e){}};
+ try{drawPreview=pv3;pv3();}catch(e){}}
 
 const SITTERS={doctor:1,clerk:1,tech:1,pharm:1,researcher:1,exec:1,nurse:1,it:1,admin:1,staff:1};
 const AG=new Map();// actor -> {g,ang,phase}

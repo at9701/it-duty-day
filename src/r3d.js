@@ -826,6 +826,15 @@ function person2(a){const lk=a.look||{shirt:a.color,hair:'#2b2b2b',skin:'#f1d3b3
  g.userData.limbs=[L1,L2,A1,A2];g.position.y=0.3;g.userData.actor=a;return g;}
 function legs(g,sw){const L=g.userData.limbs;if(!L)return;L[0].rotation.x=sw;L[1].rotation.x=-sw;L[2].rotation.x=-sw*0.8;L[3].rotation.x=sw*0.8;}
 
+// 開始畫面的造型預覽改用遊戲裡同一個立體模型，選到什麼進遊戲就是什麼
+{let pvR=null,pvS=null,pvC=null,pvG=null;const pv3=()=>{try{let pc=document.getElementById('pv');if(!pc)return;
+  if(!pvR){const nc=document.createElement('canvas');nc.id='pv';nc.width=nc.height=220;nc.style.cssText='width:110px;height:110px;background:#dfe7ee;border:1px solid var(--line);border-radius:8px';pc.replaceWith(nc);
+   pvR=new THREE.WebGLRenderer({canvas:nc,antialias:true,alpha:true});pvS=new THREE.Scene();pvS.add(new THREE.HemisphereLight(0xffffff,0xb9a58c,1.0));const d=new THREE.DirectionalLight(0xffffff,0.7);d.position.set(2,4,5);pvS.add(d);
+   pvC=new THREE.PerspectiveCamera(30,1,0.1,20);pvC.position.set(1.0,1.2,3.4);pvC.lookAt(0,0.74,0);}
+  if(pvG){pvS.remove(pvG);pvG.traverse(o=>{if(o.geometry&&o.geometry!==BLOBGEO)o.geometry.dispose();});}
+  pvG=person({g:genderKey,look:playerLook,color:'#5fd3a6',name:''});pvS.add(pvG);pvR.render(pvS,pvC);}catch(e){}};
+ try{drawPreview=pv3;pv3();}catch(e){}}
+
 const SITTERS={doctor:1,clerk:1,tech:1,pharm:1,researcher:1,exec:1,nurse:1,it:1,admin:1,staff:1};
 const AG=new Map();// actor -> {g,ang,phase}
 function actorG(a){let e=AG.get(a);if(!e){if(a.npc&&!a._bs){const r1=Math.random(),r2=Math.random();const pt=a.role==='patient';a._bs=pt&&r1<0.14?[0.7,0.68]:[0.94+r2*0.16,0.93+r1*0.14];if(pt&&a._bs[1]>0.9&&r2<0.3&&a.look)a.look=Object.assign({},a.look,{hair:'#cfd2d6'});}
