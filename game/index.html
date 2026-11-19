@@ -781,8 +781,8 @@ function openWeb(t){S.paused=true;const d=document.getElementById('dlg'),b=docum
  const h=document.createElement('h2');h.textContent='公關室轉來一通民眾電話';b.appendChild(h);const p=document.createElement('p');p.textContent='「你們官網是不是壞了？我要掛號欸，什麼時候會好？」你回：';b.appendChild(p);
  const list=document.createElement('div');list.className='list';
  WEB_ANS.forEach(([txt,bad,note])=>{const bt=document.createElement('button');bt.style.textAlign='left';bt.textContent=(S.player.trait==='talk'&&bad===0?'★ ':'')+txt;bt.onclick=()=>{d.hidden=true;S.paused=false;
-  if(bad===0){toast('對方：「好，那我等一下再試。」');}
-  else{S.patientComplaints+=bad>=2?2:1;S.lessons.push({task:t,q:'民眾問官網什麼時候好',txt,note,best:WEB_ANS[0][0],bestNote:WEB_ANS[0][2],sev:bad>=2?2:1});toast('對方掛電話了。'+note+(bad>=2?' 病患投訴 +2。':' 病患投訴 +1。'));
+  if(bad===0){toast('對方：「好，那我等一下再試。」民眾先安撫了，官網還沒修，這張單還在。');}
+  else{S.patientComplaints+=bad>=2?2:1;S.lessons.push({task:t,q:'民眾問官網什麼時候好',txt,note,best:WEB_ANS[0][0],bestNote:WEB_ANS[0][2],sev:bad>=2?2:1});toast('對方掛電話了。'+note+(bad>=2?' 病患投訴 +2。':' 病患投訴 +1。')+'官網還沒修，這張單還在。');
    if(bad===3){S.complaintsCEO++;trigger('media',{task:t,txt});}}};list.appendChild(bt);});
  b.appendChild(list);}
 // ---- 把太淺的樹補深：每步至少 3 個選項，每棵至少 2 步 ----
@@ -1385,7 +1385,7 @@ const GUIDE_P={ward:0.5,er:0.35,opd:0.55,reg:0.6,cashier:0.6,lobby:0.6,acct:0.7,
 const guideP=t=>{if(t.tri||t.src==='sched'||t.src==='alert'||t.kind==='backup')return 0;const id=t.room.base||t.room.id;return GUIDE_P[id]||0;};
 const canGuide=t=>S.allowGuide&&guideP(t)>0&&!t.guided&&!t.assignee&&roomAt(S.player)!==t.room;// 人已經在現場就不用電話教了
 const siteOf=t=>(t.remote&&S.allowRemote)?{b:'A',f:2,x:OFFICE.x+3,y:OFFICE.y+1}:{b:t.room.b,f:t.room.f,x:t.sx,y:t.sy};
-function toast(s){const el=document.getElementById('toast');el.textContent=s;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2800);}
+function toast(s){const el=document.getElementById('toast');el.textContent=s;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),Math.max(2800,s.length*110));}
 
 // ---------- movement ----------
 function goTo(a,loc){if(a.busy)cancelBusy(a);const here={b:a.b,f:a.f,x:a.x};a.steps=route(here,loc);a.path=[];nextStep(a);}
